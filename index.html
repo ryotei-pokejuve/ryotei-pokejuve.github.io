@@ -469,7 +469,7 @@
   <div id="ad-slot-footer" class="ad-slot"></div>
 
   <footer id="site-footer">
-    © 2026 RYOTEI inc
+    © 2026 RYOTEI. Made with GBA-style spirit.
   </footer>
 </div>
 
@@ -512,7 +512,7 @@
           '</table>' +
           '<p class="flavor">最新の動画はYouTubeでチェック！</p>' +
           (YOUTUBE_FEATURED_VIDEO_ID
-            ? '<div class="yt-embed-wrap"><iframe src="https://www.youtube.com/embed/' + YOUTUBE_FEATURED_VIDEO_ID + '" title="YouTube video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>'
+            ? '<div class="yt-embed-wrap"><iframe src="https://www.youtube.com/embed/' + YOUTUBE_FEATURED_VIDEO_ID + '" title="YouTube video" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>'
             : '') +
           '<a class="contact-btn yt-btn" href="' + YOUTUBE_CHANNEL_URL + '" target="_blank" rel="noopener noreferrer">▶ YouTubeチャンネルを見る</a>'
         );
