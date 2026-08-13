@@ -27,3 +27,11 @@ git push
 ## Google Analytics
 
 `index.html` 末尾の `GA_MEASUREMENT_ID` に測定ID（`G-XXXXXXXXXX`）を入れるだけで有効化。
+
+## YouTube導線
+
+`YOUTUBE_CHANNEL_URL` をチャンネルURLに変更。`YOUTUBE_FEATURED_VIDEO_ID` に動画IDを入れるとトップページに埋め込み表示される。
+
+## 広告（Google AdSense）
+
+AdSense審査通過後、`index.html` 末尾の `ADSENSE_CLIENT`（ca-pub-...）と `ADSENSE_SLOTS`（本文下・フッターの広告スロットID）を入れるだけで有効化。未設定の間は広告枠自体が非表示。
