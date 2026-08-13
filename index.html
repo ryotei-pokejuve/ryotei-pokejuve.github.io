@@ -19,6 +19,9 @@
   7. 配色（テーマ）       → :root と [data-theme="dark"] の CSS変数
   8. YouTube導線          → YOUTUBE_CHANNEL_URL / YOUTUBE_FEATURED_VIDEO_ID 定数
   9. 広告(AdSense)        → 下部 ADSENSE_CLIENT / ADSENSE_SLOTS に審査通過後のIDを入れるだけでOK
+  10. 動画一覧/Shorts/ポケカ動画/おすすめ/実績の自動更新
+      → YOUTUBE_API_KEY / YOUTUBE_CHANNEL_ID / YOUTUBE_PLAYLIST_* 定数
+      → 設定方法はREADME.mdの「YouTube自動更新の設定」参照
   ============================================================
 -->
 
@@ -96,14 +99,23 @@
     position: fixed; inset:0;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap: 40px;
-    background: radial-gradient(ellipse at center, var(--bg-outer-1) 0%, var(--bg-outer-2) 100%);
+    background: var(--bg-outer-2) url('assets/boot-bg.jpg') center 32% / cover no-repeat;
     z-index: 500;
     cursor: pointer;
     user-select:none;
+    overflow: hidden;
+  }
+  #boot-screen::after{
+    content:"";
+    position:absolute; inset:0;
+    background: linear-gradient(to bottom, rgba(0,0,0,.15), rgba(0,0,0,.05) 40%, rgba(0,0,0,.35));
+    z-index: 0;
   }
   #boot-logo{
-    font-family: var(--font-pixel-en);
-    font-size: clamp(20px, 5vw, 42px);
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-pixel-jp);
+    font-size: clamp(26px, 7vw, 48px);
     color:#fff;
     text-shadow: 4px 4px 0 var(--window-border-outer);
     text-align:center;
@@ -113,12 +125,14 @@
   #boot-logo small{
     display:block;
     font-family: var(--font-pixel-jp);
-    font-size: .45em;
+    font-size: .4em;
     color:#ffe083;
     margin-top: 14px;
     letter-spacing: 1px;
   }
   #press-start{
+    position: relative;
+    z-index: 1;
     font-family: var(--font-pixel-en);
     font-size: clamp(14px, 3vw, 20px);
     color:#fff;
@@ -127,11 +141,12 @@
   @keyframes blink{ 0%,50%{opacity:1;} 51%,100%{opacity:0;} }
 
   #boot-loading{
+    position: relative;
+    z-index: 1;
     width: min(260px, 70vw);
     height: 14px;
     border: 3px solid #fff;
     display:none;
-    position:relative;
     box-shadow: 0 0 0 3px var(--window-border-outer);
   }
   #boot-loading > i{
@@ -143,6 +158,7 @@
 
   #copyright-line{
     position:absolute; bottom: 18px;
+    z-index: 1;
     font-family: var(--font-pixel-jp);
     font-size: 11px;
     color:#cfcff0;
@@ -332,6 +348,33 @@
     font-size:10px; padding:2px 6px; margin-right:6px;
   }
 
+  /* ---- 動画一覧(YouTube自動更新) ---- */
+  .video-list{ list-style:none; margin:0; padding:0; }
+  .video-item{ border-bottom: 2px dotted var(--text-sub); }
+  .video-item:last-child{ border-bottom:none; }
+  .video-item a{
+    display:flex; align-items:center; gap:10px;
+    padding: 10px 4px; text-decoration:none; color: var(--text-color);
+  }
+  .video-item a:hover{ background: var(--menu-hover); }
+  .video-thumb{
+    width: 96px; height: 54px; object-fit:cover; flex-shrink:0;
+    border: 2px solid var(--window-border-outer);
+  }
+  .video-info{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .video-title{
+    font-size: 13px; line-height:1.4;
+    overflow:hidden; text-overflow:ellipsis; display:-webkit-box;
+    -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  }
+  .video-date{ font-size: 11px; color: var(--text-sub); }
+  .video-new{
+    display:inline-block; align-self:flex-start;
+    background: var(--accent-2); color:#fff;
+    font-size: 10px; padding: 1px 6px; margin-bottom:2px;
+  }
+  .yt-async{ color: var(--text-sub); font-size: 13px; padding: 8px 0; }
+
   /* ---- お問い合わせ ---- */
   .contact-btn{
     display:inline-block;
@@ -423,8 +466,8 @@
 ============================================================ -->
 <div id="boot-screen" role="button" tabindex="0" aria-label="PRESS START でサイトへ進む">
   <div id="boot-logo">
-    RYOTEI<br>ADVENTURE
-    <small>～ りょていの冒険の書 ～</small>
+    ポケカ引退品
+    <small>りょてい</small>
   </div>
   <div id="press-start">PRESS START</div>
   <div id="boot-loading"><i></i></div>
@@ -448,11 +491,16 @@
     <nav id="menu-window" class="pixel-window" aria-label="メインメニュー">
       <h2>MENU</h2>
       <ul id="menu-list">
-        <li data-page="top">トップ</li>
-        <li data-page="profile">プロフィール</li>
-        <li data-page="history">更新履歴</li>
-        <li data-page="blog">ブログ</li>
-        <li data-page="contact">お問い合わせ</li>
+        <li data-page="top">🏠 トップ</li>
+        <li data-page="videos">📹 動画一覧</li>
+        <li data-page="shorts">💡 Shorts</li>
+        <li data-page="pokeca">🎴 ポケカ動画</li>
+        <li data-page="recommend">🖥️ おすすめ</li>
+        <li data-page="achievements">🏆 実績</li>
+        <li data-page="profile">👤 プロフィール</li>
+        <li data-page="history">📜 更新履歴</li>
+        <li data-page="blog">✏️ ブログ</li>
+        <li data-page="contact">✉️ お問い合わせ</li>
       </ul>
       <div id="menu-footer">
         ↑↓：選択<br>
@@ -469,7 +517,7 @@
   <div id="ad-slot-footer" class="ad-slot"></div>
 
   <footer id="site-footer">
-    ©2026 りょてい inc.
+    © 2026りょてい inc
   </footer>
 </div>
 
@@ -480,12 +528,20 @@
   /* =========================================================
      設定（ここを編集してカスタマイズ）
   ========================================================= */
-  var CONTACT_EMAIL = "oyasirosama580619@yahoo.co.jp";
 
   // YouTubeチャンネルのURLに変更してください
   var YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@ryotei_pokemoncard";
   // 特集したい動画のID（例: youtube.com/watch?v=xxxxxxxxxxx の xxxxxxxxxxx 部分）。空なら埋め込み非表示
-  var YOUTUBE_FEATURED_VIDEO_ID = "bBtw-mjIVx0&t=11s";
+  var YOUTUBE_FEATURED_VIDEO_ID = "u46BlBEv6lk";
+
+  /* ---- YouTube自動更新（動画一覧/Shorts/ポケカ動画/おすすめ/実績で使用） ----
+     設定方法はREADME.md参照。すべて空のままなら「未設定です」と表示されるだけで、
+     エラーにはならない。 */
+  var YOUTUBE_API_KEY = "AIzaSyBW4fDC9AU3Xjdp2b5_j9L5GaR9zFtSipY";           // Google CloudでYouTube Data API v3のAPIキーを取得
+  var YOUTUBE_CHANNEL_ID = "";        // UCから始まるチャンネルID（@ハンドルではない）
+  var YOUTUBE_PLAYLIST_SHORTS = "";   // Shorts用の再生リストID
+  var YOUTUBE_PLAYLIST_POKECA = "";   // ポケカ動画用の再生リストID
+  var YOUTUBE_PLAYLIST_RECOMMEND = "";// おすすめ動画用の再生リストID
 
   var SNS_LINKS = [
     { label: "X (Twitter)", href: "https://x.com/", icon: "✕" },
@@ -493,6 +549,93 @@
     { label: "YouTube",     href: YOUTUBE_CHANNEL_URL, icon: "▶" },
     { label: "GitHub",      href: "https://github.com/", icon: "🐙" }
   ];
+
+  /* =========================================================
+     YouTube自動更新まわりのヘルパー
+  ========================================================= */
+  var ytChannelInfoPromise = null;
+
+  function ytChannelInfo(){
+    if(!YOUTUBE_API_KEY || !YOUTUBE_CHANNEL_ID) return Promise.resolve(null);
+    if(!ytChannelInfoPromise){
+      var url = "https://www.googleapis.com/youtube/v3/channels?part=contentDetails,statistics&id=" +
+        encodeURIComponent(YOUTUBE_CHANNEL_ID) + "&key=" + encodeURIComponent(YOUTUBE_API_KEY);
+      ytChannelInfoPromise = fetch(url).then(function(r){ return r.json(); }).then(function(data){
+        var item = data && data.items && data.items[0];
+        if(!item) return null;
+        return {
+          uploadsPlaylistId: item.contentDetails.relatedPlaylists.uploads,
+          subscriberCount: item.statistics.subscriberCount,
+          videoCount: item.statistics.videoCount,
+          viewCount: item.statistics.viewCount
+        };
+      }).catch(function(){ return null; });
+    }
+    return ytChannelInfoPromise;
+  }
+
+  function ytPlaylistVideos(playlistId, maxResults){
+    if(!YOUTUBE_API_KEY || !playlistId) return Promise.resolve([]);
+    var url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=" +
+      encodeURIComponent(playlistId) + "&maxResults=" + (maxResults || 12) +
+      "&key=" + encodeURIComponent(YOUTUBE_API_KEY);
+    return fetch(url).then(function(r){ return r.json(); }).then(function(data){
+      return (data.items || []).map(function(it){
+        var sn = it.snippet || {};
+        var thumb = sn.thumbnails && (sn.thumbnails.medium || sn.thumbnails.default);
+        return {
+          videoId: sn.resourceId && sn.resourceId.videoId,
+          title: sn.title,
+          publishedAt: sn.publishedAt,
+          thumbnail: thumb && thumb.url
+        };
+      }).filter(function(v){ return v.videoId; });
+    }).catch(function(){ return []; });
+  }
+
+  function ytIsNew(dateStr){
+    var d = new Date(dateStr).getTime();
+    return !isNaN(d) && (Date.now() - d) < 1000 * 60 * 60 * 24 * 7; // 7日以内
+  }
+
+  function ytVideoListHTML(videos){
+    if(!YOUTUBE_API_KEY){
+      return '<p class="flavor">YouTube APIが未設定です。設定すると動画一覧が自動で表示されます（README.md参照）。</p>';
+    }
+    if(!videos.length){
+      return '<p class="flavor">動画がまだ見つかりませんでした。再生リストIDを確認してください。</p>';
+    }
+    return '<ul class="video-list">' + videos.map(function(v){
+      return (
+        '<li class="video-item">' +
+          '<a href="https://www.youtube.com/watch?v=' + v.videoId + '" target="_blank" rel="noopener noreferrer">' +
+            (v.thumbnail ? '<img class="video-thumb" src="' + v.thumbnail + '" alt="" loading="lazy">' : '') +
+            '<span class="video-info">' +
+              (ytIsNew(v.publishedAt) ? '<span class="video-new">NEW</span>' : '') +
+              '<span class="video-title">' + v.title + '</span>' +
+              '<span class="video-date">' + new Date(v.publishedAt).toLocaleDateString('ja-JP') + '</span>' +
+            '</span>' +
+          '</a>' +
+        '</li>'
+      );
+    }).join('') + '</ul>';
+  }
+
+  function ytMountVideoPage(getPlaylistId){
+    var container = document.querySelector('#page-content .yt-async');
+    if(!container) return;
+    Promise.resolve(getPlaylistId()).then(function(playlistId){
+      if(!playlistId){
+        container.innerHTML = YOUTUBE_API_KEY
+          ? '<p class="flavor">再生リストIDが未設定です。</p>'
+          : '<p class="flavor">YouTube APIが未設定です。設定すると自動で表示されます（README.md参照）。</p>';
+        return;
+      }
+      return ytPlaylistVideos(playlistId).then(function(videos){
+        container.innerHTML = ytVideoListHTML(videos);
+      });
+    });
+  }
 
   /* =========================================================
      ページ内容テンプレート
@@ -584,10 +727,77 @@
           }).join('') + '</footer>'
         );
       }
+    },
+    videos: {
+      title: "VIDEOS",
+      html: function(){
+        return '<p class="flavor">📹 投稿動画の一覧（新着順）</p><div class="yt-async">よみこみちゅう……</div>';
+      },
+      onMount: function(){
+        ytMountVideoPage(function(){
+          return ytChannelInfo().then(function(info){ return info && info.uploadsPlaylistId; });
+        });
+      }
+    },
+    shorts: {
+      title: "SHORTS",
+      html: function(){
+        return '<p class="flavor">💡 Shorts一覧</p><div class="yt-async">よみこみちゅう……</div>';
+      },
+      onMount: function(){
+        ytMountVideoPage(function(){ return YOUTUBE_PLAYLIST_SHORTS; });
+      }
+    },
+    pokeca: {
+      title: "CARD VIDEOS",
+      html: function(){
+        return '<p class="flavor">🎴 ポケカ関連動画</p><div class="yt-async">よみこみちゅう……</div>';
+      },
+      onMount: function(){
+        ytMountVideoPage(function(){ return YOUTUBE_PLAYLIST_POKECA; });
+      }
+    },
+    recommend: {
+      title: "RECOMMEND",
+      html: function(){
+        return '<p class="flavor">🖥️ おすすめ動画</p><div class="yt-async">よみこみちゅう……</div>';
+      },
+      onMount: function(){
+        ytMountVideoPage(function(){ return YOUTUBE_PLAYLIST_RECOMMEND; });
+      }
+    },
+    achievements: {
+      title: "ACHIEVEMENTS",
+      html: function(){
+        return (
+          '<p class="flavor">🏆 チャンネル実績</p>' +
+          '<div class="yt-async">よみこみちゅう……</div>' +
+          '<p class="flavor" style="margin-top:16px;">記念すべき実績</p>' +
+          '<ul class="log-list">' +
+            '<li class="log-item"><span class="log-ver">🏆</span><span class="log-date">［日付］</span><span>［達成した実績を入力（例: 登録者1000人突破）］</span></li>' +
+          '</ul>'
+        );
+      },
+      onMount: function(){
+        var container = document.querySelector('#page-content .yt-async');
+        if(!container) return;
+        ytChannelInfo().then(function(info){
+          if(!info){
+            container.innerHTML = '<p class="flavor">YouTube APIが未設定です。設定すると登録者数などが自動表示されます（README.md参照）。</p>';
+            return;
+          }
+          container.innerHTML =
+            '<table class="stat-table">' +
+              '<tr><td>登録者数</td><td>' + Number(info.subscriberCount).toLocaleString() + '人</td></tr>' +
+              '<tr><td>総動画数</td><td>' + Number(info.videoCount).toLocaleString() + '本</td></tr>' +
+              '<tr><td>総再生数</td><td>' + Number(info.viewCount).toLocaleString() + '回</td></tr>' +
+            '</table>';
+        });
+      }
     }
   };
 
-  var PAGE_ORDER = ["top","profile","history","blog","contact"];
+  var PAGE_ORDER = ["top","videos","shorts","pokeca","recommend","achievements","profile","history","blog","contact"];
 
   /* =========================================================
      効果音（WebAudio, 外部ファイル不要で軽量）
@@ -660,6 +870,7 @@
         '<h2 class="page-title">' + page.title + '</h2>' +
         '<div class="page-content">' + page.html() + '</div>';
       pageContentEl.classList.remove("leaving");
+      if(typeof page.onMount === "function"){ page.onMount(); }
     }
 
     if(skipAnim){
