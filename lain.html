@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>the Wired - ryotei</title>
+<meta name="description" content="りょていのホームページ（Lainモード）。中身はGBA版と共通、UIだけ別世界（レトロサイバーパンクHUD風）。">
+<meta name="google-adsense-account" content="ca-pub-3405662051867998">
+
+<!--
+  ============================================================
+  このファイルについて
+  ------------------------------------------------------------
+  index.html（GBA風トップ）とは見た目だけが完全に別のUI。
+  1990年代後半のPlayStationゲームやゲーム機のホーム画面の「雰囲気」だけを
+  参考にしたオリジナルのレトロサイバーパンクHUDデザイン（特定作品の画像や
+  デザインの模写ではありません）。
+  ページの中身（プロフィール・動画一覧など）は content.js を共通で
+  読み込んでいるので、内容を編集したいときは content.js の方を編集する。
+  このファイル自体は「表示のしかた」しか担当していない。
+  ============================================================
+-->
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23000'/%3E%3Ccircle cx='8' cy='8' r='5' fill='none' stroke='%2300e5ff' stroke-width='1'/%3E%3Ccircle cx='8' cy='8' r='1.4' fill='%2300e5ff'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --void-0: #030408;
+    --void-1: #070a14;
+    --panel-bg: rgba(10,16,30,.55);
+    --panel-border: rgba(120,180,255,.32);
+    --line: #131c2c;
+    --blue: #5b8bff;
+    --cyan: #6fe3ff;
+    --purple: #b06bff;
+    --text: #e6f0ff;
+    --text-sub: #7488a8;
+    --glow-blue: rgba(91,139,255,.5);
+    --glow-cyan: rgba(111,227,255,.55);
+    --glow-purple: rgba(176,107,255,.5);
+    --font-pixel: 'Press Start 2P', monospace;
+    --font-mono: 'Share Tech Mono', 'DotGothic16', monospace;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; height:100%; }
+  body{
+    background: var(--void-0);
+    color: var(--text);
+    font-family: var(--font-mono);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+  a{ color: var(--cyan); }
+  button{ font-family: inherit; cursor:pointer; }
+
+  /* =========================================================
+     背景：ネオンの配線トレイル + CRT走査線 + ビネット
+  ========================================================= */
+  body::before{
+    content:"";
+    position: fixed; inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:
+      repeating-linear-gradient(112deg, rgba(111,227,255,.07) 0 1px, transparent 1px 72px),
+      repeating-linear-gradient(64deg, rgba(91,139,255,.06) 0 1px, transparent 1px 96px),
+      repeating-linear-gradient(18deg, rgba(176,107,255,.05) 0 1px, transparent 1px 128px),
+      radial-gradient(ellipse at 50% -10%, rgba(91,139,255,.16), transparent 55%),
+      radial-gradient(ellipse at 50% 110%, rgba(176,107,255,.10), transparent 55%),
+      linear-gradient(180deg, var(--void-1), var(--void-0) 65%);
+  }
+  /* CRT走査線 */
+  body::after{
+    content:"";
+    position: fixed; inset:0;
+    z-index: 900;
+    pointer-events:none;
+    background: repeating-linear-gradient(to bottom, rgba(150,210,255,.045) 0 1px, transparent 1px 3px);
+    mix-blend-mode: screen;
+  }
+  /* CRTのビネット（画面端が少し暗くなる質感） */
+  #crt-vignette{
+    position: fixed; inset:0;
+    z-index: 901;
+    pointer-events:none;
+    background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0,0,0,.55) 100%);
+  }
+  /* サイバー風パースグリッド（画面下部の光る床） */
+  #cyber-grid{
+    position: fixed; left:0; right:0; bottom:0; height: 38vh;
+    z-index: 0;
+    pointer-events:none;
+    background-image:
+      repeating-linear-gradient(to right, rgba(111,227,255,.4) 0 1px, transparent 1px 42px),
+      repeating-linear-gradient(to bottom, rgba(111,227,255,.3) 0 1px, transparent 1px 42px);
+    background-size: 42px 42px;
+    transform: perspective(280px) rotateX(62deg);
+    transform-origin: bottom;
+    -webkit-mask-image: linear-gradient(to top, black 10%, transparent 92%);
+    mask-image: linear-gradient(to top, black 10%, transparent 92%);
+    opacity:.4;
+  }
+  /* ふわふわ漂う光の粒子 */
+  #particles{ position: fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  #particles span{
+    position:absolute; bottom:-10px;
+    width:3px; height:3px; border-radius:50%;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan), 0 0 12px var(--glow-cyan);
+    opacity:0;
+    animation: particleDrift linear infinite;
+  }
+  #particles span:nth-child(odd){ background: var(--purple); box-shadow: 0 0 6px var(--purple), 0 0 12px var(--glow-purple); }
+  @keyframes particleDrift{
+    0%{ transform: translateY(0) translateX(0); opacity:0; }
+    8%{ opacity:.9; }
+    92%{ opacity:.5; }
+    100%{ transform: translateY(-100vh) translateX(var(--drift, 20px)); opacity:0; }
+  }
+
+  /* UI全体のふわふわ浮遊アニメーション */
+  @keyframes floatSoft{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-7px); } }
+  @keyframes floatSoftSmall{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-3px); } }
+  @keyframes floatTilt{ 0%,100%{ transform: translateY(0) rotate(0deg); } 50%{ transform: translateY(-6px) rotate(2deg); } }
+
+  /* ときどき画面を横切る走査グリッチライン */
+  #scan-sweep{
+    position: fixed; left:0; right:0; height: 46px; top: -20%;
+    z-index: 902;
+    pointer-events:none;
+    background: linear-gradient(to bottom, transparent, rgba(111,227,255,.15), rgba(176,107,255,.1), transparent);
+    mix-blend-mode: screen;
+    animation: scanSweep 9s ease-in-out infinite;
+  }
+  @keyframes scanSweep{
+    0%{ top: -10%; opacity:0; }
+    4%{ opacity:.8; }
+    10%{ opacity:0; }
+    100%{ top: 115%; opacity:0; }
+  }
+
+  /* =========================================================
+     グリッチテキスト（ブランド名等に使用。控えめに一瞬だけ発生）
+  ========================================================= */
+  .glitch-text{ position:relative; display:inline-block; }
+  .glitch-text::before,
+  .glitch-text::after{
+    content: attr(data-text);
+    position:absolute; left:0; top:0;
+    width:100%; overflow:hidden;
+    opacity:0;
+  }
+  .glitch-text::before{ color: var(--cyan); animation: glitchTop 7s ease-in-out infinite; }
+  .glitch-text::after{ color: var(--purple); animation: glitchBottom 7s ease-in-out infinite; }
+  @keyframes glitchTop{
+    0%,96%{ opacity:0; transform: translate(0,0); clip-path: inset(0 0 0 0); }
+    97%{ opacity:.8; transform: translate(-2px,-1px); clip-path: inset(0 0 60% 0); }
+    98%{ opacity:.8; transform: translate(2px,1px); clip-path: inset(40% 0 0 0); }
+    99%{ opacity:0; }
+    100%{ opacity:0; }
+  }
+  @keyframes glitchBottom{
+    0%,95.5%{ opacity:0; transform: translate(0,0); clip-path: inset(0 0 0 0); }
+    96.5%{ opacity:.7; transform: translate(2px,1px); clip-path: inset(55% 0 0 0); }
+    97.5%{ opacity:.7; transform: translate(-2px,-1px); clip-path: inset(0 0 45% 0); }
+    98.5%{ opacity:0; }
+    100%{ opacity:0; }
+  }
+
+  /* =========================================================
+     ワープ演出（indexと共通の見た目）
+  ========================================================= */
+  #warp-overlay{
+    position: fixed; inset:0;
+    z-index: 2000;
+    pointer-events:none;
+    background:#000;
+    clip-path: circle(150% at 50% 50%);
+    opacity:1;
+  }
+  #warp-overlay::before{
+    content:"";
+    position:absolute; inset:0;
+    background: repeating-linear-gradient(0deg, rgba(111,227,255,.5) 0 2px, transparent 2px 5px);
+    mix-blend-mode: screen;
+    opacity:.6;
+  }
+  #warp-overlay.warp-in{ animation: warpIn .6s cubic-bezier(.7,0,.3,1) forwards; }
+  #warp-overlay.warp-out{ animation: warpOut .6s cubic-bezier(.7,0,.3,1) forwards; }
+  @keyframes warpIn{
+    0%{ clip-path: circle(150% at 50% 50%); opacity:1; }
+    100%{ clip-path: circle(0% at 50% 50%); opacity:0; }
+  }
+  @keyframes warpOut{
+    0%{ clip-path: circle(0% at 50% 50%); opacity:0; }
+    12%{ opacity:1; }
+    100%{ clip-path: circle(150% at 50% 50%); opacity:1; }
+  }
+
+  /* =========================================================
+     ステータスストリップ（画面上部のHUD情報バー）
+  ========================================================= */
+  #status-strip{
+    position:relative; z-index:2;
+    display:flex; align-items:center; justify-content:space-between;
+    gap: 10px;
+    padding: 10px 16px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--text-sub);
+    border-bottom: 1px solid var(--line);
+  }
+  #status-strip b{ color: var(--cyan); font-weight:normal; }
+  .status-right{ display:flex; align-items:center; gap:10px; }
+  .sig-bars{ display:inline-flex; align-items:flex-end; gap:2px; height:10px; }
+  .sig-bars i{
+    display:block; width:3px; background: var(--cyan);
+    box-shadow: 0 0 4px var(--cyan);
+    opacity:.85;
+  }
+  .sig-bars i:nth-child(1){ height:3px; }
+  .sig-bars i:nth-child(2){ height:5px; }
+  .sig-bars i:nth-child(3){ height:7px; }
+  .sig-bars i:nth-child(4){ height:10px; }
+  .batt-icon{
+    width:18px; height:9px;
+    border: 1px solid var(--cyan);
+    border-radius:2px;
+    position:relative;
+    box-shadow: 0 0 4px rgba(111,227,255,.4);
+  }
+  .batt-icon::before{
+    content:""; position:absolute; right:-3px; top:2px;
+    width:2px; height:3px; background: var(--cyan);
+  }
+  .batt-icon::after{
+    content:""; position:absolute; left:1px; top:1px; bottom:1px;
+    width:70%; background: var(--cyan);
+    box-shadow: 0 0 4px var(--cyan);
+  }
+  #status-clock{ color: var(--text); letter-spacing:2px; }
+
+  /* =========================================================
+     ヘッダー操作ボタン（丸ピル・半透明ガラス）
+  ========================================================= */
+  #wired-header{
+    position:relative; z-index:2;
+    display:flex; align-items:center; justify-content:flex-end;
+    gap: 10px;
+    padding: 12px 16px 0;
+  }
+  .wired-btn{
+    background: rgba(10,16,30,.55);
+    backdrop-filter: blur(3px);
+    border: 1px solid var(--panel-border);
+    border-radius: 999px;
+    color: var(--cyan);
+    padding: 7px 16px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    box-shadow: 0 0 10px rgba(111,227,255,.15);
+  }
+  .wired-btn:hover{ background: rgba(111,227,255,.1); }
+  .wired-btn:active{ transform: translateY(1px); }
+  #return-btn{ border-color: rgba(176,107,255,.4); color: var(--purple); }
+  #return-btn:hover{ background: rgba(176,107,255,.1); }
+
+  /* =========================================================
+     中央エンブレム（軌道リング + ブランド）
+  ========================================================= */
+  #lain-hud{
+    position: relative; z-index:1;
+    display:flex; flex-direction:column; align-items:center;
+    padding: 22px 0 6px;
+    pointer-events:none;
+  }
+  .orbit-emblem{ position: relative; width: 150px; height: 64px; margin-bottom: 6px; animation: floatSoft 5.5s ease-in-out infinite; }
+  .orbit-ring{ position:absolute; inset:0; border: 1px solid rgba(150,200,255,.4); border-radius: 50%; }
+  .orbit-ring.ring-b{ inset: 10px 22px; border-color: rgba(176,107,255,.4); animation: ringSpin 24s linear infinite; }
+  .orbit-ring.ring-a{ animation: ringSpin 38s linear infinite reverse; }
+  @keyframes ringSpin{ from{ transform: rotate(0deg); } to{ transform: rotate(360deg); } }
+  .orbit-dot{ position:absolute; top:-3px; left:50%; width:5px; height:5px; margin-left:-2.5px; border-radius:50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+  .orbit-ring.ring-b .orbit-dot{ background: var(--purple); box-shadow: 0 0 8px var(--purple); }
+  .orbit-core{
+    position:absolute; top:50%; left:50%; width:8px; height:8px; margin:-4px 0 0 -4px;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #fff, var(--cyan) 55%, transparent 75%);
+    box-shadow: 0 0 12px var(--glow-cyan);
+    animation: corePulse 2.6s ease-in-out infinite;
+  }
+  @keyframes corePulse{ 0%,100%{ opacity:.7; transform: translate(-50%,-50%) scale(1); } 50%{ opacity:1; transform: translate(-50%,-50%) scale(1.3); } }
+  #hud-brand{
+    text-align:center; font-family: var(--font-pixel);
+    font-size: 11px; letter-spacing: 3px; color: var(--cyan);
+    text-shadow: 0 0 6px var(--glow-cyan), 0 0 16px var(--glow-cyan);
+    animation: floatSoftSmall 4.6s ease-in-out infinite .4s;
+  }
+  #hud-brand small{
+    display:block; margin-top:8px; font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: 1.5px; color: var(--text-sub);
+  }
+
+  /* =========================================================
+     アイコングリッド（ホーム画面風メニュー）
+  ========================================================= */
+  #icon-grid-wrap{ position:relative; z-index:1; padding: 6px 16px 4px; }
+  .menu-label{
+    max-width: 760px; margin: 0 auto 12px;
+    font-size: 9px; letter-spacing: 3px; color: var(--text-sub); text-align:center;
+  }
+  #icon-grid{
+    list-style:none; margin:0 auto; padding:0;
+    max-width: 760px;
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    gap: 18px 8px;
+  }
+  .icon-tile{
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .icon-orb-wrap{
+    display:inline-block;
+    animation: floatTilt 4.2s ease-in-out infinite;
+  }
+  /* 各アイコンが少しずつ違うタイミングで漂うようにずらす */
+  .icon-tile:nth-child(1) .icon-orb-wrap{ animation-delay: 0s;    animation-duration: 4.0s; }
+  .icon-tile:nth-child(2) .icon-orb-wrap{ animation-delay: .3s;   animation-duration: 4.6s; }
+  .icon-tile:nth-child(3) .icon-orb-wrap{ animation-delay: .6s;   animation-duration: 3.8s; }
+  .icon-tile:nth-child(4) .icon-orb-wrap{ animation-delay: .9s;   animation-duration: 4.4s; }
+  .icon-tile:nth-child(5) .icon-orb-wrap{ animation-delay: .2s;   animation-duration: 5.0s; }
+  .icon-tile:nth-child(6) .icon-orb-wrap{ animation-delay: .5s;   animation-duration: 4.2s; }
+  .icon-tile:nth-child(7) .icon-orb-wrap{ animation-delay: .8s;   animation-duration: 3.9s; }
+  .icon-tile:nth-child(8) .icon-orb-wrap{ animation-delay: .1s;   animation-duration: 4.8s; }
+  .icon-tile:nth-child(9) .icon-orb-wrap{ animation-delay: .4s;   animation-duration: 4.3s; }
+  .icon-tile:nth-child(10) .icon-orb-wrap{ animation-delay: .7s;  animation-duration: 4.1s; }
+  .icon-orb{
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 24px;
+    background:
+      radial-gradient(circle at 32% 26%, rgba(255,255,255,.85), rgba(150,200,255,.18) 42%, rgba(10,16,30,.9) 78%);
+    box-shadow:
+      0 0 0 1px rgba(150,200,255,.35) inset,
+      0 0 14px rgba(91,139,255,.28),
+      0 5px 10px rgba(0,0,0,.5);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .icon-tile:hover .icon-orb{
+    transform: scale(1.08);
+    box-shadow:
+      0 0 0 1px var(--cyan) inset,
+      0 0 22px var(--glow-cyan),
+      0 7px 14px rgba(0,0,0,.55);
+  }
+  .icon-tile.active .icon-orb{
+    transform: scale(1.08);
+    box-shadow:
+      0 0 0 2px var(--cyan) inset,
+      0 0 26px var(--glow-cyan),
+      0 7px 14px rgba(0,0,0,.55);
+  }
+  .icon-label{
+    font-size: 9.5px; letter-spacing: .5px; text-align:center;
+    color: var(--text-sub); line-height:1.4;
+    max-width: 80px;
+  }
+  .icon-tile:hover .icon-label,
+  .icon-tile.active .icon-label{ color: var(--cyan); text-shadow: 0 0 6px var(--glow-cyan); }
+
+  #wired-footnote{
+    max-width: 760px; margin: 14px auto 0; padding-top: 10px;
+    border-top: 1px solid var(--line);
+    font-size: 10px; color: var(--text-sub); text-align:center; opacity:.7;
+  }
+
+  /* =========================================================
+     コンテンツパネル（半透明ガラスパネル + HUDコーナー）
+  ========================================================= */
+  #wired-content-wrap{
+    position:relative; z-index:1;
+    max-width: 760px; margin: 22px auto 0; padding: 26px 26px 34px;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    backdrop-filter: blur(6px);
+    animation: floatSoftSmall 6.5s ease-in-out infinite .2s, panelGlow 4s ease-in-out infinite;
+  }
+  @keyframes panelGlow{
+    0%,100%{ box-shadow: 0 0 24px rgba(91,139,255,.10), inset 0 0 36px rgba(91,139,255,.04); }
+    50%{ box-shadow: 0 0 38px rgba(111,227,255,.22), inset 0 0 46px rgba(111,227,255,.08); }
+  }
+  .hud-corner{ position:absolute; width:16px; height:16px; pointer-events:none; }
+  .hud-corner::before,
+  .hud-corner::after{ content:""; position:absolute; background: var(--cyan); box-shadow: 0 0 6px var(--glow-cyan); }
+  .hud-corner::before{ width:100%; height:2px; }
+  .hud-corner::after{ width:2px; height:100%; }
+  .hud-corner.tl{ top:-1px; left:-1px; }
+  .hud-corner.tr{ top:-1px; right:-1px; }
+  .hud-corner.tr::before{ right:0; }
+  .hud-corner.tr::after{ right:0; }
+  .hud-corner.bl{ bottom:-1px; left:-1px; }
+  .hud-corner.bl::before{ bottom:0; }
+  .hud-corner.bl::after{ bottom:0; }
+  .hud-corner.br{ bottom:-1px; right:-1px; }
+  .hud-corner.br::before{ bottom:0; right:0; }
+  .hud-corner.br::after{ bottom:0; right:0; }
+
+  #wired-page-content{ position:relative; }
+  #wired-page-content.warp-fade{ animation: contentFlicker .28s ease; }
+  @keyframes contentFlicker{
+    0%{ opacity:0; filter: blur(2px); }
+    40%{ opacity:.4; }
+    100%{ opacity:1; filter: blur(0); }
+  }
+
+  /* ページタイトル：ネオンの縁取りチップ */
+  .page-title{
+    position: relative;
+    display:inline-flex; align-items:center; gap:10px;
+    margin: 0 0 22px;
+    padding: 8px 18px;
+    font-family: var(--font-pixel);
+    font-size: 11px; letter-spacing: 2px;
+    color: var(--cyan);
+    background: rgba(111,227,255,.06);
+    border: 1px solid rgba(111,227,255,.4);
+    box-shadow: 0 0 16px rgba(111,227,255,.2), inset 0 0 10px rgba(111,227,255,.08);
+  }
+  .page-title::before{
+    content:"";
+    width:7px; height:7px; border-radius:50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+    flex-shrink:0;
+  }
+  .page-content p{ line-height:1.9; font-size:14px; color: var(--text); }
+  .flavor{
+    color: var(--text-sub);
+    font-size: 12px;
+    border-left: 2px solid var(--purple);
+    padding-left: 10px;
+    margin: 14px 0;
+  }
+
+  .stat-table{ width:100%; border-collapse:collapse; margin: 14px 0; font-size:13px; }
+  .stat-table tr{ border-bottom: 1px solid var(--line); }
+  .stat-table td{ padding: 9px 6px; vertical-align:top; }
+  .stat-table td:first-child{ width: 30%; color: var(--purple); white-space:nowrap; }
+
+  .log-list{ list-style:none; margin:0; padding:0; }
+  .log-item{
+    display:grid; grid-template-columns: 84px 60px 1fr;
+    gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line);
+    font-size: 13px; align-items:baseline;
+  }
+  .log-ver{ color: var(--void-0); background: var(--cyan); padding:2px 6px; font-size:10px; text-align:center; }
+  .log-date{ color: var(--text-sub); font-size:11px; }
+
+  .blog-post{ padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .blog-post:last-child{ border-bottom:none; }
+  .blog-post h3{ margin: 0 0 6px; font-size:15px; color: var(--text); }
+  .blog-meta{ font-size:10px; color: var(--text-sub); margin-bottom:8px; }
+  .blog-tag{
+    display:inline-block; background: rgba(176,107,255,.12); color: var(--purple);
+    font-size:10px; padding:2px 6px; margin-right:6px;
+  }
+
+  .video-list{ list-style:none; margin:0; padding:0; }
+  .video-item{ border-bottom: 1px solid var(--line); }
+  .video-item:last-child{ border-bottom:none; }
+  .video-item a{
+    display:flex; align-items:center; gap:10px;
+    padding: 10px 4px; text-decoration:none; color: var(--text);
+  }
+  .video-item a:hover{ background: rgba(111,227,255,.05); }
+  .video-thumb{
+    width: 96px; height: 54px; object-fit:cover; flex-shrink:0;
+    border: 1px solid rgba(111,227,255,.3); filter: saturate(.8) brightness(.9);
+  }
+  .video-info{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .video-title{
+    font-size: 12px; line-height:1.4;
+    overflow:hidden; text-overflow:ellipsis; display:-webkit-box;
+    -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  }
+  .video-date{ font-size: 10px; color: var(--text-sub); }
+  .video-new{
+    display:inline-block; align-self:flex-start;
+    background: var(--purple); color:#fff;
+    font-size: 9px; padding: 1px 6px; margin-bottom:2px;
+  }
+  .yt-async{ color: var(--text-sub); font-size: 12px; padding: 8px 0; }
+  .video-more-btn{
+    display:block; width:100%; margin-top: 12px; padding: 10px;
+    background: transparent; color: var(--cyan);
+    border: 1px solid rgba(111,227,255,.35);
+    font-family: inherit; font-size: 12px; cursor:pointer;
+  }
+  .video-more-btn:hover{ background: rgba(111,227,255,.08); }
+  .video-more-btn:disabled{ opacity:.5; cursor:default; }
+
+  .contact-btn{
+    display:inline-block; margin-top: 10px; padding: 10px 18px;
+    background: rgba(111,227,255,.06); color: var(--cyan); text-decoration:none;
+    font-size: 12px; border: 1px solid var(--cyan);
+    box-shadow: 0 0 10px rgba(111,227,255,.25);
+  }
+  .contact-btn:active{ transform: translateY(1px); }
+  .yt-btn{ border-color: var(--purple); color: var(--purple); box-shadow: 0 0 10px rgba(176,107,255,.25); background: rgba(176,107,255,.06); }
+
+  .yt-embed-wrap{
+    position:relative; width:100%; padding-top:56.25%;
+    margin: 14px 0; border: 1px solid rgba(111,227,255,.3);
+  }
+  .yt-embed-wrap iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+
+  #sns-links{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 18px; }
+  .sns-btn{
+    display:flex; align-items:center; gap:6px;
+    padding: 8px 12px;
+    background: rgba(111,227,255,.04);
+    border: 1px solid rgba(111,227,255,.3);
+    text-decoration:none; color: var(--text);
+    font-size: 11px;
+  }
+  .sns-btn:hover{ background: rgba(111,227,255,.1); color: var(--cyan); }
+  .sns-icon{ width:14px; }
+
+  .ad-slot{
+    display:none; margin: 18px 0 0; padding: 8px;
+    border: 1px dashed rgba(111,227,255,.3); text-align:center; overflow:hidden;
+  }
+
+  #wired-page-footer{
+    position:relative; z-index:1;
+    max-width: 760px; margin: 0 auto;
+    text-align:center; font-size: 10px; color: var(--text-sub);
+    padding: 22px 0 30px; letter-spacing:1px;
+  }
+
+  #corner-mark{
+    position: fixed; right: 12px; bottom: 10px;
+    z-index: 5;
+    font-size: 9px; letter-spacing: 2px; color: var(--text-sub);
+    opacity: .5;
+    pointer-events:none;
+    animation: floatSoftSmall 5s ease-in-out infinite .6s;
+  }
+
+  @media (max-width: 640px){
+    .orbit-emblem{ width:110px; height:48px; }
+    #icon-grid{ grid-template-columns: repeat(auto-fill, minmax(68px, 1fr)); gap: 14px 4px; }
+    .icon-orb{ width:50px; height:50px; font-size:20px; }
+    .icon-label{ font-size:8.5px; max-width:66px; }
+    #wired-content-wrap{ margin: 16px 12px 0; padding: 20px 16px 28px; }
+    #status-strip{ font-size:9px; padding: 8px 12px; }
+    .page-title{ font-size:9.5px; padding:7px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="warp-overlay"></div>
+<div id="cyber-grid"></div>
+<div id="particles">
+  <span style="left:6%;  animation-duration:12s; animation-delay:0s;   --drift:14px;"></span>
+  <span style="left:16%; animation-duration:15s; animation-delay:2s;   --drift:-10px;"></span>
+  <span style="left:28%; animation-duration:10s; animation-delay:4s;   --drift:8px;"></span>
+  <span style="left:41%; animation-duration:17s; animation-delay:1s;   --drift:-16px;"></span>
+  <span style="left:55%; animation-duration:13s; animation-delay:5s;   --drift:12px;"></span>
+  <span style="left:68%; animation-duration:11s; animation-delay:3s;   --drift:-8px;"></span>
+  <span style="left:80%; animation-duration:16s; animation-delay:6s;   --drift:10px;"></span>
+  <span style="left:91%; animation-duration:14s; animation-delay:2.5s; --drift:-14px;"></span>
+</div>
+<div id="crt-vignette"></div>
+<div id="scan-sweep"></div>
+
+<div id="status-strip">
+  <span class="status-left">WIRED LINK: <b>ONLINE</b></span>
+  <span id="status-clock">--:--</span>
+  <span class="status-right">
+    <span class="sig-bars"><i></i><i></i><i></i><i></i></span>
+    <span class="batt-icon"></span>
+  </span>
+</div>
+
+<header id="wired-header">
+  <button class="wired-btn" id="sound-toggle" title="サウンド切替" aria-label="サウンド切替">SOUND: ON</button>
+  <button class="wired-btn" id="return-btn" title="GBAモードへ戻る" aria-label="GBAモードへ戻る">← RETURN</button>
+</header>
+
+<div id="lain-hud">
+  <div class="orbit-emblem">
+    <div class="orbit-ring ring-a"><span class="orbit-dot"></span></div>
+    <div class="orbit-ring ring-b"><span class="orbit-dot"></span></div>
+    <div class="orbit-core"></div>
+  </div>
+  <div id="hud-brand" class="glitch-text" data-text="THE WIRED">
+    THE WIRED
+    <small>ryotei / ポケカ引退品 — access node</small>
+  </div>
+</div>
+
+<div id="icon-grid-wrap">
+  <div class="menu-label">SELECT PROGRAM</div>
+  <ul id="icon-grid" aria-label="メインメニュー">
+    <li class="icon-tile" data-page="top"><span class="icon-orb-wrap"><span class="icon-orb">🏠</span></span><span class="icon-label">トップ</span></li>
+    <li class="icon-tile" data-page="videos"><span class="icon-orb-wrap"><span class="icon-orb">📹</span></span><span class="icon-label">動画一覧</span></li>
+    <li class="icon-tile" data-page="shorts"><span class="icon-orb-wrap"><span class="icon-orb">💡</span></span><span class="icon-label">Shorts</span></li>
+    <li class="icon-tile" data-page="pokeca"><span class="icon-orb-wrap"><span class="icon-orb">🎴</span></span><span class="icon-label">ポケカ動画</span></li>
+    <li class="icon-tile" data-page="live"><span class="icon-orb-wrap"><span class="icon-orb">🖥️</span></span><span class="icon-label">ライブ配信</span></li>
+    <li class="icon-tile" data-page="achievements"><span class="icon-orb-wrap"><span class="icon-orb">🏆</span></span><span class="icon-label">実績</span></li>
+    <li class="icon-tile" data-page="profile"><span class="icon-orb-wrap"><span class="icon-orb">👤</span></span><span class="icon-label">プロフィール</span></li>
+    <li class="icon-tile" data-page="history"><span class="icon-orb-wrap"><span class="icon-orb">📜</span></span><span class="icon-label">更新履歴</span></li>
+    <li class="icon-tile" data-page="blog"><span class="icon-orb-wrap"><span class="icon-orb">✏️</span></span><span class="icon-label">レポート</span></li>
+    <li class="icon-tile" data-page="sns"><span class="icon-orb-wrap"><span class="icon-orb">🔗</span></span><span class="icon-label">SNS</span></li>
+  </ul>
+  <div id="wired-footnote">
+    タップ / クリックで選択・決定
+  </div>
+</div>
+
+<section id="wired-content-wrap">
+  <span class="hud-corner tl"></span><span class="hud-corner tr"></span>
+  <span class="hud-corner bl"></span><span class="hud-corner br"></span>
+  <div id="wired-page-content"></div>
+  <div id="ad-slot-content" class="ad-slot"></div>
+</section>
+
+<div id="ad-slot-footer" class="ad-slot"></div>
+
+<footer id="wired-page-footer">
+  present day, present time... ©2026 りょてい
+</footer>
+
+<div id="corner-mark">SEL // ryotei OS</div>
+
+<script src="content.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = SITE.PAGES;
+  var PAGE_ORDER = SITE.PAGE_ORDER;
+
+  /* =========================================================
+     効果音（indexと同じ簡易WebAudio）
+  ========================================================= */
+  var soundOn = true;
+  var audioCtx = null;
+  function beep(freq, dur){
+    if(!soundOn) return;
+    try{
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.value = 0.04;
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + (dur || 0.08));
+      osc.stop(audioCtx.currentTime + (dur || 0.08));
+    }catch(e){ /* 対応していない環境は無視 */ }
+  }
+  var soundToggle = document.getElementById("sound-toggle");
+  soundToggle.addEventListener("click", function(){
+    soundOn = !soundOn;
+    soundToggle.textContent = soundOn ? "SOUND: ON" : "SOUND: OFF";
+    if(soundOn) beep(660, 0.06);
+  });
+
+  /* =========================================================
+     ステータスバーの時計（見た目だけのHUD演出）
+  ========================================================= */
+  var clockEl = document.getElementById("status-clock");
+  function tickClock(){
+    var d = new Date();
+    var hh = String(d.getHours()).padStart(2, "0");
+    var mm = String(d.getMinutes()).padStart(2, "0");
+    clockEl.textContent = hh + ":" + mm;
+  }
+  tickClock();
+  setInterval(tickClock, 15000);
+
+  /* =========================================================
+     ページ切り替え（ページの中身はcontent.jsのPAGESをそのまま利用）
+  ========================================================= */
+  var menuItems = Array.prototype.slice.call(document.querySelectorAll("#icon-grid .icon-tile"));
+  var pageContentEl = document.getElementById("wired-page-content");
+  var currentIndex = 0;
+
+  function renderPage(key, skipAnim){
+    var page = PAGES[key];
+    if(!page) return;
+    currentIndex = PAGE_ORDER.indexOf(key);
+
+    menuItems.forEach(function(li){
+      li.classList.toggle("active", li.dataset.page === key);
+    });
+
+    // content.js の ytMountVideoPage() は #page-content 配下を探すため、
+    // 内側のdivに id="page-content" を付与しておく（indexとlainで共通の仕組みを使うための橋渡し）
+    pageContentEl.innerHTML =
+      '<h2 class="page-title">' + page.title + '</h2>' +
+      '<div class="page-content" id="page-content">' + page.html() + '</div>';
+
+    if(!skipAnim){
+      pageContentEl.classList.remove("warp-fade");
+      void pageContentEl.offsetWidth; // reflow
+      pageContentEl.classList.add("warp-fade");
+    }
+
+    if(typeof page.onMount === "function"){ page.onMount(); }
+
+    if(location.hash !== "#" + key){
+      history.pushState(null, "", "#" + key);
+    }
+  }
+
+  menuItems.forEach(function(li){
+    li.addEventListener("click", function(){
+      beep(520, 0.05);
+      renderPage(li.dataset.page);
+    });
+  });
+
+  window.addEventListener("keydown", function(e){
+    if(e.key === "ArrowDown" || e.key === "ArrowRight"){
+      currentIndex = (currentIndex + 1) % PAGE_ORDER.length;
+      beep(420, 0.04);
+      renderPage(PAGE_ORDER[currentIndex]);
+    } else if(e.key === "ArrowUp" || e.key === "ArrowLeft"){
+      currentIndex = (currentIndex - 1 + PAGE_ORDER.length) % PAGE_ORDER.length;
+      beep(420, 0.04);
+      renderPage(PAGE_ORDER[currentIndex]);
+    }
+  });
+
+  window.addEventListener("popstate", function(){
+    var key = (location.hash || "#top").replace("#","");
+    if(PAGES[key]) renderPage(key, true);
+  });
+
+  var initial = (location.hash || "#top").replace("#","");
+  renderPage(PAGES[initial] ? initial : "top", true);
+
+  /* =========================================================
+     ワープ演出：入場 / GBAモードへ帰る
+  ========================================================= */
+  var warpOverlay = document.getElementById("warp-overlay");
+
+  // 入場時：円が中央にすぼまりながら消える（DQ11S風の切替演出の逆側）。
+  // #warp-overlayは初期状態で画面全体を覆っているので、ここでclassを足すだけで良い。
+  beep(180, 0.3);
+  warpOverlay.classList.add("warp-in");
+
+  var returnBtn = document.getElementById("return-btn");
+  returnBtn.addEventListener("click", function(){
+    beep(660, 0.2);
+    warpOverlay.classList.remove("warp-in");
+    warpOverlay.classList.add("warp-out");
+    setTimeout(function(){
+      sessionStorage.setItem("ryotei-warp-entry", "1");
+      location.href = "index.html" + (location.hash || "");
+    }, 560);
+  });
+
+})();
+</script>
+
+<!-- ============================================================
+     Google Analytics（index.htmlと同じ測定IDを設定）
+============================================================ -->
+<script>
+(function(){
+  var GA_MEASUREMENT_ID = ""; // 例: "G-XXXXXXXXXX"
+  if(!GA_MEASUREMENT_ID) return;
+  var s = document.createElement("script");
+  s.async = true;
+  s.src = "https://www.googletagmanager.com/gtag/js?id=" + GA_MEASUREMENT_ID;
+  document.head.appendChild(s);
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag("js", new Date());
+  gtag("config", GA_MEASUREMENT_ID);
+})();
+</script>
+
+<!-- ============================================================
+     Google AdSense（index.htmlと同じクライアントID/スロットIDを設定）
+============================================================ -->
+<script>
+(function(){
+  var ADSENSE_CLIENT = "ca-pub-3405662051867998";
+  var ADSENSE_SLOTS = {
+    content: "7933776978",
+    footer: "7949892728"
+  };
+  if(!ADSENSE_CLIENT) return;
+
+  var s = document.createElement("script");
+  s.async = true;
+  s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" + ADSENSE_CLIENT;
+  s.crossOrigin = "anonymous";
+  document.head.appendChild(s);
+
+  Object.keys(ADSENSE_SLOTS).forEach(function(key){
+    var slot = ADSENSE_SLOTS[key];
+    var el = document.getElementById("ad-slot-" + key);
+    if(!slot || !el) return;
+    el.style.display = "block";
+    el.innerHTML = '<ins class="adsbygoogle" style="display:block" data-ad-client="' + ADSENSE_CLIENT + '" data-ad-slot="' + slot + '" data-ad-format="auto" data-full-width-responsive="true"></ins>';
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+  });
+})();
+</script>
+
+</body>
+</html>
