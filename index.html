@@ -495,7 +495,7 @@
         <li data-page="videos">📹 動画一覧</li>
         <li data-page="shorts">💡 Shorts</li>
         <li data-page="pokeca">🎴 ポケカ動画</li>
-        <li data-page="live">🖥️ おすすめ</li>
+        <li data-page="live">🖥️ ライブ配信</li>
         <li data-page="achievements">🏆 実績</li>
         <li data-page="profile">👤 プロフィール</li>
         <li data-page="history">📜 更新履歴</li>
@@ -760,7 +760,7 @@
     live: {
       title: "LIVE",
       html: function(){
-        return '<p class="flavor">🖥️ おすすめ動画</p><div class="yt-async">よみこみちゅう……</div>';
+        return '<p class="flavor">🖥️ ライブ配信</p><div class="yt-async">よみこみちゅう……</div>';
       },
       onMount: function(){
         ytMountVideoPage(function(){ return YOUTUBE_PLAYLIST_LIVE; });
