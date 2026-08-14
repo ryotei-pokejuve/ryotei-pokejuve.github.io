@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>りょていの冒険の書 - PRESS START</title>
+<title>りょていのサイト - PRESS START</title>
 <meta name="description" content="りょていのホームページ。GBA風・RPG風タイトル画面から始まるレトロデザインサイト。">
 
 <!--
@@ -495,7 +495,7 @@
 <div id="game-container">
 
   <div id="status-bar">
-    <div class="brand">RYOTEI ADVENTURE</div>
+    <div class="brand">RYOTEI POKECA</div>
     <div id="status-controls">
       <button class="icon-btn" id="sound-toggle" title="サウンド切替" aria-label="サウンド切替">🔊</button>
       <button class="icon-btn" id="theme-toggle" title="ダークモード切替" aria-label="ダークモード切替">🌙</button>
@@ -514,8 +514,8 @@
         <li data-page="achievements">🏆 実績</li>
         <li data-page="profile">👤 プロフィール</li>
         <li data-page="history">📜 更新履歴</li>
-        <li data-page="blog">✏️ ブログ</li>
-        <li data-page="sns">🔗 SNS</li>
+        <li data-page="blog">✏️ レポート</li>
+        <li data-page="sns">🔗 つうしん(SNS)</li>
       </ul>
       <div id="menu-footer">
         ↑↓：選択<br>
@@ -683,13 +683,13 @@
       title: "TOP",
       html: function(){
         return (
-          '<p>ようこそ、りょていの冒険の書へ。</p>' +
-          '<p class="flavor">「このホームページは、GBA時代のRPGにインスパイアされたデザインで作られている……」</p>' +
-          '<p>メニューから気になるページを選んでね。プロフィールや更新履歴、ブログなどをのぞいてみよう。</p>' +
+          '<p>りょていのサイトです</p>' +
+          '<p class="flavor">ポケカの引退品って良いよね</p>' +
+          '<p>気になるページを選択しよう</p>' +
           '<table class="stat-table">' +
-            '<tr><td>サイト名</td><td>りょていの冒険の書</td></tr>' +
+            '<tr><td>サイト名</td><td>りょていのサイト</td></tr>' +
             '<tr><td>ステータス</td><td>こうかい中</td></tr>' +
-            '<tr><td>テーマ</td><td>レトロ / ドット絵 / RPG</td></tr>' +
+            '<tr><td>テーマ</td><td>ポケカ・趣味等</td></tr>' +
           '</table>' +
           '<p class="flavor">最新の動画はYouTubeでチェック！</p>' +
           (YOUTUBE_FEATURED_VIDEO_ID
@@ -703,15 +703,12 @@
       title: "PROFILE",
       html: function(){
         return (
-          '<p class="flavor">「ぼうけんしゃのステータスがひょうじされた！」</p>' +
+          '<p class="flavor">りょていのステータス</p>' +
           '<table class="stat-table">' +
-            '<tr><td>名前</td><td>りょてい（ここに名前・ハンドルネームを入力）</td></tr>' +
-            '<tr><td>二つ名</td><td>［ここに称号・キャッチコピーを入力］</td></tr>' +
-            '<tr><td>出身</td><td>［ここに地域・出身地を入力］</td></tr>' +
-            '<tr><td>趣味</td><td>［ここに趣味を入力］</td></tr>' +
-            '<tr><td>とくぎ</td><td>［ここに得意なこと・スキルを入力］</td></tr>' +
-            '<tr><td>使用ツール</td><td>［よく使うツールやソフトを入力］</td></tr>' +
-            '<tr><td>ひとこと</td><td>［自己紹介の一言を入力］</td></tr>' +
+            '<tr><td>名前</td><td>りょてい</td></tr>' +
+            '<tr><td>出身</td><td>カントー地方</td></tr>' +
+            '<tr><td>趣味</td><td>スポーツ観戦・ツーリング・ポケカ開封</td></tr>' +
+            '<tr><td>ひとこと</td><td>RSE良いよね</td></tr>' +
           '</table>'
         );
       }
@@ -720,12 +717,12 @@
       title: "HISTORY",
       html: function(){
         return (
-          '<p class="flavor">「これまでのぼうけんの記録……」</p>' +
+          '<p class="flavor">つづきから</p>' +
           '<ul class="log-list">' +
             '<li class="log-item"><span class="log-ver">Ver 1.00</span><span class="log-date">2026.08.13</span><span>サイトを公開！GBA風トップページを実装しました。</span></li>' +
             '<li class="log-item"><span class="log-ver">Ver 0.10</span><span class="log-date">2026.08.01</span><span>サイト制作を開始。デザインコンセプトを決定。</span></li>' +
           '</ul>' +
-          '<p class="flavor" style="margin-top:16px;">新しい更新があったら、ここにリストを追加してね。</p>'
+          '<p class="flavor" style="margin-top:16px;"></p>'
         );
       }
     },
@@ -733,7 +730,7 @@
       title: "BLOG",
       html: function(){
         return (
-          '<p class="flavor">「クエストログ（記事一覧）がひょうじされた！」</p>' +
+          '<p class="flavor">レポート(記事一覧）</p>' +
           '<article class="blog-post">' +
             '<h3>はじめまして</h3>' +
             '<div class="blog-meta">2026.08.13 <span class="blog-tag">お知らせ</span></div>' +
@@ -756,7 +753,7 @@
       title: "SNS",
       html: function(){
         return (
-          '<p class="flavor">「ぼうけんしゃからの通信……」</p>' +
+          '<p class="flavor">「りょていのつうしんケーブル」</p>' +
           '<p>各種SNSはこちらから。フォロー・ご連絡お待ちしています。</p>' +
           '<footer id="sns-links">' + SNS_LINKS.map(function(s){
             return '<a class="sns-btn" href="' + s.href + '" target="_blank" rel="noopener noreferrer">' +
