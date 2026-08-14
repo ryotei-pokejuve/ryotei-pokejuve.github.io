@@ -464,14 +464,14 @@
 <!-- ============================================================
      ブート画面（PRESS START）
 ============================================================ -->
-<div id="boot-screen" role="button" tabindex="0" aria-label="PRESS START でサイトへ進む">
+<div id="boot-screen" role="button" tabindex="0" aria-label="PUSH START でサイトへ進む">
   <div id="boot-logo">
     ポケカ引退品
     <small>りょてい</small>
   </div>
-  <div id="press-start">PRESS START</div>
+  <div id="press-start">PUSH START BUTTON</div>
   <div id="boot-loading"><i></i></div>
-  <div id="copyright-line">© 2026 RYOTEI WORKS. ALL RIGHTS RESERVED.</div>
+  <div id="copyright-line">©2026 りょてい inc</div>
 </div>
 
 <!-- ============================================================
@@ -495,7 +495,7 @@
         <li data-page="videos">📹 動画一覧</li>
         <li data-page="shorts">💡 Shorts</li>
         <li data-page="pokeca">🎴 ポケカ動画</li>
-        <li data-page="recommend">🖥️ おすすめ</li>
+        <li data-page="live">🖥️ おすすめ</li>
         <li data-page="achievements">🏆 実績</li>
         <li data-page="profile">👤 プロフィール</li>
         <li data-page="history">📜 更新履歴</li>
@@ -517,7 +517,7 @@
   <div id="ad-slot-footer" class="ad-slot"></div>
 
   <footer id="site-footer">
-    © 2026りょてい inc
+    ©2026 りょてい inc
   </footer>
 </div>
 
@@ -541,7 +541,7 @@
   var YOUTUBE_CHANNEL_ID = "UCv8-wt6gkGbKf0DditFsL_g";        // UCから始まるチャンネルID（@ハンドルではない）
   var YOUTUBE_PLAYLIST_SHORTS = "PLBYd2EyPW3CDVw_g9CwdI2_X34kd78xPK";   // Shorts用の再生リストID
   var YOUTUBE_PLAYLIST_POKECA = "PLBYd2EyPW3CD1YvXDAajn1vfmfQFOWSEj";   // ポケカ動画用の再生リストID
-  var YOUTUBE_PLAYLIST_RECOMMEND = "PLBYd2EyPW3CD1YvXDAajn1vfmfQFOWSEj";// おすすめ動画用の再生リストID
+  var YOUTUBE_PLAYLIST_LIVE = "PLBYd2EyPW3CD1YvXDAajn1vfmfQFOWSEj";// ライブ配信動画用の再生リストID
 
   var SNS_LINKS = [
     { label: "X (Twitter)", href: "https://x.com/", icon: "✕" },
@@ -757,13 +757,13 @@
         ytMountVideoPage(function(){ return YOUTUBE_PLAYLIST_POKECA; });
       }
     },
-    recommend: {
-      title: "RECOMMEND",
+    live: {
+      title: "LIVE",
       html: function(){
         return '<p class="flavor">🖥️ おすすめ動画</p><div class="yt-async">よみこみちゅう……</div>';
       },
       onMount: function(){
-        ytMountVideoPage(function(){ return YOUTUBE_PLAYLIST_RECOMMEND; });
+        ytMountVideoPage(function(){ return YOUTUBE_PLAYLIST_LIVE; });
       }
     },
     achievements: {
@@ -797,7 +797,7 @@
     }
   };
 
-  var PAGE_ORDER = ["top","videos","shorts","pokeca","recommend","achievements","profile","history","blog","contact"];
+  var PAGE_ORDER = ["top","videos","shorts","pokeca","live","achievements","profile","history","blog","contact"];
 
   /* =========================================================
      効果音（WebAudio, 外部ファイル不要で軽量）
