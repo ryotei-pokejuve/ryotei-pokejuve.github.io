@@ -613,6 +613,7 @@
   <div class="menu-label">SELECT PROGRAM</div>
   <ul id="icon-grid" aria-label="メインメニュー">
     <li class="icon-tile" data-page="top"><span class="icon-orb-wrap"><span class="icon-orb">🏠</span></span><span class="icon-label">トップ</span></li>
+    <li class="icon-tile" data-href="search.html"><span class="icon-orb-wrap"><span class="icon-orb">🎴</span></span><span class="icon-label">カード相場</span></li>
     <li class="icon-tile" data-page="videos"><span class="icon-orb-wrap"><span class="icon-orb">📹</span></span><span class="icon-label">動画一覧</span></li>
     <li class="icon-tile" data-page="shorts"><span class="icon-orb-wrap"><span class="icon-orb">💡</span></span><span class="icon-label">Shorts</span></li>
     <li class="icon-tile" data-page="pokeca"><span class="icon-orb-wrap"><span class="icon-orb">🎴</span></span><span class="icon-label">ポケカ動画</span></li>
@@ -729,6 +730,10 @@
   menuItems.forEach(function(li){
     li.addEventListener("click", function(){
       beep(520, 0.05);
+      if(li.dataset.href){
+        location.href = li.dataset.href;
+        return;
+      }
       renderPage(li.dataset.page);
     });
   });

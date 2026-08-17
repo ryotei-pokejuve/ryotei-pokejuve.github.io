@@ -82,19 +82,60 @@
     return !isNaN(d) && (Date.now() - d) < 1000 * 60 * 60 * 24 * 7; // 7日以内
   }
 
-  function ytVideoItemHTML(v){
-    return (
-      '<li class="video-item">' +
-        '<a href="https://www.youtube.com/watch?v=' + v.videoId + '" target="_blank" rel="noopener noreferrer">' +
-          (v.thumbnail ? '<img class="video-thumb" src="' + v.thumbnail + '" alt="" loading="lazy">' : '') +
-          '<span class="video-info">' +
-            (ytIsNew(v.publishedAt) ? '<span class="video-new">NEW</span>' : '') +
-            '<span class="video-title">' + v.title + '</span>' +
-            '<span class="video-date">' + new Date(v.publishedAt).toLocaleDateString('ja-JP') + '</span>' +
-          '</span>' +
-        '</a>' +
-      '</li>'
-    );
+  // XSS対策: YouTube APIから取得した動画タイトル・サムネイルURLは外部データ扱いとし、
+  // HTML文字列への結合は行わずDOM APIで組み立てる（動画タイトルはtextContent、
+  // サムネイルURLはhttps確認のうえimg.srcへプロパティ代入）。
+  function isHttpsUrl(url){
+    if(!url) return false;
+    try{
+      var u = new URL(url, location.href);
+      return u.protocol === "https:";
+    }catch(e){
+      return false;
+    }
+  }
+
+  function createVideoItemEl(v){
+    var li = document.createElement('li');
+    li.className = 'video-item';
+
+    var a = document.createElement('a');
+    a.href = "https://www.youtube.com/watch?v=" + encodeURIComponent(v.videoId);
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+
+    if(isHttpsUrl(v.thumbnail)){
+      var img = document.createElement('img');
+      img.className = 'video-thumb';
+      img.src = v.thumbnail;
+      img.alt = "";
+      img.loading = "lazy";
+      a.appendChild(img);
+    }
+
+    var infoSpan = document.createElement('span');
+    infoSpan.className = 'video-info';
+
+    if(ytIsNew(v.publishedAt)){
+      var newSpan = document.createElement('span');
+      newSpan.className = 'video-new';
+      newSpan.textContent = 'NEW';
+      infoSpan.appendChild(newSpan);
+    }
+
+    var titleSpan = document.createElement('span');
+    titleSpan.className = 'video-title';
+    titleSpan.textContent = v.title || "";
+    infoSpan.appendChild(titleSpan);
+
+    var dateSpan = document.createElement('span');
+    dateSpan.className = 'video-date';
+    dateSpan.textContent = new Date(v.publishedAt).toLocaleDateString('ja-JP');
+    infoSpan.appendChild(dateSpan);
+
+    a.appendChild(infoSpan);
+    li.appendChild(a);
+    return li;
   }
 
   // 動画一覧系ページ：最初の12件を表示し、「もっと見る」を押すたびに次の12件を追加読み込みする
@@ -121,7 +162,7 @@
             return;
           }
           result.videos.forEach(function(v){
-            listEl.insertAdjacentHTML('beforeend', ytVideoItemHTML(v));
+            listEl.appendChild(createVideoItemEl(v));
           });
           var oldBtn = container.querySelector('.video-more-btn');
           if(oldBtn) oldBtn.remove();

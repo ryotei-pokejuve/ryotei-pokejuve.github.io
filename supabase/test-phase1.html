@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Phase 1 動作確認ツール（開発用・非公開）</title>
+<style>
+  body{ font-family: system-ui, sans-serif; max-width: 780px; margin: 20px auto; padding: 0 16px; line-height:1.6; color:#222; }
+  h1{ font-size: 20px; }
+  h2{ font-size: 15px; margin-top: 32px; border-bottom: 2px solid #ddd; padding-bottom: 4px; }
+  section{ margin-bottom: 18px; padding: 14px; border: 1px solid #ddd; border-radius: 6px; background:#fafafa; }
+  .expect{ color:#555; font-size:13px; margin: 4px 0 10px; }
+  label{ display:block; font-size:13px; margin-top:8px; }
+  input{ width: 100%; padding:6px; box-sizing:border-box; font-size:14px; }
+  button{ margin-top:10px; padding:8px 14px; cursor:pointer; }
+  pre{ background:#111; color:#c8f7c5; padding:10px; overflow:auto; font-size:12px; border-radius:4px; max-height:260px; }
+  .ok{ color: #0a7d1e; font-weight:bold; }
+  .ng{ color: #c0392b; font-weight:bold; }
+  #login-status{ font-size:13px; padding:6px 10px; background:#eef; border-radius:4px; display:inline-block; }
+</style>
+</head>
+<body>
+
+<h1>Phase 1 動作確認ツール</h1>
+<p>このページは開発・確認専用です。GitHubには公開しないでください（publishable keyは公開しても安全ですが、本番サイトの一部として配布する意図のファイルではありません）。</p>
+
+<div id="login-status">未ログイン</div>
+
+<h2>0. 準備：接続設定</h2>
+<section>
+  <label>Supabase URL</label>
+  <input id="cfg-url" value="https://idnhamxtwxfcxflenxko.supabase.co">
+  <label>publishable (anon) key</label>
+  <input id="cfg-key" value="sb_publishable_lZoCHYEsf4LscKv2TVphBg_0JAAy4wO">
+  <button onclick="initClient()">この設定で初期化</button>
+  <div id="init-result"></div>
+</section>
+
+<h2>1. カード検索（未ログインでもOKなはず）</h2>
+<section>
+  <div class="expect">期待結果: エラーにならず、検索結果（0件でもOK）が返ってくる</div>
+  <label>検索語（空でも可）</label>
+  <input id="search-query" value="">
+  <button onclick="testSearch()">api.search_cards を呼ぶ</button>
+  <pre id="search-result">（まだ実行していません）</pre>
+</section>
+
+<h2>2. 実テーブルへの直接アクセス（拒否されるべき）</h2>
+<section>
+  <div class="expect">期待結果: エラー、または空配列。生のcardsテーブルの中身が見えたら設定ミスです</div>
+  <button onclick="testDirectTable()">public.cards に直接SELECTしてみる</button>
+  <pre id="direct-result">（まだ実行していません）</pre>
+</section>
+
+<h2>3. 管理者ログイン</h2>
+<section>
+  <div class="expect">3.で作成した管理者アカウントのメールアドレス・パスワードを入力してください</div>
+  <label>メールアドレス</label>
+  <input id="login-email" type="email">
+  <label>パスワード</label>
+  <input id="login-password" type="password">
+  <button onclick="login()">ログイン</button>
+  <button onclick="logout()">ログアウト</button>
+  <pre id="login-result">（まだ実行していません）</pre>
+</section>
+
+<h2>4. カード情報を確認する</h2>
+<section>
+  <div class="expect">SQL Editorで作成したテスト用カードのIDを入れてください（cards テーブルの id 列）</div>
+  <label>card_id</label>
+  <input id="card-id" placeholder="例: 11111111-2222-3333-4444-555555555555">
+  <button onclick="testGetCard()">api.get_card を呼ぶ</button>
+  <pre id="getcard-result">（まだ実行していません）</pre>
+</section>
+
+<h2>5. 価格登録（未ログイン状態で試す → 拒否されるはず）</h2>
+<section>
+  <div class="expect">期待結果: ログインしていない状態では "not authorized" のようなエラーになる</div>
+  <label>価格（円）</label>
+  <input id="price-value" value="1000">
+  <button onclick="testRecordPrice()">api.admin_record_price を呼ぶ</button>
+  <pre id="price-result">（まだ実行していません）</pre>
+</section>
+
+<h2>6. 価格登録（3.で管理者ログイン後に試す → 成功するはず）</h2>
+<section>
+  <div class="expect">3.でログインしてから、上の「5.」のボタンをもう一度押してください。今度は成功し、IDが返ってくるはずです。その後「4.」をもう一度押すと current_price が反映されているのを確認できます。</div>
+</section>
+
+<h2>7. 重複登録テスト</h2>
+<section>
+  <div class="expect">期待結果: 同じ observed_at（下の日時固定値）で2回押すと、2回目は id が null（何も登録されない）になる</div>
+  <button onclick="testDuplicate()">同じ日時で2回登録してみる（ログイン必須）</button>
+  <pre id="dup-result">（まだ実行していません）</pre>
+</section>
+
+<h2>8. 不正な値のテスト</h2>
+<section>
+  <div class="expect">期待結果: すべてエラーになる（マイナス価格・未来すぎる日時・存在しないカードID）</div>
+  <button onclick="testInvalid()">3パターンまとめて試す（ログイン必須）</button>
+  <pre id="invalid-result">（まだ実行していません）</pre>
+</section>
+
+<h2>9. 一般ユーザー（管理者未登録）の拒否テスト ★重要</h2>
+<section>
+  <div class="expect">
+    事前準備: Authentication → Users でもう1人「一般ユーザー」を作成してください（admin_usersには登録しないこと）。<br>
+    上の「3. 管理者ログイン」欄に、その一般ユーザーのメール・パスワードを入れてログインし直してから、下のボタンを押してください。<br>
+    期待結果: 3つとも "not authorized" 等のエラーになる（実テーブルは permission denied）
+  </div>
+  <button onclick="testGeneralUserRejected()">一般ユーザーで3つまとめて試す</button>
+  <pre id="general-result">（まだ実行していません）</pre>
+</section>
+
+<h2>10. limitの境界値テスト</h2>
+<section>
+  <div class="expect">期待結果: p_limit に 0 やマイナスを渡してもエラーにならず、1件以上（上限まで）で正常に返る</div>
+  <button onclick="testLimitBoundary()">p_limit=0 と p_limit=-5 を試す</button>
+  <pre id="limit-result">（まだ実行していません）</pre>
+</section>
+
+<h2>11. 古い観測値が現在価格を巻き戻さないことの確認</h2>
+<section>
+  <div class="expect">期待結果: 「今」の価格を登録した後に「昨日」の価格を登録しても、current_priceは「今」の値のまま変わらない（ログイン必須）</div>
+  <button onclick="testNoRollback()">今の価格→昨日の価格の順で登録して確認</button>
+  <pre id="rollback-result">（まだ実行していません）</pre>
+</section>
+
+<h2>12. 販売価格／買取価格が別々に保持されることの確認</h2>
+<section>
+  <div class="expect">期待結果: sell用とbuy用でcurrent_priceが別々の値になる（ログイン必須）</div>
+  <button onclick="testSellBuySeparate()">sellとbuyを別々に登録して確認</button>
+  <pre id="sellbuy-result">（まだ実行していません）</pre>
+</section>
+
+<h2>13. 内部関数に直接アクセスできないことの確認</h2>
+<section>
+  <div class="expect">期待結果: public.normalize_card_name をAPI経由で直接呼ぼうとするとエラーになる（ログイン不要）</div>
+  <button onclick="testInternalFunctionBlocked()">public.normalize_card_name を直接呼んでみる</button>
+  <pre id="internal-result">（まだ実行していません）</pre>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  var client = null;
+
+  function initClient(){
+    var url = document.getElementById('cfg-url').value.trim();
+    var key = document.getElementById('cfg-key').value.trim();
+    client = supabase.createClient(url, key);
+    document.getElementById('init-result').textContent = '初期化しました。下のテストを順番に試してください。';
+    client.auth.onAuthStateChange(function(event, session){
+      document.getElementById('login-status').textContent = session
+        ? ('ログイン中: ' + session.user.email)
+        : '未ログイン';
+    });
+  }
+
+  function show(id, data, error){
+    var el = document.getElementById(id);
+    if(error){
+      el.innerHTML = '<span class="ng">✕ エラー</span>\n' + JSON.stringify(error, null, 2);
+    } else {
+      el.innerHTML = '<span class="ok">✓ 成功</span>\n' + JSON.stringify(data, null, 2);
+    }
+  }
+
+  async function testSearch(){
+    var q = document.getElementById('search-query').value;
+    var { data, error } = await client.schema('api').rpc('search_cards', { p_query: q || null });
+    show('search-result', data, error);
+  }
+
+  async function testDirectTable(){
+    var { data, error } = await client.from('cards').select('*').limit(5);
+    show('direct-result', data, error);
+  }
+
+  async function login(){
+    var email = document.getElementById('login-email').value;
+    var password = document.getElementById('login-password').value;
+    var { data, error } = await client.auth.signInWithPassword({ email: email, password: password });
+    show('login-result', data && data.user ? { logged_in_as: data.user.email } : data, error);
+  }
+
+  async function logout(){
+    await client.auth.signOut();
+    document.getElementById('login-result').textContent = 'ログアウトしました';
+  }
+
+  async function testGetCard(){
+    var cardId = document.getElementById('card-id').value.trim();
+    var { data, error } = await client.schema('api').rpc('get_card', { p_card_id: cardId });
+    show('getcard-result', data, error);
+  }
+
+  async function testRecordPrice(){
+    var cardId = document.getElementById('card-id').value.trim();
+    var price = parseInt(document.getElementById('price-value').value, 10);
+    var { data, error } = await client.schema('api').rpc('admin_record_price', {
+      p_card_id: cardId, p_price: price
+    });
+    show('price-result', data, error);
+  }
+
+  async function testDuplicate(){
+    var cardId = document.getElementById('card-id').value.trim();
+    var fixedTime = '2026-08-01T00:00:00Z';
+    var first = await client.schema('api').rpc('admin_record_price', {
+      p_card_id: cardId, p_price: 500, p_observed_at: fixedTime
+    });
+    var second = await client.schema('api').rpc('admin_record_price', {
+      p_card_id: cardId, p_price: 500, p_observed_at: fixedTime
+    });
+    document.getElementById('dup-result').textContent =
+      '1回目: ' + JSON.stringify(first) + '\n2回目（nullになるはず）: ' + JSON.stringify(second);
+  }
+
+  async function testInvalid(){
+    var cardId = document.getElementById('card-id').value.trim();
+    var results = {};
+    results.negative_price = await client.schema('api').rpc('admin_record_price', {
+      p_card_id: cardId, p_price: -100
+    });
+    results.future_date = await client.schema('api').rpc('admin_record_price', {
+      p_card_id: cardId, p_price: 1000, p_observed_at: '2099-01-01T00:00:00Z'
+    });
+    results.unknown_card = await client.schema('api').rpc('admin_record_price', {
+      p_card_id: '00000000-0000-0000-0000-000000000000', p_price: 1000
+    });
+    document.getElementById('invalid-result').textContent = JSON.stringify(results, null, 2);
+  }
+
+  async function testGeneralUserRejected(){
+    var cardId = document.getElementById('card-id').value.trim();
+    var results = {};
+
+    var priceTry = await client.schema('api').rpc('admin_record_price', { p_card_id: cardId, p_price: 1234 });
+    results.admin_record_price = priceTry.error ? { blocked: true, message: priceTry.error.message } : { blocked: false, data: priceTry.data };
+
+    var cardTry = await client.schema('api').rpc('admin_upsert_card', {
+      p_set_id: null, p_name: 'ふせいカード', p_card_number: '999/999'
+    });
+    results.admin_upsert_card = cardTry.error ? { blocked: true, message: cardTry.error.message } : { blocked: false, data: cardTry.data };
+
+    var tableTry = await client.from('cards').select('*').limit(1);
+    results.direct_table = tableTry.error ? { blocked: true, message: tableTry.error.message } : { blocked: false, data: tableTry.data };
+
+    document.getElementById('general-result').textContent = JSON.stringify(results, null, 2);
+  }
+
+  async function testLimitBoundary(){
+    var zero = await client.schema('api').rpc('search_cards', { p_limit: 0 });
+    var negative = await client.schema('api').rpc('search_cards', { p_limit: -5 });
+    document.getElementById('limit-result').textContent =
+      'p_limit=0: ' + JSON.stringify({ error: zero.error, count: zero.data ? zero.data.length : null }) +
+      '\np_limit=-5: ' + JSON.stringify({ error: negative.error, count: negative.data ? negative.data.length : null });
+  }
+
+  async function testNoRollback(){
+    var cardId = document.getElementById('card-id').value.trim();
+    var now = new Date().toISOString();
+    var yesterday = new Date(Date.now() - 24*60*60*1000).toISOString();
+
+    await client.schema('api').rpc('admin_record_price', { p_card_id: cardId, p_price: 3000, p_observed_at: now });
+    var afterNow = await client.schema('api').rpc('get_card', { p_card_id: cardId });
+
+    await client.schema('api').rpc('admin_record_price', { p_card_id: cardId, p_price: 300, p_observed_at: yesterday });
+    var afterOld = await client.schema('api').rpc('get_card', { p_card_id: cardId });
+
+    document.getElementById('rollback-result').textContent =
+      '「今」登録直後の current_price: ' + JSON.stringify(afterNow.data && afterNow.data[0] && afterNow.data[0].current_price) +
+      '\n「昨日」登録後の current_price（変わらないはず）: ' + JSON.stringify(afterOld.data && afterOld.data[0] && afterOld.data[0].current_price);
+  }
+
+  async function testSellBuySeparate(){
+    var cardId = document.getElementById('card-id').value.trim();
+    await client.schema('api').rpc('admin_record_price', { p_card_id: cardId, p_price: 5000, p_price_type: 'sell' });
+    await client.schema('api').rpc('admin_record_price', { p_card_id: cardId, p_price: 4000, p_price_type: 'buy' });
+
+    var sell = await client.schema('api').rpc('get_card', { p_card_id: cardId, p_price_type: 'sell' });
+    var buy  = await client.schema('api').rpc('get_card', { p_card_id: cardId, p_price_type: 'buy' });
+
+    document.getElementById('sellbuy-result').textContent =
+      'sell: ' + JSON.stringify(sell.data && sell.data[0] && sell.data[0].current_price) +
+      '\nbuy: '  + JSON.stringify(buy.data && buy.data[0] && buy.data[0].current_price);
+  }
+
+  async function testInternalFunctionBlocked(){
+    var { data, error } = await client.schema('public').rpc('normalize_card_name', { p_text: 'テスト' });
+    document.getElementById('internal-result').textContent = error
+      ? ('✓ ブロックされました: ' + JSON.stringify(error))
+      : ('✕ 呼べてしまいました: ' + JSON.stringify(data));
+  }
+</script>
+</body>
+</html>

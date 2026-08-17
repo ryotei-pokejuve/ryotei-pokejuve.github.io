@@ -549,6 +549,7 @@
       <h2>MENU</h2>
       <ul id="menu-list">
         <li data-page="top">🏠 トップ</li>
+        <li data-href="search.html">🎴 カード相場</li>
         <li data-page="videos">📹 動画一覧</li>
         <li data-page="shorts">💡 Shorts</li>
         <li data-page="pokeca">🎴 ポケカ動画</li>
@@ -676,6 +677,10 @@
   menuItems.forEach(function(li){
     li.addEventListener("click", function(){
       beep(660, 0.07);
+      if(li.dataset.href){
+        location.href = li.dataset.href;
+        return;
+      }
       renderPage(li.dataset.page);
     });
   });

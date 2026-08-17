@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>カード詳細 - りょていのサイト</title>
+<meta name="description" content="ポケモンカードの詳細・相場情報。">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https://idnhamxtwxfcxflenxko.supabase.co;">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --font-pixel-en: 'Press Start 2P', monospace;
+    --font-pixel-jp: 'DotGothic16', sans-serif;
+    --bg-outer-1: #7b7bd6;
+    --bg-outer-2: #4a4a9c;
+    --window-bg: #f8f3e2;
+    --window-border-outer: #2a2a4a;
+    --window-border-inner: #ffffff;
+    --text-color: #24243c;
+    --text-sub: #55557a;
+    --accent: #3d7fd4;
+    --accent-2: #e0663f;
+    --shadow-color: rgba(0,0,0,.35);
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family: var(--font-pixel-jp);
+    color: var(--text-color);
+    background: linear-gradient(160deg, var(--bg-outer-1), var(--bg-outer-2));
+    min-height: 100vh;
+  }
+  a{ color: var(--accent); }
+
+  #page-wrap{ max-width: 640px; margin: 0 auto; padding: 14px 12px 40px; }
+
+  .back-link{
+    display:inline-block; margin-bottom:10px;
+    font-size: 12px; color:#fff; text-decoration:none;
+    text-shadow: 2px 2px 0 var(--window-border-outer);
+  }
+
+  .pixel-window{
+    background: var(--window-bg);
+    border: 4px solid var(--window-border-outer);
+    box-shadow: inset 0 0 0 3px var(--window-border-inner), 6px 6px 0 var(--shadow-color);
+    padding: 16px 18px;
+  }
+
+  #status-panel{
+    display:flex; gap: 16px; flex-wrap: wrap;
+  }
+  #card-image{
+    width: 160px; max-width: 40%;
+    aspect-ratio: 3/4; object-fit: cover;
+    border: 3px solid var(--window-border-outer);
+    background: #ddd;
+    flex-shrink: 0;
+  }
+  #card-image.placeholder{
+    display:flex; align-items:center; justify-content:center;
+    font-size: 11px; color: var(--text-sub);
+  }
+  #card-main{ flex: 1 1 200px; min-width: 0; }
+  #card-name{
+    font-size: 16px; margin: 0 0 10px; font-weight:bold;
+    word-break: break-word;
+  }
+
+  .stat-table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  .stat-table tr{ border-bottom: 2px dotted var(--text-sub); }
+  .stat-table td{ padding: 8px 4px; vertical-align:top; }
+  .stat-table td:first-child{ width: 38%; color: var(--accent-2); font-weight:bold; white-space:nowrap; }
+
+  #price-highlight{
+    margin-top: 12px; padding: 10px;
+    background: rgba(61,127,212,.1);
+    border: 2px solid var(--accent);
+    font-size: 20px; font-weight:bold; color: var(--accent);
+    text-align:center;
+  }
+  #price-updated{
+    text-align:center; font-size: 11px; color: var(--text-sub); margin-top: 4px;
+  }
+
+  #history-section{ margin-top: 18px; }
+  #history-section h2{
+    font-family: var(--font-pixel-en); font-size: 12px; color: var(--accent);
+    border-bottom: 3px solid var(--accent); display:inline-block; padding-bottom:4px; margin: 0 0 10px;
+  }
+  .history-list{ list-style:none; margin:0; padding:0; }
+  .history-item{
+    display:flex; justify-content:space-between;
+    padding: 8px 4px; border-bottom: 1px dotted var(--text-sub);
+    font-size: 13px;
+  }
+  .history-price{ font-weight:bold; }
+  .history-date{ color: var(--text-sub); font-size: 11.5px; }
+
+  #loading-state, #error-state{
+    text-align:center; padding: 30px 10px; font-size: 13px; display:none;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="page-wrap">
+  <a class="back-link" id="back-link" href="search.html">← 検索結果へもどる</a>
+
+  <div id="loading-state">よみこみちゅう……</div>
+  <div id="error-state" class="pixel-window">カードが見つかりませんでした。</div>
+
+  <div id="card-content" class="pixel-window" style="display:none;">
+    <div id="status-panel">
+      <img id="card-image" alt="">
+      <div id="card-main">
+        <h1 id="card-name"></h1>
+        <table class="stat-table">
+          <tr><td>番号</td><td id="stat-number"></td></tr>
+          <tr><td>レアリティ</td><td id="stat-rarity"></td></tr>
+          <tr><td>収録パック</td><td id="stat-set"></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div id="price-highlight"></div>
+    <div id="price-updated"></div>
+
+    <div id="history-section">
+      <h2>PRICE LOG</h2>
+      <ul class="history-list" id="history-list"></ul>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3/dist/umd/supabase.js" integrity="sha256-7ABBdtEBrsd67vJmqhyUQRKH/iA5xl6l9scvXhSzhH0=" crossorigin="anonymous"></script>
+<script src="market.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var params = new URLSearchParams(location.search);
+  var cardId = params.get("id");
+
+  var loadingEl = document.getElementById("loading-state");
+  var errorEl = document.getElementById("error-state");
+  var contentEl = document.getElementById("card-content");
+
+  function renderHistoryLoading(){
+    var listEl = document.getElementById("history-list");
+    listEl.innerHTML = "";
+    var li = document.createElement("li");
+    li.className = "history-item";
+    var span = document.createElement("span");
+    span.textContent = "よみこみちゅう……";
+    li.appendChild(span);
+    listEl.appendChild(li);
+  }
+
+  function renderHistory(history){
+    var listEl = document.getElementById("history-list");
+    listEl.innerHTML = "";
+    if(history.length === 0){
+      var empty = document.createElement("li");
+      empty.className = "history-item";
+      var emptySpan = document.createElement("span");
+      emptySpan.textContent = "価格履歴はまだありません";
+      empty.appendChild(emptySpan);
+      listEl.appendChild(empty);
+      return;
+    }
+    history.forEach(function(h){
+      var li = document.createElement("li");
+      li.className = "history-item";
+      var priceSpan = document.createElement("span");
+      priceSpan.className = "history-price";
+      priceSpan.textContent = MARKET.formatYen(h.price);
+      var dateSpan = document.createElement("span");
+      dateSpan.className = "history-date";
+      dateSpan.textContent = MARKET.formatDateTime(h.observed_at);
+      li.appendChild(priceSpan);
+      li.appendChild(dateSpan);
+      listEl.appendChild(li);
+    });
+  }
+
+  function renderHistoryError(){
+    var listEl = document.getElementById("history-list");
+    listEl.innerHTML = "";
+    var li = document.createElement("li");
+    li.className = "history-item";
+    var span = document.createElement("span");
+    span.textContent = "価格履歴を取得できませんでした。";
+    li.appendChild(span);
+    listEl.appendChild(li);
+  }
+
+  if(!cardId){
+    loadingEl.style.display = "none";
+    errorEl.style.display = "block";
+    errorEl.textContent = "カードIDが指定されていません。";
+  } else {
+    loadingEl.style.display = "block";
+
+    // カード詳細と価格履歴は別々に取得する。履歴の取得に失敗しても、
+    // カード詳細（本体）は表示できるようにするため（Promise.allで一括失敗させない）。
+    MARKET.getCard(cardId).then(function(card){
+      loadingEl.style.display = "none";
+
+      if(!card){
+        errorEl.style.display = "block";
+        return;
+      }
+
+      contentEl.style.display = "block";
+      document.title = card.name + " - りょていのサイト";
+
+      var imgEl = document.getElementById("card-image");
+      var safeUrl = MARKET.sanitizeImageUrl(card.image_url);
+      if(safeUrl){
+        imgEl.src = safeUrl;
+      } else {
+        imgEl.remove();
+        var ph = document.createElement("div");
+        ph.id = "card-image";
+        ph.className = "placeholder";
+        ph.textContent = "NO IMAGE";
+        document.getElementById("status-panel").insertBefore(ph, document.getElementById("card-main"));
+      }
+
+      document.getElementById("card-name").textContent = card.name;
+      document.getElementById("stat-number").textContent = card.card_number || "―";
+      document.getElementById("stat-rarity").textContent = card.rarity || "―";
+      document.getElementById("stat-set").textContent = card.set_name || "―";
+
+      document.getElementById("price-highlight").textContent = MARKET.formatYen(card.current_price);
+      document.getElementById("price-updated").textContent =
+        card.price_updated_at ? ("最終更新: " + MARKET.formatDateTime(card.price_updated_at)) : "価格はまだ登録されていません";
+
+      renderHistoryLoading();
+      MARKET.getPriceHistory(cardId, { limit: 20 }).then(function(history){
+        renderHistory(history);
+      }).catch(function(err){
+        console.error(err);
+        renderHistoryError();
+      });
+    }).catch(function(err){
+      console.error(err);
+      loadingEl.style.display = "none";
+      errorEl.style.display = "block";
+      errorEl.textContent = "読み込みに失敗しました。時間をおいてもう一度お試しください。";
+    });
+  }
+
+  // 検索ページへ戻るリンクは、可能なら直前の検索状態を維持したsearch.htmlに戻す
+  var backLink = document.getElementById("back-link");
+  if(document.referrer && document.referrer.indexOf("search.html") !== -1){
+    backLink.addEventListener("click", function(e){
+      e.preventDefault();
+      history.back();
+    });
+  }
+})();
+</script>
+</body>
+</html>

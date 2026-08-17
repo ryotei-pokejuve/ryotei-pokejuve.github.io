@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>カード図鑑 - りょていのサイト</title>
+<meta name="description" content="ポケモンカードの検索・相場チェック。">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https://idnhamxtwxfcxflenxko.supabase.co;">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --font-pixel-en: 'Press Start 2P', monospace;
+    --font-pixel-jp: 'DotGothic16', sans-serif;
+    --bg-outer-1: #7b7bd6;
+    --bg-outer-2: #4a4a9c;
+    --window-bg: #f8f3e2;
+    --window-border-outer: #2a2a4a;
+    --window-border-inner: #ffffff;
+    --text-color: #24243c;
+    --text-sub: #55557a;
+    --accent: #3d7fd4;
+    --accent-2: #e0663f;
+    --menu-hover: #d8ecff;
+    --shadow-color: rgba(0,0,0,.35);
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family: var(--font-pixel-jp);
+    color: var(--text-color);
+    background: linear-gradient(160deg, var(--bg-outer-1), var(--bg-outer-2));
+    min-height: 100vh;
+  }
+  a{ color: var(--accent); }
+  button{ font-family: inherit; cursor:pointer; }
+
+  .pixel-window{
+    background: var(--window-bg);
+    border: 4px solid var(--window-border-outer);
+    box-shadow: inset 0 0 0 3px var(--window-border-inner), 6px 6px 0 var(--shadow-color);
+    padding: 16px 18px;
+  }
+
+  #page-wrap{ max-width: 720px; margin: 0 auto; padding: 12px 12px 40px; }
+
+  #top-bar{
+    position: sticky; top: 0; z-index: 50;
+    padding: 10px 0 8px;
+    background: linear-gradient(160deg, var(--bg-outer-1), var(--bg-outer-2));
+  }
+  #top-bar .back-link{
+    display:inline-block; margin-bottom:8px;
+    font-size: 12px; color:#fff; text-decoration:none;
+    text-shadow: 2px 2px 0 var(--window-border-outer);
+  }
+  #brand{
+    font-family: var(--font-pixel-en);
+    font-size: 13px; color:#fff;
+    text-shadow: 2px 2px 0 var(--window-border-outer);
+    margin: 0 0 10px;
+  }
+
+  #search-form{ display:flex; gap:6px; flex-wrap:wrap; }
+  #search-input{
+    flex: 1 1 200px;
+    min-width: 0;
+    padding: 10px;
+    font-size: 15px;
+    font-family: inherit;
+    border: 3px solid var(--window-border-outer);
+    box-shadow: inset 0 0 0 2px var(--window-border-inner);
+    background: var(--window-bg);
+    color: var(--text-color);
+  }
+  #search-btn{
+    padding: 10px 16px;
+    font-size: 13px;
+    background: var(--accent);
+    color:#fff;
+    border: 3px solid var(--window-border-outer);
+    box-shadow: 3px 3px 0 var(--shadow-color);
+    min-height: 44px;
+  }
+  #search-btn:active{ transform: translate(2px,2px); box-shadow:none; }
+
+  #filter-toggle{
+    margin-top: 8px;
+    font-size: 12px;
+    background: transparent;
+    color: #fff;
+    border: none;
+    text-decoration: underline;
+    padding: 6px 2px;
+    min-height: 44px;
+  }
+  #filter-panel{
+    display:none;
+    margin-top: 6px;
+    padding: 10px;
+    background: rgba(255,255,255,.12);
+    border: 2px dashed rgba(255,255,255,.5);
+  }
+  #filter-panel.open{ display:flex; gap:8px; flex-wrap:wrap; }
+  #filter-panel select{
+    flex: 1 1 140px;
+    padding: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    border: 2px solid var(--window-border-outer);
+  }
+
+  #status-line{
+    margin: 10px 0 4px;
+    font-size: 12px;
+    color: #fff;
+    text-shadow: 1px 1px 0 var(--window-border-outer);
+    min-height: 18px;
+  }
+
+  #results{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  @media (min-width: 560px){
+    #results{ grid-template-columns: 1fr 1fr 1fr; }
+  }
+  .card-tile{
+    display:block;
+    text-decoration:none;
+    color: var(--text-color);
+    background: var(--window-bg);
+    border: 3px solid var(--window-border-outer);
+    box-shadow: inset 0 0 0 2px var(--window-border-inner), 3px 3px 0 var(--shadow-color);
+    padding: 8px;
+    min-height: 44px;
+  }
+  .card-tile:active{ transform: translate(1px,1px); }
+  .card-thumb{
+    width: 100%; aspect-ratio: 3 / 4; object-fit: cover;
+    background: #ddd;
+    border: 2px solid var(--window-border-outer);
+    display:block;
+    margin-bottom: 6px;
+  }
+  .card-thumb.placeholder{
+    display:flex; align-items:center; justify-content:center;
+    font-size: 10px; color: var(--text-sub);
+  }
+  .card-name{ font-size: 12.5px; line-height:1.4; margin-bottom:4px; word-break: break-word; }
+  .card-meta{ font-size: 10.5px; color: var(--text-sub); margin-bottom: 2px; }
+  .card-price{ font-size: 13px; color: var(--accent-2); font-weight:bold; }
+
+  #pager{
+    display:flex; justify-content: space-between; align-items:center;
+    gap: 8px; margin-top: 16px;
+  }
+  #pager button{
+    padding: 10px 14px; font-size: 12px; min-height:44px;
+    background: var(--window-bg); border: 3px solid var(--window-border-outer);
+    box-shadow: inset 0 0 0 2px var(--window-border-inner);
+  }
+  #pager button:disabled{ opacity:.45; }
+  #pager span{ font-size: 12px; color:#fff; text-shadow: 1px 1px 0 var(--window-border-outer); }
+
+  #empty-state, #error-state{
+    margin-top: 20px; padding: 20px; text-align:center;
+    background: var(--window-bg); border: 3px solid var(--window-border-outer);
+    box-shadow: inset 0 0 0 2px var(--window-border-inner);
+    font-size: 13px; display:none;
+  }
+  #retry-btn{
+    margin-top: 10px; padding: 10px 16px; font-size: 12px; min-height: 44px;
+    background: var(--accent); color:#fff;
+    border: 3px solid var(--window-border-outer);
+    box-shadow: 3px 3px 0 var(--shadow-color);
+  }
+  #retry-btn:active{ transform: translate(2px,2px); box-shadow:none; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="page-wrap">
+  <div id="top-bar">
+    <a class="back-link" href="index.html">← トップへもどる</a>
+    <h1 id="brand">🎴 CARD SEARCH</h1>
+
+    <form id="search-form">
+      <input id="search-input" type="search" placeholder="カード名・番号で検索（例: リーリエ）" autocomplete="off">
+      <button id="search-btn" type="submit">けんさく</button>
+    </form>
+    <button id="filter-toggle" type="button" aria-expanded="false">絞り込み ▾</button>
+    <div id="filter-panel">
+      <select id="filter-set">
+        <option value="">パック（すべて）</option>
+      </select>
+      <select id="filter-rarity">
+        <option value="">レアリティ（すべて）</option>
+        <option value="SR">SR</option>
+        <option value="SAR">SAR</option>
+        <option value="AR">AR</option>
+        <option value="RR">RR</option>
+        <option value="R">R</option>
+      </select>
+    </div>
+    <div id="status-line"></div>
+  </div>
+
+  <div id="results" aria-live="polite"></div>
+
+  <div id="empty-state">該当するカードが見つかりませんでした。検索語を変えてお試しください。</div>
+  <div id="error-state">
+    通信エラーが発生しました。時間をおいてもう一度お試しください。<br>
+    <button id="retry-btn" type="button">もう一度試す</button>
+  </div>
+
+  <div id="pager">
+    <button id="prev-btn" type="button">◀ まえ</button>
+    <span id="page-info"></span>
+    <button id="next-btn" type="button">つぎ ▶</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3/dist/umd/supabase.js" integrity="sha256-7ABBdtEBrsd67vJmqhyUQRKH/iA5xl6l9scvXhSzhH0=" crossorigin="anonymous"></script>
+<script src="market.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var PAGE_SIZE = 18;
+  var state = MARKET.loadSearchState() || { query: "", rarity: "", setId: "", offset: 0 };
+  var isInitialLoad = true;
+  var searchSeq = 0; // 古いレスポンスが後から届いても画面を上書きしないための連番
+
+  var els = {
+    form: document.getElementById("search-form"),
+    input: document.getElementById("search-input"),
+    filterToggle: document.getElementById("filter-toggle"),
+    filterPanel: document.getElementById("filter-panel"),
+    rarity: document.getElementById("filter-rarity"),
+    set: document.getElementById("filter-set"),
+    status: document.getElementById("status-line"),
+    results: document.getElementById("results"),
+    empty: document.getElementById("empty-state"),
+    error: document.getElementById("error-state"),
+    retry: document.getElementById("retry-btn"),
+    searchBtn: document.getElementById("search-btn"),
+    prev: document.getElementById("prev-btn"),
+    next: document.getElementById("next-btn"),
+    pageInfo: document.getElementById("page-info")
+  };
+
+  els.input.value = state.query || "";
+  els.rarity.value = state.rarity || "";
+
+  els.filterToggle.addEventListener("click", function(){
+    var open = els.filterPanel.classList.toggle("open");
+    els.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+
+  // パック一覧を読み込んで選択肢に追加（失敗しても検索自体は使えるようにする）
+  MARKET.listCardSets().then(function(sets){
+    sets.forEach(function(s){
+      var opt = document.createElement("option");
+      opt.value = s.id;
+      opt.textContent = s.name;
+      els.set.appendChild(opt);
+    });
+    els.set.value = state.setId || "";
+  }).catch(function(err){
+    console.error(err);
+  });
+
+  var debounceTimer = null;
+  function debouncedSearch(){
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function(){
+      state.offset = 0;
+      runSearch();
+    }, 350);
+  }
+
+  els.input.addEventListener("input", function(){
+    state.query = els.input.value;
+    if(state.query.length === 0 || state.query.length >= 2){
+      debouncedSearch();
+    }
+  });
+  els.rarity.addEventListener("change", function(){
+    state.rarity = els.rarity.value;
+    state.offset = 0;
+    runSearch();
+  });
+  els.set.addEventListener("change", function(){
+    state.setId = els.set.value;
+    state.offset = 0;
+    runSearch();
+  });
+  els.form.addEventListener("submit", function(e){
+    e.preventDefault();
+    clearTimeout(debounceTimer);
+    state.query = els.input.value;
+    state.offset = 0;
+    runSearch();
+  });
+
+  els.prev.addEventListener("click", function(){
+    state.offset = Math.max(0, state.offset - PAGE_SIZE);
+    runSearch();
+  });
+  els.next.addEventListener("click", function(){
+    state.offset = state.offset + PAGE_SIZE;
+    runSearch();
+  });
+  els.retry.addEventListener("click", function(){
+    runSearch();
+  });
+
+  // カード詳細へ移動する直前のスクロール位置を保存（結果一覧に戻ったときの復元用）
+  els.results.addEventListener("click", function(e){
+    if(e.target.closest(".card-tile")){
+      state.scrollY = window.scrollY;
+      MARKET.saveSearchState(state);
+    }
+  });
+
+  // XSS対策: DOM APIで要素を組み立てる（innerHTMLへの文字列結合は行わない）。
+  // 画像URLは MARKET.sanitizeImageUrl() を必ず通し、https以外・不正な値はプレースホルダーにする。
+  function createCardTile(card){
+    var a = document.createElement("a");
+    a.className = "card-tile";
+    a.href = "card.html?id=" + encodeURIComponent(card.id);
+
+    var safeUrl = MARKET.sanitizeImageUrl(card.image_url);
+    if(safeUrl){
+      var img = document.createElement("img");
+      img.className = "card-thumb";
+      img.src = safeUrl;
+      img.alt = "";
+      img.loading = "lazy";
+      a.appendChild(img);
+    } else {
+      var ph = document.createElement("div");
+      ph.className = "card-thumb placeholder";
+      ph.textContent = "NO IMAGE";
+      a.appendChild(ph);
+    }
+
+    var nameEl = document.createElement("div");
+    nameEl.className = "card-name";
+    nameEl.textContent = card.name || "";
+    a.appendChild(nameEl);
+
+    var metaEl = document.createElement("div");
+    metaEl.className = "card-meta";
+    metaEl.textContent = (card.card_number || "") + (card.rarity ? " ／ " + card.rarity : "");
+    a.appendChild(metaEl);
+
+    var setEl = document.createElement("div");
+    setEl.className = "card-meta";
+    setEl.textContent = card.set_name || "";
+    a.appendChild(setEl);
+
+    var priceEl = document.createElement("div");
+    priceEl.className = "card-price";
+    priceEl.textContent = MARKET.formatYen(card.current_price);
+    a.appendChild(priceEl);
+
+    return a;
+  }
+
+  function setLoadingUI(loading){
+    els.searchBtn.disabled = loading;
+    if(loading){
+      els.prev.disabled = true;
+      els.next.disabled = true;
+    }
+  }
+
+  function runSearch(){
+    MARKET.saveSearchState(state);
+    var seq = ++searchSeq;
+    setLoadingUI(true);
+    els.status.textContent = "検索中…";
+    els.empty.style.display = "none";
+    els.error.style.display = "none";
+
+    MARKET.searchCards({
+      query: state.query,
+      rarity: state.rarity || null,
+      setId: state.setId || null,
+      limit: PAGE_SIZE,
+      offset: state.offset
+    }).then(function(rows){
+      if(seq !== searchSeq) return; // すでに新しい検索が走っている場合は結果を捨てる
+      setLoadingUI(false);
+      els.status.textContent = "";
+      els.results.innerHTML = "";
+      rows.forEach(function(card){
+        els.results.appendChild(createCardTile(card));
+      });
+
+      if(rows.length === 0){
+        els.empty.style.display = "block";
+      }
+
+      var total = rows.length > 0 ? rows[0].total_count : 0;
+      var currentPage = Math.floor(state.offset / PAGE_SIZE) + 1;
+      var totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      els.pageInfo.textContent = total > 0 ? (currentPage + " / " + totalPages + " ページ（全" + total + "件）") : "";
+      els.prev.disabled = state.offset <= 0;
+      els.next.disabled = state.offset + PAGE_SIZE >= total;
+
+      // 詳細ページから戻ってきた直後だけ、以前のスクロール位置を復元する
+      if(isInitialLoad){
+        isInitialLoad = false;
+        if(typeof state.scrollY === "number"){
+          window.scrollTo(0, state.scrollY);
+          state.scrollY = undefined;
+          MARKET.saveSearchState(state);
+        }
+      }
+    }).catch(function(err){
+      if(seq !== searchSeq) return;
+      console.error(err);
+      setLoadingUI(false);
+      els.status.textContent = "";
+      els.results.innerHTML = "";
+      els.pageInfo.textContent = "";
+      els.prev.disabled = true;
+      els.next.disabled = true;
+      els.error.style.display = "block";
+    });
+  }
+
+  runSearch();
+})();
+</script>
+</body>
+</html>
