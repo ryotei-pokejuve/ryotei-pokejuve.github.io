@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #12151a; }
+  * { box-sizing: border-box; }
+  a { color: #7fd4c1; text-decoration: none; border-bottom: 1px solid rgba(127,212,193,0.4); }
+  a:hover { color: #b9ece0; border-bottom-color: #b9ece0; }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+</style>
+</helmet>
+
+<section style="min-height: 100vh; padding: 44px 48px 64px; background: #12151a; font-family: 'Zen Kaku Gothic New', system-ui, sans-serif; display: flex; flex-direction: column; gap: 30px; border-bottom: 1px solid #232a34;">
+
+  <div style="max-width: 900px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.28em; color: #6d7d8f; text-transform: uppercase;">Turn 2 — unified system</div>
+    <h1 style="margin: 0; font-size: 30px; font-weight: 700; letter-spacing: 0.02em; color: #eef2f6;">1a + 1b を一本化 ── ダーク／ライトの二テーマ＋実レスポンシブ</h1>
+    <p style="margin: 0; font-size: 14.5px; line-height: 1.85; color: #94a3b1; text-wrap: pretty;">構造は 1b の台紙ベース、行密度と罫線処理は 1a を採用し、配色だけをテーマとして切り替えます。<strong style="color: #cfd8e1; font-weight: 500;">DARK / LIGHT</strong> と <strong style="color: #cfd8e1; font-weight: 500;">1180 / 760 / 390</strong> のトグルは飾りではなく実際に同一マークアップの分岐を切り替えています。390 では左のナビが下段のタブバーに落ち、一覧と詳細が縦積みになり、行高は 46px 以上に広がります。実装仕様は <a href="IMPLEMENTATION.md">IMPLEMENTATION.md</a> にまとめました。</p>
+  </div>
+
+  <div id="2a" style="display: flex; flex-direction: column; gap: 14px;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #0e1116; background: #cfd8e1; padding: 4px 10px; border-radius: 4px;">2a</span>
+      <span style="font-size: 17px; font-weight: 700; color: #eef2f6; letter-spacing: 0.03em;">NOTA-II ／ 統合版</span>
+    </div>
+
+    <div onClick="{{ u.focus }}" style="{{ u.S.frame }}">
+      <div style="{{ u.S.topbar }}">
+        <div style="width: 10px; height: 10px; background: #7fd4c1; transform: rotate(45deg); flex: none;"></div>
+        <span style="{{ u.S.brand }}">NOTA-II</span>
+        <span style="{{ u.S.barTitle }}">{{ u.title }}</span>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <div style="{{ u.S.toggle }}">
+            <sc-for list="{{ u.themes }}" as="th" hint-placeholder-count="2">
+              <span onClick="{{ th.go }}" style="{{ th.style }}">{{ th.label }}</span>
+            </sc-for>
+          </div>
+          <div style="{{ u.S.toggle }}">
+            <sc-for list="{{ u.views }}" as="v" hint-placeholder-count="3">
+              <span onClick="{{ v.go }}" style="{{ v.style }}">{{ v.label }}</span>
+            </sc-for>
+          </div>
+          <span style="{{ u.S.barDim }}">08 / 64</span>
+        </div>
+      </div>
+
+      <div style="{{ u.S.body }}">
+        <div style="{{ u.S.navWrap }}">
+          <sc-for list="{{ u.nav }}" as="n" hint-placeholder-count="4">
+            <div onClick="{{ n.go }}" style="{{ n.style }}">
+              <span style="{{ n.markStyle }}">{{ n.mark }}</span>
+              <span style="{{ n.labelStyle }}">{{ n.label }}</span>
+            </div>
+          </sc-for>
+          <sc-if value="{{ u.showHint }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ u.S.hint }}">↑↓ 移動<br />ENTER 決定<br />ESC 戻る</div>
+          </sc-if>
+        </div>
+
+        <div style="{{ u.S.content }}">
+
+          <sc-if value="{{ u.isMenu }}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <sc-for list="{{ u.menu }}" as="m" hint-placeholder-count="4">
+                <div onClick="{{ m.go }}" style="{{ m.style }}">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="{{ m.markStyle }}">{{ m.mark }}</span>
+                    <span style="{{ m.labelStyle }}">{{ m.label }}</span>
+                    <span style="{{ m.metaStyle }}">{{ m.meta }}</span>
+                  </div>
+                  <div style="{{ m.descStyle }}">{{ m.desc }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ u.isList }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ u.S.listWrap }}">
+              <div style="{{ u.S.listPanel }}">
+                <div style="{{ u.S.listHead }}">
+                  <span style="{{ u.S.monoDim }}">SPECIMENS</span>
+                  <span style="{{ u.S.monoPos }}">{{ u.listPos }}</span>
+                </div>
+                <sc-for list="{{ u.items }}" as="s" hint-placeholder-count="8">
+                  <div onClick="{{ s.go }}" style="{{ s.style }}">
+                    <span style="{{ s.markStyle }}">{{ s.mark }}</span>
+                    <span style="{{ s.noStyle }}">{{ s.no }}</span>
+                    <span style="{{ s.nameStyle }}">{{ s.name }}</span>
+                    <span style="{{ s.chipStyle }}">{{ s.cat }}</span>
+                    <span style="{{ s.qtyStyle }}">{{ s.qty }}</span>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
+                <div style="{{ u.S.detailCard }}">
+                  <div style="{{ u.S.detailHead }}">
+                    <span style="{{ u.S.detailName }}">{{ u.curName }}</span>
+                    <span style="{{ u.S.barDim }}">{{ u.curNo }}</span>
+                  </div>
+                  <div style="padding: 13px; display: flex; gap: 13px; flex-wrap: wrap;">
+                    <div style="{{ u.S.imgBox }}">
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; letter-spacing: 0.1em; color: #8b8168;">IMAGE</span>
+                    </div>
+                    <div style="flex: 1; min-width: 190px; display: flex; flex-direction: column; gap: 8px;">
+                      <sc-for list="{{ u.stats }}" as="st" hint-placeholder-count="3">
+                        <div style="display: flex; align-items: center; gap: 9px;">
+                          <span style="{{ u.S.statLabel }}">{{ st.label }}</span>
+                          <div style="display: flex; gap: 2px;">
+                            <sc-for list="{{ st.pips }}" as="p" hint-placeholder-count="10">
+                              <sc-if value="{{ p.on }}" hint-placeholder-val="{{ true }}">
+                                <div style="{{ u.S.pipOn }}"></div>
+                              </sc-if>
+                              <sc-if value="{{ p.off }}" hint-placeholder-val="{{ false }}">
+                                <div style="{{ u.S.pipOff }}"></div>
+                              </sc-if>
+                            </sc-for>
+                          </div>
+                          <span style="{{ u.S.statValue }}">{{ st.value }}</span>
+                        </div>
+                      </sc-for>
+                      <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        <sc-for list="{{ u.tags }}" as="t" hint-placeholder-count="2">
+                          <span style="{{ t.style }}">{{ t.label }}</span>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div style="{{ u.S.notes }}">
+                  <div style="{{ u.S.monoDim }}">NOTES</div>
+                  <div style="{{ u.S.desc }}">{{ u.curDesc }}</div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ u.isMap }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ u.S.mapWrap }}">
+              <div style="{{ u.S.mapGrid }}">
+                <sc-for list="{{ u.areas }}" as="ar" hint-placeholder-count="12">
+                  <div onClick="{{ ar.go }}" style="{{ ar.style }}">
+                    <div style="{{ ar.codeStyle }}">{{ ar.code }}</div>
+                    <div style="{{ ar.nameStyle }}">{{ ar.name }}</div>
+                    <div style="{{ ar.stateStyle }}">{{ ar.state }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="{{ u.S.legend }}">
+                <sc-for list="{{ u.legend }}" as="l" hint-placeholder-count="3">
+                  <div style="display: flex; align-items: center; gap: 7px;">
+                    <span style="{{ l.style }}"></span>
+                    <span style="{{ u.S.legendLabel }}">{{ l.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ u.isLog }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <sc-for list="{{ logs }}" as="g" hint-placeholder-count="6">
+                <div style="{{ u.S.logRow }}">
+                  <span style="{{ u.S.logDate }}">{{ g.date }}</span>
+                  <span style="{{ u.S.logArea }}">{{ g.area }}</span>
+                  <span style="{{ u.S.logText }}">{{ g.text }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+
+      <div style="padding: 0 12px 12px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="{{ u.S.msg }}">
+          <div style="{{ u.S.msgText }}">{{ u.msg }}</div>
+          <div style="position: absolute; right: 15px; bottom: 13px; animation: bob 1s steps(2, end) infinite;">
+            <div style="{{ u.S.caret }}"></div>
+          </div>
+        </div>
+        <sc-if value="{{ showAds }}" hint-placeholder-val="{{ true }}">
+          <div style="{{ u.S.ad }}">
+            <span style="{{ u.S.adLabel }}">AD SLOT — 728×90 / 320×100</span>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+      <div style="max-width: 1180px; display: flex; flex-wrap: wrap; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: #6d7d8f;">
+        <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">テーマは配色トークンのみ差し替え／構造は共通</span>
+        <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">ライトは縁2px＋下影、ダークは縁1px＋内側罫線</span>
+        <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">選択＝反転塗り＋左3pxバー＋▶</span>
+        <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">760 で一覧と詳細が縦積み</span>
+        <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">390 でナビが下段タブバー・行高46px</span>
+        <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">メニューの「設定」でテーマ切替が発火</span>
+      </div>
+    </sc-if>
+  </div>
+</section>
+
+<section style="min-height: 100vh; padding: 44px 48px 72px; background: #12151a; font-family: 'Zen Kaku Gothic New', system-ui, sans-serif; display: flex; flex-direction: column; gap: 34px;">
+
+  <div style="max-width: 900px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.28em; color: #6d7d8f; text-transform: uppercase;">Turn 1 — 2D mode, two directions</div>
+    <h1 style="margin: 0; font-size: 30px; font-weight: 700; letter-spacing: 0.02em; color: #eef2f6;">架空の観測端末として操作するサイト UI</h1>
+    <p style="margin: 0; font-size: 14.5px; line-height: 1.85; color: #94a3b1; text-wrap: pretty;">参考資料からは意匠ではなく構造だけを抽出しました。二重の縁で立ち上げる窓、上段＝状態／中段＝操作対象／下段＝常設メッセージ窓の三段、カーソル記号と反転を併記する選択状態、分類色を小さなチップに閉じ込める符号化、離散ピップによる数値表示、そして十字キー六操作で全要素に到達できるナビゲーション。この六つを軸に、<a href="#1a">1a</a>（暗色・線ベース・高密度）と<a href="#1b">1b</a>（明色・面ベース・余白多め）の二案を用意しています。どちらも4画面（メニュー／標本／区域図／記録）が実際に遷移し、枠をクリックしてから方向キー・Enter・Esc で操作できます。</p>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 44px; align-items: flex-start;">
+
+    <div id="1a" style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #0e1116; background: #7fd4c1; padding: 4px 10px; border-radius: 4px;">1a</span>
+        <span style="font-size: 17px; font-weight: 700; color: #eef2f6; letter-spacing: 0.03em;">暗色端末 / 線ベース・高密度</span>
+      </div>
+      <p style="margin: 0; max-width: 700px; font-size: 13px; line-height: 1.8; color: #8b9aa8;">情報の区切りを罫線と余白でつくり、面を増やさない。カーソルは行頭の実線バーと ▶ の併記。長時間の閲覧と広い一覧に向く。</p>
+
+      <div style="display: flex; gap: 18px; align-items: flex-start;">
+
+        <div onClick="{{ aFocus }}" style="width: 760px; flex: none; border-radius: 14px; border: 1px solid #000; background: #171c24; box-shadow: inset 0 0 0 1px #2c3644, 0 26px 60px rgba(0,0,0,0.55); overflow: hidden;">
+          <div style="height: 52px; display: flex; align-items: center; gap: 14px; padding: 0 16px; background: #10141a; border-bottom: 1px solid #2c3644;">
+            <div style="width: 9px; height: 9px; background: #7fd4c1; transform: rotate(45deg);"></div>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; color: #7fd4c1;">NOTA-II</span>
+            <span style="width: 1px; height: 18px; background: #2c3644;"></span>
+            <span style="font-size: 14px; font-weight: 500; letter-spacing: 0.1em; color: #e6ecf3;">{{ aTitle }}</span>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
+              <div style="display: flex; border: 1px solid #2c3644; border-radius: 6px; overflow: hidden;">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; padding: 4px 10px; background: #7fd4c1; color: #0e1116;">2D</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; padding: 4px 10px; color: #57657a;">3D</span>
+              </div>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #7c8b9c;">{{ aCounter }}</span>
+            </div>
+          </div>
+
+          <div style="min-height: 470px; display: flex;">
+            <div style="width: 132px; flex: none; padding: 12px 0; border-right: 1px solid #2c3644; display: flex; flex-direction: column;">
+              <sc-for list="{{ aNav }}" as="n" hint-placeholder-count="4">
+                <div onClick="{{ n.go }}" style="position: relative; cursor: pointer; padding: 11px 12px 11px 16px; display: flex; align-items: center; gap: 8px;">
+                  <sc-if value="{{ n.sel }}" hint-placeholder-val="{{ false }}">
+                    <div style="position: absolute; left: 0; top: 4px; bottom: 4px; width: 3px; background: #7fd4c1;"></div>
+                  </sc-if>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #7fd4c1; width: 8px;">{{ n.mark }}</span>
+                  <span style="font-size: 13.5px; letter-spacing: 0.08em; color: {{ n.color }};">{{ n.label }}</span>
+                </div>
+              </sc-for>
+              <div style="margin-top: auto; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; line-height: 1.9; letter-spacing: 0.06em; color: #4d5b6c;">↑↓ 移動<br />ENTER 決定<br />ESC 戻る</div>
+            </div>
+
+            <div style="flex: 1; min-width: 0; padding: 14px;">
+
+              <sc-if value="{{ aIsMenu }}" hint-placeholder-val="{{ true }}">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <sc-for list="{{ aMenu }}" as="m" hint-placeholder-count="4">
+                    <div onClick="{{ m.go }}" style="position: relative; cursor: pointer; padding: 14px 16px; border: 1px solid #2c3644; border-radius: 10px; background: #1b212a;">
+                      <sc-if value="{{ m.sel }}" hint-placeholder-val="{{ false }}">
+                        <div style="position: absolute; inset: -1px; border: 1px solid #7fd4c1; border-radius: 10px; background: rgba(127,212,193,0.09);"></div>
+                      </sc-if>
+                      <div style="position: relative; display: flex; align-items: center; gap: 12px;">
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7fd4c1; width: 10px;">{{ m.mark }}</span>
+                        <span style="font-size: 16px; font-weight: 500; letter-spacing: 0.08em; color: #eef2f6;">{{ m.label }}</span>
+                        <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #7c8b9c;">{{ m.meta }}</span>
+                      </div>
+                      <div style="position: relative; margin-top: 5px; padding-left: 22px; font-size: 12px; line-height: 1.7; color: #8b9aa8; text-wrap: pretty;">{{ m.desc }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ aIsList }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; gap: 14px;">
+                  <div style="width: 320px; flex: none;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 6px 8px; border-bottom: 1px solid #2c3644;">
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: #6d7d8f;">SPECIMENS</span>
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6d7d8f;">{{ aListPos }}</span>
+                    </div>
+                    <sc-for list="{{ aItems }}" as="s" hint-placeholder-count="8">
+                      <div onClick="{{ s.go }}" style="position: relative; cursor: pointer; padding: 8px 8px 8px 14px; display: flex; align-items: center; gap: 9px; border-bottom: 1px solid #212936;">
+                        <sc-if value="{{ s.sel }}" hint-placeholder-val="{{ false }}">
+                          <div style="position: absolute; inset: 0; background: rgba(127,212,193,0.1);"></div>
+                        </sc-if>
+                        <sc-if value="{{ s.sel }}" hint-placeholder-val="{{ false }}">
+                          <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #7fd4c1;"></div>
+                        </sc-if>
+                        <span style="position: relative; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #7fd4c1; width: 8px;">{{ s.mark }}</span>
+                        <span style="position: relative; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6d7d8f; width: 32px;">{{ s.no }}</span>
+                        <span style="position: relative; flex: 1; min-width: 0; font-size: 14px; letter-spacing: 0.05em; color: #e6ecf3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ s.name }}</span>
+                        <span style="position: relative; font-size: 10.5px; letter-spacing: 0.08em; padding: 2px 7px; border-radius: 3px; color: {{ s.catInk }}; background: {{ s.catColor }};">{{ s.cat }}</span>
+                        <span style="position: relative; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #94a3b1; width: 30px; text-align: right;">{{ s.qty }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; align-items: baseline; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid #2c3644;">
+                      <span style="font-size: 19px; font-weight: 500; letter-spacing: 0.06em; color: #eef2f6;">{{ aCurName }}</span>
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6d7d8f;">{{ aCurNo }}</span>
+                    </div>
+                    <div style="display: flex; gap: 14px;">
+                      <div style="width: 104px; height: 104px; flex: none; border: 1px solid #2c3644; border-radius: 8px; background: #131820; background-image: repeating-linear-gradient(90deg, rgba(127,212,193,0.09) 0 2px, transparent 2px 8px); display: flex; align-items: flex-end; padding: 7px;">
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; letter-spacing: 0.1em; color: #57657a;">IMAGE</span>
+                      </div>
+                      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 9px;">
+                        <sc-for list="{{ aStats }}" as="st" hint-placeholder-count="3">
+                          <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 11.5px; letter-spacing: 0.1em; color: #8b9aa8; width: 40px;">{{ st.label }}</span>
+                            <div style="display: flex; gap: 2px;">
+                              <sc-for list="{{ st.pips }}" as="p" hint-placeholder-count="10">
+                                <sc-if value="{{ p.on }}" hint-placeholder-val="{{ true }}">
+                                  <div style="width: 9px; height: 13px; border-radius: 1px; background: #7fd4c1;"></div>
+                                </sc-if>
+                                <sc-if value="{{ p.off }}" hint-placeholder-val="{{ false }}">
+                                  <div style="width: 9px; height: 13px; border-radius: 1px; background: #263040;"></div>
+                                </sc-if>
+                              </sc-for>
+                            </div>
+                            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6d7d8f;">{{ st.value }}</span>
+                          </div>
+                        </sc-for>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px;">
+                          <sc-for list="{{ aTags }}" as="t" hint-placeholder-count="2">
+                            <span style="font-size: 10.5px; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 3px; color: {{ t.ink }}; background: {{ t.color }};">{{ t.label }}</span>
+                          </sc-for>
+                        </div>
+                      </div>
+                    </div>
+                    <div style="font-size: 12.5px; line-height: 1.9; color: #a7b4c1; text-wrap: pretty;">{{ aCurDesc }}</div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ aIsMap }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                    <sc-for list="{{ aAreas }}" as="ar" hint-placeholder-count="12">
+                      <div onClick="{{ ar.go }}" style="position: relative; cursor: pointer; padding: 11px 10px; border: 1px solid #2c3644; border-radius: 9px; background: #1b212a;">
+                        <sc-if value="{{ ar.sel }}" hint-placeholder-val="{{ false }}">
+                          <div style="position: absolute; inset: -1px; border: 1px solid #7fd4c1; border-radius: 9px; background: rgba(127,212,193,0.09);"></div>
+                        </sc-if>
+                        <div style="position: relative; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; color: #6d7d8f;">{{ ar.code }}</div>
+                        <div style="position: relative; margin-top: 3px; font-size: 13px; letter-spacing: 0.05em; color: #e6ecf3;">{{ ar.name }}</div>
+                        <div style="position: relative; margin-top: 8px; display: flex; align-items: center; gap: 6px;">
+                          <span style="width: 7px; height: 7px; border-radius: 50%; background: {{ ar.stateColor }};"></span>
+                          <span style="font-size: 10.5px; letter-spacing: 0.06em; color: #94a3b1;">{{ ar.state }}</span>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="display: flex; gap: 16px; padding-top: 10px; border-top: 1px solid #2c3644;">
+                    <sc-for list="{{ legend }}" as="l" hint-placeholder-count="3">
+                      <div style="display: flex; align-items: center; gap: 7px;">
+                        <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ l.color }};"></span>
+                        <span style="font-size: 10.5px; letter-spacing: 0.08em; color: #7c8b9c;">{{ l.label }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ aIsLog }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column;">
+                  <sc-for list="{{ logs }}" as="g" hint-placeholder-count="6">
+                    <div style="display: flex; gap: 14px; padding: 10px 6px; border-bottom: 1px solid #212936;">
+                      <span style="flex: none; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: #7fd4c1; width: 68px;">{{ g.date }}</span>
+                      <span style="flex: none; font-size: 11px; letter-spacing: 0.08em; color: #6d7d8f; width: 52px;">{{ g.area }}</span>
+                      <span style="flex: 1; min-width: 0; font-size: 12.5px; line-height: 1.7; color: #b3bfcb; text-wrap: pretty;">{{ g.text }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+            </div>
+          </div>
+
+          <div style="padding: 12px 14px; border-top: 1px solid #2c3644; background: #10141a; display: flex; flex-direction: column; gap: 10px;">
+            <div style="position: relative; min-height: 66px; padding: 12px 40px 12px 14px; border: 1px solid #2c3644; border-radius: 10px; background: #1b212a;">
+              <div style="font-size: 13.5px; line-height: 1.8; color: #dce4ec;">{{ aMsg }}</div>
+              <div style="position: absolute; right: 14px; bottom: 12px; animation: bob 1s steps(2, end) infinite;">
+                <div style="width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid #7fd4c1;"></div>
+              </div>
+            </div>
+            <sc-if value="{{ showAds }}" hint-placeholder-val="{{ true }}">
+              <div style="height: 60px; border: 1px dashed #37424f; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.2em; color: #4d5b6c;">AD SLOT 728×90</span>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+
+        <div style="width: 372px; flex: none; display: flex; flex-direction: column; gap: 10px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: #6d7d8f;">MOBILE 390</span>
+          <div style="border-radius: 22px; border: 1px solid #000; background: #171c24; box-shadow: inset 0 0 0 1px #2c3644, 0 20px 44px rgba(0,0,0,0.5); overflow: hidden;">
+            <div style="height: 46px; display: flex; align-items: center; gap: 10px; padding: 0 14px; background: #10141a; border-bottom: 1px solid #2c3644;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #7fd4c1;">‹</span>
+              <span style="font-size: 13.5px; letter-spacing: 0.08em; color: #e6ecf3;">標本</span>
+              <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7c8b9c;">{{ aCounter }}</span>
+            </div>
+            <div style="padding: 10px 12px;">
+              <sc-for list="{{ aItems }}" as="s" hint-placeholder-count="8">
+                <div onClick="{{ s.go }}" style="position: relative; cursor: pointer; padding: 11px 6px 11px 12px; display: flex; align-items: center; gap: 9px; border-bottom: 1px solid #212936;">
+                  <sc-if value="{{ s.sel }}" hint-placeholder-val="{{ false }}">
+                    <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #7fd4c1;"></div>
+                  </sc-if>
+                  <span style="position: relative; font-size: 14px; letter-spacing: 0.05em; color: #e6ecf3; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ s.name }}</span>
+                  <span style="position: relative; font-size: 10px; letter-spacing: 0.08em; padding: 2px 7px; border-radius: 3px; color: {{ s.catInk }}; background: {{ s.catColor }};">{{ s.cat }}</span>
+                  <span style="position: relative; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #94a3b1;">{{ s.qty }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="padding: 12px; border-top: 1px solid #2c3644; background: #10141a;">
+              <div style="padding: 12px 14px; border: 1px solid #2c3644; border-radius: 10px; background: #1b212a; font-size: 13px; line-height: 1.8; color: #dce4ec;">{{ aMsg }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width: 1150px; display: flex; flex-wrap: wrap; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: #6d7d8f;">
+          <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">境界＝1px罫線のみ／面は増やさない</span>
+          <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">選択＝行頭バー＋薄い反転＋▶</span>
+          <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">分類色はチップ内に限定</span>
+          <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">数値は10粒の離散ピップ</span>
+          <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">モバイルは詳細を後段に落とす</span>
+        </div>
+      </sc-if>
+    </div>
+
+    <div id="1b" style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #f6f2e8; background: #2f6f5e; padding: 4px 10px; border-radius: 4px;">1b</span>
+        <span style="font-size: 17px; font-weight: 700; color: #eef2f6; letter-spacing: 0.03em;">明色台紙 / 面ベース・余白多め</span>
+      </div>
+      <p style="margin: 0; max-width: 700px; font-size: 13px; line-height: 1.8; color: #8b9aa8;">要素ごとに二重縁の台紙を敷き、選択は塗りの全反転で示す。タップ面積が大きく、初見のわかりやすさとスマホ操作に向く。</p>
+
+      <div style="display: flex; gap: 18px; align-items: flex-start;">
+
+        <div onClick="{{ bFocus }}" style="width: 760px; flex: none; border-radius: 16px; border: 2px solid #241f19; background: #efe9db; box-shadow: 0 26px 60px rgba(0,0,0,0.5); overflow: hidden;">
+          <div style="height: 56px; display: flex; align-items: center; gap: 14px; padding: 0 16px; background: #2f6f5e; border-bottom: 2px solid #241f19;">
+            <div style="width: 10px; height: 10px; background: #f0d79a; transform: rotate(45deg);"></div>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; color: #f6f2e8;">NOTA-II</span>
+            <span style="font-size: 15px; font-weight: 500; letter-spacing: 0.1em; color: #f6f2e8;">{{ bTitle }}</span>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
+              <div style="display: flex; border: 2px solid #241f19; border-radius: 7px; overflow: hidden;">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; padding: 4px 10px; background: #f0d79a; color: #241f19;">2D</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; padding: 4px 10px; background: #24564a; color: #9dc3b7;">3D</span>
+              </div>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #cfe3da;">{{ bCounter }}</span>
+            </div>
+          </div>
+
+          <div style="min-height: 470px; display: flex; gap: 12px; padding: 12px;">
+            <div style="width: 128px; flex: none; display: flex; flex-direction: column; gap: 8px;">
+              <sc-for list="{{ bNav }}" as="n" hint-placeholder-count="4">
+                <div onClick="{{ n.go }}" style="position: relative; cursor: pointer; padding: 11px 12px; border: 2px solid #241f19; border-radius: 9px; background: #fdfaf1; box-shadow: 0 2px 0 rgba(36,31,25,0.3);">
+                  <sc-if value="{{ n.sel }}" hint-placeholder-val="{{ false }}">
+                    <div style="position: absolute; inset: 0; border-radius: 7px; background: #2f6f5e;"></div>
+                  </sc-if>
+                  <div style="position: relative; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: {{ n.markColor }}; width: 8px;">{{ n.mark }}</span>
+                    <span style="font-size: 13.5px; font-weight: 500; letter-spacing: 0.08em; color: {{ n.color }};">{{ n.label }}</span>
+                  </div>
+                </div>
+              </sc-for>
+              <div style="margin-top: auto; padding: 10px 12px; border: 2px dashed #d5cbb2; border-radius: 9px; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; line-height: 1.9; letter-spacing: 0.06em; color: #8b8168;">↑↓ 移動<br />ENTER 決定<br />ESC 戻る</div>
+            </div>
+
+            <div style="flex: 1; min-width: 0;">
+
+              <sc-if value="{{ bIsMenu }}" hint-placeholder-val="{{ true }}">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <sc-for list="{{ bMenu }}" as="m" hint-placeholder-count="4">
+                    <div onClick="{{ m.go }}" style="position: relative; cursor: pointer; padding: 15px 16px; border: 2px solid #241f19; border-radius: 11px; background: #fdfaf1; box-shadow: inset 0 0 0 2px #e6dec7, 0 3px 0 rgba(36,31,25,0.28);">
+                      <sc-if value="{{ m.sel }}" hint-placeholder-val="{{ false }}">
+                        <div style="position: absolute; inset: 0; border-radius: 9px; background: #f0d79a; box-shadow: inset 0 0 0 2px #241f19;"></div>
+                      </sc-if>
+                      <div style="position: relative; display: flex; align-items: center; gap: 12px;">
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #2f6f5e; width: 10px;">{{ m.mark }}</span>
+                        <span style="font-size: 16.5px; font-weight: 700; letter-spacing: 0.08em; color: #241f19;">{{ m.label }}</span>
+                        <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #7a7157;">{{ m.meta }}</span>
+                      </div>
+                      <div style="position: relative; margin-top: 5px; padding-left: 22px; font-size: 12px; line-height: 1.7; color: #5f584a; text-wrap: pretty;">{{ m.desc }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ bIsList }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; gap: 12px;">
+                  <div style="width: 316px; flex: none; border: 2px solid #241f19; border-radius: 11px; background: #fdfaf1; box-shadow: inset 0 0 0 2px #e6dec7; padding: 8px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 6px 8px; border-bottom: 2px solid #e6dec7;">
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: #2f6f5e;">SPECIMENS</span>
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #8b8168;">{{ bListPos }}</span>
+                    </div>
+                    <sc-for list="{{ bItems }}" as="s" hint-placeholder-count="8">
+                      <div onClick="{{ s.go }}" style="position: relative; cursor: pointer; margin-top: 3px; padding: 8px 8px; border-radius: 6px; display: flex; align-items: center; gap: 9px;">
+                        <sc-if value="{{ s.sel }}" hint-placeholder-val="{{ false }}">
+                          <div style="position: absolute; inset: 0; border-radius: 6px; background: #2f6f5e;"></div>
+                        </sc-if>
+                        <span style="position: relative; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: {{ s.markColor }}; width: 8px;">{{ s.mark }}</span>
+                        <span style="position: relative; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: {{ s.dimColor }}; width: 32px;">{{ s.no }}</span>
+                        <span style="position: relative; flex: 1; min-width: 0; font-size: 14px; font-weight: 500; letter-spacing: 0.05em; color: {{ s.textColor }}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ s.name }}</span>
+                        <span style="position: relative; font-size: 10.5px; letter-spacing: 0.08em; padding: 2px 7px; border-radius: 3px; color: {{ s.catInk }}; background: {{ s.catColor }};">{{ s.cat }}</span>
+                        <span style="position: relative; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: {{ s.textColor }}; width: 30px; text-align: right;">{{ s.qty }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="border: 2px solid #241f19; border-radius: 11px; background: #fdfaf1; box-shadow: inset 0 0 0 2px #e6dec7; overflow: hidden;">
+                      <div style="padding: 9px 14px; background: #2f6f5e; display: flex; align-items: baseline; justify-content: space-between;">
+                        <span style="font-size: 17px; font-weight: 700; letter-spacing: 0.06em; color: #f6f2e8;">{{ bCurName }}</span>
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #b8d5c9;">{{ bCurNo }}</span>
+                      </div>
+                      <div style="padding: 13px; display: flex; gap: 13px;">
+                        <div style="width: 100px; height: 100px; flex: none; border: 2px solid #241f19; border-radius: 7px; background: #e8e0cb; background-image: repeating-linear-gradient(90deg, rgba(36,31,25,0.09) 0 2px, transparent 2px 8px); display: flex; align-items: flex-end; padding: 6px;">
+                          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; letter-spacing: 0.1em; color: #8b8168;">IMAGE</span>
+                        </div>
+                        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px;">
+                          <sc-for list="{{ bStats }}" as="st" hint-placeholder-count="3">
+                            <div style="display: flex; align-items: center; gap: 9px;">
+                              <span style="font-size: 11.5px; letter-spacing: 0.1em; color: #5f584a; width: 40px;">{{ st.label }}</span>
+                              <div style="display: flex; gap: 2px;">
+                                <sc-for list="{{ st.pips }}" as="p" hint-placeholder-count="10">
+                                  <sc-if value="{{ p.on }}" hint-placeholder-val="{{ true }}">
+                                    <div style="width: 9px; height: 13px; border-radius: 1px; background: #2f6f5e;"></div>
+                                  </sc-if>
+                                  <sc-if value="{{ p.off }}" hint-placeholder-val="{{ false }}">
+                                    <div style="width: 9px; height: 13px; border-radius: 1px; background: #ddd4bc;"></div>
+                                  </sc-if>
+                                </sc-for>
+                              </div>
+                              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8b8168;">{{ st.value }}</span>
+                            </div>
+                          </sc-for>
+                          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                            <sc-for list="{{ bTags }}" as="t" hint-placeholder-count="2">
+                              <span style="font-size: 10.5px; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 3px; color: {{ t.ink }}; background: {{ t.color }};">{{ t.label }}</span>
+                            </sc-for>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div style="flex: 1; border: 2px solid #241f19; border-radius: 11px; background: #fdfaf1; box-shadow: inset 0 0 0 2px #e6dec7; padding: 12px 14px;">
+                      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: #2f6f5e; margin-bottom: 6px;">NOTES</div>
+                      <div style="font-size: 12.5px; line-height: 1.9; color: #3f3a30; text-wrap: pretty;">{{ bCurDesc }}</div>
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ bIsMap }}" hint-placeholder-val="{{ false }}">
+                <div style="border: 2px solid #241f19; border-radius: 11px; background: #2f6f5e; background-image: repeating-linear-gradient(45deg, rgba(246,242,232,0.06) 0 4px, transparent 4px 14px); padding: 14px; display: flex; flex-direction: column; gap: 14px;">
+                  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                    <sc-for list="{{ bAreas }}" as="ar" hint-placeholder-count="12">
+                      <div onClick="{{ ar.go }}" style="position: relative; cursor: pointer; padding: 11px 10px; border: 2px solid #241f19; border-radius: 10px; background: #ece4d0; box-shadow: inset 0 2px 0 rgba(255,255,255,0.6), 0 3px 0 rgba(36,31,25,0.35); text-align: center;">
+                        <sc-if value="{{ ar.sel }}" hint-placeholder-val="{{ false }}">
+                          <div style="position: absolute; inset: -6px; border: 3px solid #f0d79a; border-radius: 14px;"></div>
+                        </sc-if>
+                        <div style="position: relative; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; color: #8b8168;">{{ ar.code }}</div>
+                        <div style="position: relative; margin-top: 2px; font-size: 13px; font-weight: 500; letter-spacing: 0.05em; color: #241f19;">{{ ar.name }}</div>
+                        <div style="position: relative; margin-top: 7px; display: inline-block; font-size: 10px; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 3px; color: #fdfaf1; background: {{ ar.stateColor }};">{{ ar.state }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="display: flex; gap: 16px; padding: 9px 12px; border: 2px solid #241f19; border-radius: 8px; background: rgba(20,40,34,0.5);">
+                    <sc-for list="{{ legend }}" as="l" hint-placeholder-count="3">
+                      <div style="display: flex; align-items: center; gap: 7px;">
+                        <span style="width: 10px; height: 10px; border-radius: 3px; border: 2px solid #241f19; background: {{ l.color }};"></span>
+                        <span style="font-size: 10.5px; letter-spacing: 0.08em; color: #dbeae3;">{{ l.label }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ bIsLog }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <sc-for list="{{ logs }}" as="g" hint-placeholder-count="6">
+                    <div style="display: flex; gap: 12px; padding: 11px 13px; border: 2px solid #241f19; border-radius: 9px; background: #fdfaf1; box-shadow: inset 0 0 0 2px #e6dec7;">
+                      <span style="flex: none; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: #2f6f5e; width: 68px;">{{ g.date }}</span>
+                      <span style="flex: none; font-size: 11px; letter-spacing: 0.08em; color: #8b8168; width: 52px;">{{ g.area }}</span>
+                      <span style="flex: 1; min-width: 0; font-size: 12.5px; line-height: 1.7; color: #453f34; text-wrap: pretty;">{{ g.text }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+            </div>
+          </div>
+
+          <div style="padding: 0 12px 12px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="position: relative; min-height: 70px; padding: 14px 42px 14px 16px; border: 2px solid #241f19; border-radius: 11px; background: #fdfaf1; box-shadow: inset 0 0 0 3px #9cc0b4;">
+              <div style="font-size: 14px; line-height: 1.8; color: #241f19;">{{ bMsg }}</div>
+              <div style="position: absolute; right: 15px; bottom: 13px; animation: bob 1s steps(2, end) infinite;">
+                <div style="width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 9px solid #2f6f5e;"></div>
+              </div>
+            </div>
+            <sc-if value="{{ showAds }}" hint-placeholder-val="{{ true }}">
+              <div style="height: 60px; border: 2px dashed #cfc4a9; border-radius: 9px; display: flex; align-items: center; justify-content: center;">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.2em; color: #a1977c;">AD SLOT 728×90</span>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+
+        <div style="width: 372px; flex: none; display: flex; flex-direction: column; gap: 10px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: #6d7d8f;">MOBILE 390</span>
+          <div style="border-radius: 24px; border: 2px solid #241f19; background: #efe9db; box-shadow: 0 20px 44px rgba(0,0,0,0.5); overflow: hidden;">
+            <div style="height: 50px; display: flex; align-items: center; gap: 10px; padding: 0 14px; background: #2f6f5e;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #f0d79a;">‹</span>
+              <span style="font-size: 14px; font-weight: 700; letter-spacing: 0.08em; color: #f6f2e8;">標本</span>
+              <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #cfe3da;">{{ bCounter }}</span>
+            </div>
+            <div style="padding: 10px; display: flex; flex-direction: column; gap: 7px;">
+              <sc-for list="{{ bItems }}" as="s" hint-placeholder-count="8">
+                <div onClick="{{ s.go }}" style="position: relative; cursor: pointer; padding: 12px 12px; border: 2px solid #241f19; border-radius: 9px; background: #fdfaf1; box-shadow: 0 2px 0 rgba(36,31,25,0.25); display: flex; align-items: center; gap: 9px;">
+                  <sc-if value="{{ s.sel }}" hint-placeholder-val="{{ false }}">
+                    <div style="position: absolute; inset: 0; border-radius: 7px; background: #f0d79a; box-shadow: inset 0 0 0 2px #241f19;"></div>
+                  </sc-if>
+                  <span style="position: relative; flex: 1; min-width: 0; font-size: 14.5px; font-weight: 500; letter-spacing: 0.05em; color: #241f19; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ s.name }}</span>
+                  <span style="position: relative; font-size: 10px; letter-spacing: 0.08em; padding: 2px 7px; border-radius: 3px; color: {{ s.catInk }}; background: {{ s.catColor }};">{{ s.cat }}</span>
+                  <span style="position: relative; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #453f34;">{{ s.qty }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="padding: 0 10px 12px;">
+              <div style="padding: 13px 15px; border: 2px solid #241f19; border-radius: 10px; background: #fdfaf1; box-shadow: inset 0 0 0 3px #9cc0b4; font-size: 13.5px; line-height: 1.8; color: #241f19;">{{ bMsg }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width: 1150px; display: flex; flex-wrap: wrap; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: #6d7d8f;">
+          <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">境界＝二重縁の台紙＋2px下影</span>
+          <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">選択＝塗りの全反転＋外側リング</span>
+          <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">タップ面積 44px 以上</span>
+          <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">区域図のみタイル背景を許可</span>
+          <span style="padding: 5px 10px; border: 1px solid #2c3644; border-radius: 5px;">メッセージ窓は三重縁で最優先</span>
+        </div>
+      </sc-if>
+    </div>
+
+  </div>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;typewriter&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;挙動&quot;},&quot;showNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;表示&quot;},&quot;showAdSlots&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;表示&quot;}}">
+// 分類色。ink は背景ごとに固定（テーマに依存させない）。全て小文字 10.5px で 4.5:1 以上。
+const LI = '#fdfaf1', DI = '#241f19';
+const CAT = {
+  '鉱': { bg: '#6d5fb8', ink: LI }, '植': { bg: '#327049', ink: LI },
+  '水': { bg: '#336c96', ink: LI }, '火': { bg: '#a94f2d', ink: LI },
+  '風': { bg: '#3a7276', ink: LI }, '土': { bg: '#7d6231', ink: LI },
+  '光': { bg: '#d9b455', ink: DI }, '闇': { bg: '#56596e', ink: LI }
+};
+
+const ITEMS = [
+  { no: '001', name: '霜結晶', cat: '鉱', qty: '×12', stats: [4, 8, 3], tags: ['鉱', '光'], desc: '低温帯の岩壁に薄く張る層状結晶。採取後は常温で崩れるため密閉容器での保管が前提となる。断面に年輪状の縞が確認できる。' },
+  { no: '002', name: '灯苔', cat: '植', qty: '×07', stats: [6, 5, 1], tags: ['植', '光'], desc: '洞窟の湿った天井に群生し微弱な発光を示す。群落の密度と発光量にはおおむね比例関係がある。' },
+  { no: '003', name: '塩鉄片', cat: '鉱', qty: '×24', stats: [2, 6, 6], tags: ['鉱', '水'], desc: '干潟に堆積した鉄分の凝集片。表面の酸化被膜が層ごとに色を変える。加工材として流通量が多い。' },
+  { no: '004', name: '深流藻', cat: '水', qty: '×03', stats: [8, 7, 2], tags: ['水'], desc: '外洋の中層で採れる細長い藻。乾燥させると強靭な繊維になり、記録帳の綴じ紐に用いられる。' },
+  { no: '005', name: '熾砂', cat: '火', qty: '×15', stats: [5, 4, 5], tags: ['火', '土'], desc: '旧火口の縁に溜まる高温の砂。掘削直後は保護具を要する。冷却後は釉薬の材料になる。' },
+  { no: '006', name: '風紋石', cat: '風', qty: '×09', stats: [5, 9, 4], tags: ['風', '土'], desc: '長期の風蝕で表面に細かな条線を刻んだ石。条線の向きから卓越風の履歴を読み取れる。' },
+  { no: '007', name: '夜露瓶', cat: '闇', qty: '×02', stats: [9, 10, 1], tags: ['闇', '水'], desc: '新月の夜のみ回収できる凝結水。光に晒すと数分で透明度を失うため、遮光下で扱う。' },
+  { no: '008', name: '層土標本', cat: '土', qty: '×31', stats: [1, 3, 8], tags: ['土'], desc: '調査区域ごとに採取する基礎標本。断面の層数がその区域の堆積年代の目安になる。' }
+];
+
+const STAT_LABELS = ['希少', '純度', '重量'];
+
+const AREAS = [
+  { code: 'A-01', name: '灯台岬', state: '調査済' }, { code: 'A-02', name: '低塩湿地', state: '調査済' },
+  { code: 'A-03', name: '砕石場', state: '未踏' }, { code: 'A-04', name: '北棧橋', state: '調査済' },
+  { code: 'B-01', name: '霜洞入口', state: '未踏' }, { code: 'B-02', name: '深洞第三層', state: '封鎖' },
+  { code: 'B-03', name: '旧火口縁', state: '未踏' }, { code: 'B-04', name: '風紋台地', state: '調査済' },
+  { code: 'C-01', name: '外洋観測点', state: '未踏' }, { code: 'C-02', name: '藻場', state: '調査済' },
+  { code: 'C-03', name: '無名礁', state: '封鎖' }, { code: 'C-04', name: '南端浜', state: '未踏' }
+];
+
+const STATE_COLOR = { '調査済': '#327049', '未踏': '#336c96', '封鎖': '#8e4444' };
+
+const MENU = [
+  { key: 'list', label: '標本', meta: '08 / 64', desc: '採取済みの標本を一覧と詳細の二段構成で参照する。' },
+  { key: 'map', label: '区域図', meta: '12 区域', desc: '調査区域をプレートで並べ、状態を色で符号化する。' },
+  { key: 'log', label: '記録', meta: '06 件', desc: '日付順の調査記録。メッセージ窓と同じ書式で読む。' },
+  { key: 'config', label: '設定', meta: '—', desc: 'カーソル記号・文字送り・3Dモード切替の設定。' }
+];
+
+const NAV = [
+  { key: 'menu', label: 'メニュー' }, { key: 'list', label: '標本' },
+  { key: 'map', label: '区域図' }, { key: 'log', label: '記録' }
+];
+
+const LOGS = [
+  { date: '04.12', area: 'B-01', text: '霜洞入口の外気温が前回より 3 度低い。結晶層の厚みは倍近く、採取量を絞って層構造を残した。' },
+  { date: '04.09', area: 'C-02', text: '藻場の水位が高く、中層まで踏み込めず。深流藻は 3 点のみ。次回は干潮の時刻に合わせる。' },
+  { date: '04.05', area: 'B-04', text: '風紋台地の条線が南南西を向いていた。昨季の記録と 20 度ずれており、卓越風の変化を疑う。' },
+  { date: '03.30', area: 'A-02', text: '低塩湿地で塩鉄片を大量に確認。被膜の色が層ごとに違い、堆積の速さが一定でないと判断した。' },
+  { date: '03.27', area: 'C-03', text: '無名礁は接近不能。潮流が強く上陸点が見つからない。封鎖扱いとして記録を残す。' },
+  { date: '03.22', area: 'A-01', text: '灯台岬から観測開始。基準となる層土標本を採取し、以降の区域比較の基点とする。' }
+];
+
+const SCREENS = ['menu', 'list', 'map', 'log'];
+
+class Component extends DCLogic {
+  state = {
+    theme: 'dark', vw: 1180,
+    u: { screen: 'menu', mi: 0, li: 0, ai: 0, typed: 999 },
+    focus: 'a',
+    a: { screen: 'menu', mi: 0, li: 0, ai: 0, typed: 0 },
+    b: { screen: 'menu', mi: 0, li: 0, ai: 0, typed: 0 }
+  };
+
+  componentDidMount() {
+    this._key = (e) => this.onKey(e);
+    window.addEventListener('keydown', this._key);
+    this.tick();
+  }
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this._key);
+    clearInterval(this._t);
+  }
+
+  msg(opt) {
+    const s = this.state[opt];
+    if (s.screen === 'menu') {
+      const m = MENU[s.mi];
+      return '「' + m.label + '」' + m.desc;
+    }
+    if (s.screen === 'list') {
+      const it = ITEMS[s.li];
+      return it.name + '（No.' + it.no + '）を選択中。分類は「' + it.cat + '」、所持 ' + it.qty.replace('×', '') + ' 点。';
+    }
+    if (s.screen === 'map') {
+      const a = AREAS[s.ai];
+      return a.code + ' ' + a.name + ' ── 状態：' + a.state + '。決定でこの区域の標本一覧に移る。';
+    }
+    return '調査記録を新しい順に表示している。Esc でメニューに戻る。';
+  }
+
+  tick() {
+    if (this.props.typewriter === false) {
+      clearInterval(this._t);
+      this.setState(st => ({ a: { ...st.a, typed: 999 }, b: { ...st.b, typed: 999 } }));
+      return;
+    }
+    clearInterval(this._t);
+    this._t = setInterval(() => {
+      const la = this.msg('a').length, lb = this.msg('b').length;
+      const sa = this.state.a.typed, sb = this.state.b.typed;
+      if (sa >= la && sb >= lb) { clearInterval(this._t); return; }
+      this.setState(st => ({
+        a: { ...st.a, typed: Math.min(la, st.a.typed + 1) },
+        b: { ...st.b, typed: Math.min(lb, st.b.typed + 1) }
+      }));
+    }, 20);
+  }
+
+  patch(opt, p) {
+    this.setState(st => ({ [opt]: { ...st[opt], ...p, typed: 0 } }), () => this.tick());
+  }
+
+  focusOn(opt) { if (this.state.focus !== opt) this.setState({ focus: opt }); }
+
+  goScreen(opt, key) {
+    if (key === 'config') { this.patch(opt, {}); return; }
+    this.patch(opt, { screen: key });
+  }
+
+  move(opt, d) {
+    const s = this.state[opt];
+    if (s.screen === 'menu') this.patch(opt, { mi: (s.mi + d + MENU.length) % MENU.length });
+    else if (s.screen === 'list') this.patch(opt, { li: (s.li + d + ITEMS.length) % ITEMS.length });
+    else if (s.screen === 'map') this.patch(opt, { ai: (s.ai + d + AREAS.length) % AREAS.length });
+  }
+
+  onKey(e) {
+    const opt = this.state.focus;
+    const s = this.state[opt];
+    const big = s.screen === 'map' ? 4 : 1;
+    if (e.key === 'ArrowDown') { e.preventDefault(); this.move(opt, big); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); this.move(opt, -big); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); this.move(opt, 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); this.move(opt, -1); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (s.screen === 'menu') { if (opt === 'u') this.uGo(MENU[s.mi].key); else this.goScreen(opt, MENU[s.mi].key); }
+      else if (s.screen === 'map') this.patch(opt, { screen: 'list' });
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      if (s.screen !== 'menu') this.patch(opt, { screen: 'menu' });
+    }
+  }
+
+  pips(v) {
+    const out = [];
+    for (let i = 0; i < 10; i++) out.push({ on: i < v, off: i >= v });
+    return out;
+  }
+
+  vm(opt) {
+    const s = this.state[opt];
+    const dark = opt === 'a';
+    const cur = ITEMS[s.li];
+    const full = this.msg(opt);
+    const inv = dark ? null : true;
+    return {
+      Title: NAV.find(n => n.key === s.screen).label,
+      Counter: '08 / 64',
+      Msg: full.slice(0, s.typed),
+      IsMenu: s.screen === 'menu', IsList: s.screen === 'list',
+      IsMap: s.screen === 'map', IsLog: s.screen === 'log',
+      Nav: NAV.map(n => ({
+        label: n.label, sel: n.key === s.screen, mark: n.key === s.screen ? '▶' : '·',
+        color: n.key === s.screen ? (dark ? '#7fd4c1' : '#f6f2e8') : (dark ? '#8b9aa8' : '#3f3a30'),
+        markColor: n.key === s.screen ? (inv ? '#f0d79a' : '#7fd4c1') : '#a1977c',
+        go: () => { this.focusOn(opt); this.goScreen(opt, n.key); }
+      })),
+      Menu: MENU.map((m, i) => ({
+        label: m.label, meta: m.meta, desc: m.desc, sel: i === s.mi,
+        mark: i === s.mi ? '▶' : '▷',
+        go: () => { this.focusOn(opt); this.patch(opt, { mi: i }); setTimeout(() => this.goScreen(opt, m.key), 90); }
+      })),
+      ListPos: String(s.li + 1).padStart(2, '0') + ' / ' + ITEMS.length,
+      Items: ITEMS.map((it, i) => {
+        const sel = i === s.li;
+        return {
+          no: it.no, name: it.name, cat: it.cat, qty: it.qty, sel,
+          mark: sel ? '▶' : '·', catColor: CAT[it.cat].bg, catInk: CAT[it.cat].ink,
+          markColor: sel && inv ? '#f0d79a' : (dark ? '#7fd4c1' : '#2f6f5e'),
+          textColor: sel && inv ? '#f6f2e8' : '#241f19',
+          dimColor: sel && inv ? '#9dc3b7' : '#8b8168',
+          go: () => { this.focusOn(opt); this.patch(opt, { li: i, screen: 'list' }); }
+        };
+      }),
+      CurName: cur.name, CurNo: 'No.' + cur.no, CurDesc: cur.desc,
+      Stats: cur.stats.map((v, i) => ({ label: STAT_LABELS[i], value: v + ' / 10', pips: this.pips(v) })),
+      Tags: cur.tags.map(t => ({ label: t, color: CAT[t].bg, ink: CAT[t].ink })),
+      Areas: AREAS.map((a, i) => ({
+        code: a.code, name: a.name, state: a.state, sel: i === s.ai,
+        stateColor: STATE_COLOR[a.state],
+        go: () => { this.focusOn(opt); this.patch(opt, { ai: i }); }
+      })),
+      Focus: () => this.focusOn(opt)
+    };
+  }
+
+  tokens() {
+    return this.state.theme === 'dark'
+      ? { bg: '#171c24', deep: '#10141a', edge: '#2c3644', line: '#212936', text: '#e6ecf3', dim: '#7c8b9c', faint: '#4d5b6c', accent: '#7fd4c1', accentInk: '#0e1116', card: '#1b212a', selBg: 'rgba(127,212,193,0.12)', selInk: '#eaf7f3', barBg: '#10141a', barInk: '#e6ecf3', barDim: '#7c8b9c', pipOff: '#263040', chipInk: '#0e1116', bw: '1px', ring: 'inset 0 0 0 1px #2c3644', lift: 'none', msgRing: 'inset 0 0 0 1px #2c3644' }
+      : { bg: '#efe9db', deep: '#e5dcc8', edge: '#241f19', line: '#e0d7c0', text: '#241f19', dim: '#7a7157', faint: '#a1977c', accent: '#2f6f5e', accentInk: '#f6f2e8', card: '#fdfaf1', selBg: '#f0d79a', selInk: '#241f19', barBg: '#2f6f5e', barInk: '#f6f2e8', barDim: '#cfe3da', pipOff: '#ddd4bc', chipInk: '#fdfaf1', bw: '2px', ring: 'inset 0 0 0 2px #e6dec7', lift: '0 2px 0 rgba(36,31,25,0.26)', lift3: '0 3px 0 rgba(36,31,25,0.3)', msgRing: 'inset 0 0 0 3px #9cc0b4' };
+  }
+
+  vmU() {
+    const t = this.tokens();
+    const s = this.state.u;
+    const vw = this.state.vw;
+    const narrow = vw <= 430;
+    const mid = vw <= 760;
+    const mono = "'IBM Plex Mono', monospace";
+    const cur = ITEMS[s.li];
+    const card = (sel) => ({
+      position: 'relative', cursor: 'pointer', padding: narrow ? '14px 14px' : '13px 15px',
+      minHeight: 46, border: t.bw + ' solid ' + t.edge, borderRadius: 10,
+      background: sel ? t.selBg : t.card, boxShadow: sel ? 'none' : (t.ring + (t.lift3 ? ', ' + t.lift3 : '')),
+      transition: 'background 120ms linear'
+    });
+    const row = (sel) => ({
+      position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center',
+      gap: 9, padding: narrow ? '13px 10px 13px 12px' : '9px 8px 9px 12px', minHeight: narrow ? 46 : 0,
+      borderBottom: '1px solid ' + t.line, borderRadius: 4,
+      background: sel ? t.selBg : 'transparent',
+      boxShadow: sel ? 'inset 3px 0 0 ' + t.accent : 'none'
+    });
+    const chip = (k) => ({ fontSize: 10.5, letterSpacing: '0.08em', padding: '2px 7px', borderRadius: 3, color: CAT[k].ink, background: CAT[k].bg, flex: 'none' });
+    const pick = (sel) => ({
+      cursor: 'pointer', fontFamily: mono, fontSize: 11, letterSpacing: '0.1em', padding: '5px 11px',
+      background: sel ? t.accent : 'transparent', color: sel ? t.accentInk : t.barDim
+    });
+    return {
+      T: t, narrow, mid, showHint: !narrow,
+      title: NAV.find(n => n.key === s.screen).label,
+      msg: this.msg('u'),
+      isMenu: s.screen === 'menu', isList: s.screen === 'list', isMap: s.screen === 'map', isLog: s.screen === 'log',
+      themes: [{ label: 'DARK', k: 'dark' }, { label: 'LIGHT', k: 'light' }].map(o => ({
+        label: o.label, style: pick(this.state.theme === o.k), go: () => this.setState({ theme: o.k })
+      })),
+      views: [{ label: '1180', w: 1180 }, { label: '760', w: 760 }, { label: '390', w: 390 }].map(o => ({
+        label: o.label, style: pick(vw === o.w), go: () => this.setState({ vw: o.w })
+      })),
+      S: {
+        frame: { width: vw, flex: 'none', borderRadius: narrow ? 22 : 14, border: t.bw + ' solid ' + (this.state.theme === 'dark' ? '#000' : t.edge), background: t.bg, boxShadow: (this.state.theme === 'dark' ? 'inset 0 0 0 1px #2c3644, ' : '') + '0 26px 60px rgba(0,0,0,0.55)', overflow: 'hidden' },
+        topbar: { minHeight: 52, display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: narrow ? 8 : 13, padding: narrow ? '10px 14px' : '0 16px', background: t.barBg, borderBottom: t.bw + ' solid ' + t.edge },
+        brand: { fontFamily: mono, fontSize: 12, letterSpacing: '0.2em', color: this.state.theme === 'dark' ? t.accent : t.barInk },
+        barTitle: { fontSize: narrow ? 14 : 15, fontWeight: 500, letterSpacing: '0.1em', color: t.barInk },
+        barDim: { fontFamily: mono, fontSize: 11, letterSpacing: '0.08em', color: t.barDim },
+        toggle: { display: 'flex', border: '1px solid ' + (this.state.theme === 'dark' ? t.edge : t.edge), borderRadius: 6, overflow: 'hidden' },
+        body: { minHeight: narrow ? 420 : 468, display: 'flex', flexDirection: narrow ? 'column' : 'row', gap: 12, padding: 12 },
+        navWrap: narrow
+          ? { order: 2, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }
+          : { width: mid ? 112 : 130, flex: 'none', display: 'flex', flexDirection: 'column', gap: 8 },
+        content: { flex: 1, minWidth: 0, order: 1 },
+        listWrap: { display: 'flex', flexDirection: mid ? 'column' : 'row', gap: 12 },
+        listPanel: { width: mid ? 'auto' : 310, flex: 'none', border: t.bw + ' solid ' + t.edge, borderRadius: 11, background: t.card, boxShadow: t.ring, padding: 8 },
+        listHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 6px 8px', borderBottom: '1px solid ' + t.line },
+        detailCard: { border: t.bw + ' solid ' + t.edge, borderRadius: 11, background: t.card, boxShadow: t.ring, overflow: 'hidden' },
+        detailHead: { padding: '9px 14px', background: t.barBg, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 },
+        detailName: { fontSize: 17, fontWeight: 700, letterSpacing: '0.06em', color: t.barInk },
+        imgBox: { width: 100, height: 100, flex: 'none', border: '1px solid ' + t.edge, borderRadius: 7, background: t.deep, backgroundImage: 'repeating-linear-gradient(90deg, ' + t.faint + '55 0 2px, transparent 2px 8px)', display: 'flex', alignItems: 'flex-end', padding: 6 },
+        notes: { border: t.bw + ' solid ' + t.edge, borderRadius: 11, background: t.card, boxShadow: t.ring, padding: '12px 14px' },
+        msg: { position: 'relative', minHeight: 68, padding: '14px 42px 14px 16px', border: t.bw + ' solid ' + t.edge, borderRadius: 11, background: t.card, boxShadow: t.msgRing },
+        msgText: { fontSize: narrow ? 13.5 : 14, lineHeight: 1.8, color: t.text },
+        caret: { width: 0, height: 0, borderLeft: '7px solid transparent', borderRight: '7px solid transparent', borderTop: '9px solid ' + t.accent },
+        ad: { height: 60, border: '1px dashed ' + t.faint, borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+        adLabel: { fontFamily: mono, fontSize: 9.5, letterSpacing: '0.2em', color: t.faint },
+        mapWrap: { border: t.bw + ' solid ' + t.edge, borderRadius: 11, background: this.state.theme === 'dark' ? t.deep : t.accent, backgroundImage: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0 4px, transparent 4px 14px)', padding: 12, display: 'flex', flexDirection: 'column', gap: 12 },
+        mapGrid: { display: 'grid', gridTemplateColumns: 'repeat(' + (narrow ? 2 : mid ? 3 : 4) + ', 1fr)', gap: 9 },
+        legend: { display: 'flex', flexWrap: 'wrap', gap: 14, padding: '9px 12px', border: '1px solid ' + t.edge, borderRadius: 8, background: 'rgba(0,0,0,0.28)' },
+        legendLabel: { fontSize: 10.5, letterSpacing: '0.08em', color: '#e4ece9' },
+        hint: { marginTop: 'auto', padding: '10px 12px', border: '1px dashed ' + t.faint, borderRadius: 9, fontFamily: mono, fontSize: 9.5, lineHeight: 1.9, letterSpacing: '0.06em', color: t.faint },
+        monoDim: { fontFamily: mono, fontSize: 10, letterSpacing: '0.18em', color: t.accent },
+        monoPos: { fontFamily: mono, fontSize: 10, color: t.dim },
+        statLabel: { fontSize: 11.5, letterSpacing: '0.1em', color: t.dim, width: 40, flex: 'none' },
+        statValue: { fontFamily: mono, fontSize: 11, color: t.dim },
+        pipOn: { width: 9, height: 13, borderRadius: 1, background: t.accent },
+        pipOff: { width: 9, height: 13, borderRadius: 1, background: t.pipOff },
+        desc: { fontSize: 12.5, lineHeight: 1.9, color: t.text },
+        logRow: { display: 'flex', flexDirection: narrow ? 'column' : 'row', gap: narrow ? 4 : 12, padding: '11px 13px', border: t.bw + ' solid ' + t.edge, borderRadius: 9, background: t.card, boxShadow: t.ring },
+        logDate: { flex: 'none', fontFamily: mono, fontSize: 11, letterSpacing: '0.06em', color: t.accent, width: narrow ? 'auto' : 66 },
+        logArea: { flex: 'none', fontSize: 11, letterSpacing: '0.08em', color: t.dim, width: narrow ? 'auto' : 52 },
+        logText: { flex: 1, minWidth: 0, fontSize: 12.5, lineHeight: 1.7, color: t.text }
+      },
+      nav: NAV.map(n => {
+        const sel = n.key === s.screen;
+        return {
+          label: n.label, mark: sel ? '▶' : '·',
+          style: { position: 'relative', cursor: 'pointer', minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: narrow ? 'center' : 'flex-start', gap: 8, padding: narrow ? '10px 6px' : '11px 12px', border: t.bw + ' solid ' + t.edge, borderRadius: 9, background: sel ? t.selBg : t.card, boxShadow: sel ? 'none' : t.ring },
+          markStyle: { fontFamily: mono, fontSize: 10, color: t.accent, display: narrow ? 'none' : 'block' },
+          labelStyle: { fontSize: 13.5, fontWeight: 500, letterSpacing: '0.08em', color: sel ? t.selInk : t.text },
+          go: () => this.uGo(n.key)
+        };
+      }),
+      menu: MENU.map((m, i) => {
+        const sel = i === s.mi;
+        return {
+          label: m.label, meta: m.meta, desc: m.desc, mark: sel ? '▶' : '▷',
+          style: card(sel),
+          markStyle: { fontFamily: mono, fontSize: 11, color: t.accent, width: 10, flex: 'none' },
+          labelStyle: { fontSize: 16.5, fontWeight: 700, letterSpacing: '0.08em', color: sel ? t.selInk : t.text },
+          metaStyle: { marginLeft: 'auto', fontFamily: mono, fontSize: 11, letterSpacing: '0.08em', color: t.dim },
+          descStyle: { position: 'relative', marginTop: 5, paddingLeft: 22, fontSize: 12, lineHeight: 1.7, color: t.dim, textWrap: 'pretty' },
+          go: () => { this.setState(st => ({ u: { ...st.u, mi: i } }), () => setTimeout(() => this.uGo(m.key), 90)); }
+        };
+      }),
+      listPos: String(s.li + 1).padStart(2, '0') + ' / ' + ITEMS.length,
+      items: ITEMS.map((it, i) => {
+        const sel = i === s.li;
+        return {
+          no: it.no, name: it.name, cat: it.cat, qty: it.qty, mark: sel ? '▶' : '·',
+          style: row(sel), chipStyle: chip(it.cat),
+          markStyle: { fontFamily: mono, fontSize: 10, color: t.accent, width: 8, flex: 'none' },
+          noStyle: { fontFamily: mono, fontSize: 10.5, color: t.dim, width: 30, flex: 'none' },
+          nameStyle: { flex: 1, minWidth: 0, fontSize: 14, fontWeight: 500, letterSpacing: '0.05em', color: sel ? t.selInk : t.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+          qtyStyle: { fontFamily: mono, fontSize: 11, color: sel ? t.selInk : t.text, width: 30, flex: 'none', textAlign: 'right' },
+          go: () => this.setState(st => ({ u: { ...st.u, li: i, screen: 'list' } }))
+        };
+      }),
+      curName: cur.name, curNo: 'No.' + cur.no, curDesc: cur.desc,
+      stats: cur.stats.map((v, i) => ({ label: STAT_LABELS[i], value: v + ' / 10', pips: this.pips(v) })),
+      tags: cur.tags.map(x => ({ label: x, style: chip(x) })),
+      areas: AREAS.map((a, i) => {
+        const sel = i === s.ai;
+        return {
+          code: a.code, name: a.name, state: a.state,
+          style: { position: 'relative', cursor: 'pointer', minHeight: 46, padding: '11px 10px', border: t.bw + ' solid ' + t.edge, borderRadius: 10, background: t.card, boxShadow: sel ? '0 0 0 3px ' + t.accent : t.ring, textAlign: 'center' },
+          codeStyle: { fontFamily: mono, fontSize: 9.5, letterSpacing: '0.14em', color: t.dim },
+          nameStyle: { marginTop: 2, fontSize: 13, fontWeight: 500, letterSpacing: '0.05em', color: t.text },
+          stateStyle: { marginTop: 7, display: 'inline-block', fontSize: 10, letterSpacing: '0.08em', padding: '2px 8px', borderRadius: 3, color: '#fdfaf1', background: STATE_COLOR[a.state] },
+          go: () => this.setState(st => ({ u: { ...st.u, ai: i } }))
+        };
+      }),
+      legend: ['調査済', '未踏', '封鎖'].map(k => ({ label: k, style: { width: 9, height: 9, borderRadius: 2, background: STATE_COLOR[k] } })),
+      focus: () => this.focusOn('u')
+    };
+  }
+
+  uGo(key) {
+    if (key === 'config') { this.setState({ theme: this.state.theme === 'dark' ? 'light' : 'dark' }); return; }
+    this.setState(st => ({ u: { ...st.u, screen: key } }));
+  }
+
+  renderVals() {
+    const u = this.vmU();
+    const out = {
+      u,
+      logs: LOGS,
+      legend: ['調査済', '未踏', '封鎖'].map(k => ({ label: k, color: STATE_COLOR[k] })),
+      showNotes: this.props.showNotes ?? true,
+      showAds: this.props.showAdSlots ?? true
+    };
+    ['a', 'b'].forEach(opt => {
+      const vm = this.vm(opt);
+      Object.keys(vm).forEach(k => { out[opt + k] = vm[k]; });
+    });
+    return out;
+  }
+}
+
+</script>
+</body>
+</html>
