@@ -71,6 +71,9 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
     0 5px 0 rgba(0, 0, 0, .38);
 }
 
+.mode-link { display: inline-flex; min-height: 44px; align-items: center; padding: 6px 10px; border: 2px solid var(--line); background: var(--deep); color: var(--accent); text-decoration: none; }
+.site-footer { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 16px; padding: 8px; color: var(--muted); font-size: .85rem; text-align: center; }
+
 .status-bar, .main-window, .message-window { background: var(--card); }
 .terminal-shell > .win2 {
   position: relative;

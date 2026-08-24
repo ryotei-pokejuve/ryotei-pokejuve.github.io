@@ -5,7 +5,6 @@ const { spawnSync } = require('node:child_process');
 const repositoryRoot = path.resolve(__dirname, '..');
 const baseRef = process.env.PREVIEW_2D_PROD_BASE_REF;
 const productionFiles = [
-  'index.html',
   'lain.html',
   'content.js',
   'about.html',
@@ -44,3 +43,11 @@ assert.equal(
 );
 
 console.log('preview-2d production file diff guard test: PASS');
+
+const approvedResult = spawnSync('git', ['diff', '--name-only', ...(baseRef ? [baseRef] : []), '--', 'index.html'], { cwd: repositoryRoot, encoding: 'utf8' });
+assert.equal(approvedResult.error, undefined, 'approved production diff could not be inspected');
+assert.equal(approvedResult.status, 0, approvedResult.stderr);
+assert.ok(
+  approvedResult.stdout.trim().split(/\r?\n/).filter(Boolean).every((file) => file === 'index.html'),
+  'TASK-007 approval is scoped to index.html',
+);

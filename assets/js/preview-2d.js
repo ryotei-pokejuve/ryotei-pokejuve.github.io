@@ -7,7 +7,7 @@
     isEditing: shared.isEditing,
     keydownAction: shared.keydownAction,
   };
-  root.RYOTEI_NAVIGATION = { resolveView: shared.resolveView };
+  root.RYOTEI_NAVIGATION = { resolveView: shared.resolveView, resolveRoute: shared.resolveRoute };
   if (typeof module === 'object' && module.exports) module.exports = shared;
 }(typeof window === 'object' ? window : globalThis, function () {
   'use strict';
@@ -53,11 +53,20 @@
     return '2d';
   }
 
+  function resolveRoute(url, pages) {
+    try {
+      var key = new URL(String(url || ''), 'https://preview.invalid/').hash.slice(1);
+      return pages && pages[key] ? key : null;
+    } catch (error) {}
+    return null;
+  }
+
   return {
     createEntities: createEntities,
     isEditing: isEditing,
     keydownAction: keydownAction,
     resolveView: resolveView,
+    resolveRoute: resolveRoute,
   };
 }));
 
@@ -83,6 +92,7 @@
   var isSelecting = false;
   var messageTimer = null;
   var messageRun = 0;
+  var isProductionTop = /(?:\/index\.html|\/)$/.test(window.location.pathname || '');
 
   function finishMessage() {
     messageRun += 1;
@@ -213,6 +223,12 @@
       });
       menuList.setAttribute('aria-activedescendant', buttons[state.cursor.menu].id);
       renderDetail(menu[state.cursor.menu]);
+      if (isProductionTop && menu[state.cursor.menu].kind === 'content') {
+        var nextHash = '#' + menu[state.cursor.menu].id;
+        if (window.location.hash !== nextHash && window.history && typeof window.history.pushState === 'function') window.history.pushState(null, '', nextHash);
+        var lainToggle = document.getElementById('lain-toggle');
+        if (lainToggle) lainToggle.href = 'lain.html' + nextHash;
+      }
       updateStatusPosition();
       setMessage(state.message);
       if (focusItem) buttons[state.cursor.menu].focus();
@@ -287,6 +303,13 @@
   document.getElementById('item-count').textContent = String(menu.length).padStart(2, '0');
   themeToggle.addEventListener('click', function () { setTheme(store.getState().theme === 'dark' ? 'light' : 'dark'); });
   document.addEventListener('keydown', handleKeydown);
+  if (isProductionTop && typeof window.addEventListener === 'function') {
+    window.addEventListener('popstate', function () {
+      var routeIndex = order.indexOf(window.RYOTEI_NAVIGATION.resolveRoute(window.location.href, pages));
+      if (routeIndex >= 0) select(routeIndex, false);
+    });
+  }
   setTheme(store.getState().theme === 'light' ? 'light' : 'dark');
-  select(0, false);
+  var initialIndex = isProductionTop ? order.indexOf(window.RYOTEI_NAVIGATION.resolveRoute(window.location.href, pages)) : -1;
+  select(initialIndex >= 0 ? initialIndex : 0, false);
 }());
