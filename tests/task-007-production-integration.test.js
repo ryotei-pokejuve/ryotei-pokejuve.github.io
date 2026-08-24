@@ -13,4 +13,6 @@ assert.match(fs.readFileSync('tests/preview-2d-viewport.test.js', 'utf8'), /PREV
 assert.match(html, /class="ad-reserve"/);
 assert.match(html, /id="menu-list"[^>]*role="listbox"/);
 assert.match(html, /id="message-text"/);
+assert.match(html, /<link rel="icon" href="data:image\/svg\+xml,[^"]+">/, 'production favicon is restored');
+assert.match(fs.readFileSync('lain.html', 'utf8'), /<link rel="icon" href="data:image\/svg\+xml,[^"]+">/, 'Lain keeps its mode-specific favicon');
 console.log('TASK-007 production integration contract test: PASS');

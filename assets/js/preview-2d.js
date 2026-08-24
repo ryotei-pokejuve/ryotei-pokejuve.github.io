@@ -184,7 +184,7 @@
     statusPosition.textContent = String(cursor + 1).padStart(2, '0') + '/' + String(menu.length).padStart(2, '0');
   }
 
-  function resetToMenu() {
+  function resetToMenu(focusMenu) {
     store.back('メニューへ戻りました。方向キーまたはタッチで項目を選択できます。');
     menuList.tabIndex = 0;
     var buttons = menuList.querySelectorAll('.menu-item');
@@ -199,7 +199,7 @@
     screenName.textContent = 'MENU';
     updateStatusPosition();
     setMessage('メニューへ戻りました。方向キーまたはタッチで項目を選択できます。');
-    menuList.focus();
+    if (focusMenu !== false) menuList.focus();
   }
 
   function select(index, focusItem) {
@@ -307,9 +307,11 @@
     window.addEventListener('popstate', function () {
       var routeIndex = order.indexOf(window.RYOTEI_NAVIGATION.resolveRoute(window.location.href, pages));
       if (routeIndex >= 0) select(routeIndex, false);
+      else resetToMenu(false);
     });
   }
   setTheme(store.getState().theme === 'light' ? 'light' : 'dark');
   var initialIndex = isProductionTop ? order.indexOf(window.RYOTEI_NAVIGATION.resolveRoute(window.location.href, pages)) : -1;
-  select(initialIndex >= 0 ? initialIndex : 0, false);
+  if (isProductionTop && initialIndex < 0) resetToMenu(false);
+  else select(initialIndex >= 0 ? initialIndex : 0, false);
 }());
