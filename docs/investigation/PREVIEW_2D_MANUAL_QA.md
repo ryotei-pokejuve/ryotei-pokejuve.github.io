@@ -1,7 +1,7 @@
 # preview-2d 手動QAチェックリスト
 
 対象: `preview-2d.html`  
-目的: NIGHT_GOAL「CODEX FINAL REVIEW」の23観点を、実機ブラウザで再現可能な形で記録する。  
+目的: NIGHT_GOAL「Claudeレビュー必須項目」の17項目を、実機ブラウザで再現可能な形で記録する。  
 判定欄: `未実施 / PASS / FAIL / N/A`。FAIL時は環境、再現手順、期待結果、実際結果、スクリーンショットまたはConsoleログを記録する。
 
 ## 実施情報
@@ -71,7 +71,7 @@
 | 23 | 将来3D MODE | content/state/navigationを2D固有データとして重複させず、今回3D実装や大型依存を追加していない | 未実施 | |
 | 24 | index.html非変更 | `git diff -- index.html lain.html content.js`が空である | 未実施 | |
 
-注: NIGHT_GOALの必須確認は番号付きで24行（本文では「23項目」と記載）あるため、欠落防止のため全24行を収録している。
+注: NIGHT_GOALの「Claudeレビュー必須項目」は17項目である。このうち「NIGHT_GOAL.md準拠」「A案80% + B案20%方針との整合」「2D MODEとして十分なゲーム感」「Webサイトとしての可読性・利便性」は個別行を設けず、表全体の目視レビューで確認する。表には入力方式・画面幅などを分けた確認単位に加え、Performance、cursor state、index.html非変更などPROJECT.mdの一般要件および内部QA観点も含むため、全24行となる。
 
 ## 自動回帰テスト
 
