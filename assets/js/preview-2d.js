@@ -1,5 +1,30 @@
+(function (root, factory) {
+  'use strict';
+
+  var adapter = factory();
+  root.RYOTEI_CONTENT_ADAPTER = adapter;
+  if (typeof module === 'object' && module.exports) module.exports = adapter;
+}(typeof window === 'object' ? window : globalThis, function () {
+  'use strict';
+
+  function createEntities(pages, order) {
+    var pageMap = pages || {};
+    var pageOrder = Array.isArray(order) ? order : [];
+    var entities = pageOrder.filter(function (id) { return pageMap[id]; }).map(function (id) {
+      return { id: id, title: pageMap[id].title || id, kind: 'content', href: null, page: pageMap[id] };
+    });
+
+    entities.push({ id: 'market', title: 'CARD MARKET', kind: 'external', href: 'search.html', page: null });
+    return entities;
+  }
+
+  return { createEntities: createEntities };
+}));
+
 (function () {
   'use strict';
+
+  if (typeof window !== 'object') return;
 
   var THEME_KEY = 'ryotei-2d-theme';
   var pages = window.SITE && window.SITE.PAGES;
@@ -183,10 +208,7 @@
     return;
   }
 
-  menu = order.filter(function (id) { return pages[id]; }).map(function (id) {
-    return { id: id, title: pages[id].title || id, page: pages[id], kind: 'content' };
-  });
-  menu.push({ id: 'market', title: 'CARD MARKET', kind: 'external', href: 'search.html' });
+  menu = window.RYOTEI_CONTENT_ADAPTER.createEntities(pages, order);
 
   menu.forEach(function (item, index) {
     var button = document.createElement('button');
