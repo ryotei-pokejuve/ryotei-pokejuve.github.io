@@ -8,6 +8,7 @@
   var state = { theme: document.documentElement.dataset.theme, screen: 'menu', cursor: 0, message: '' };
   var menuList = document.getElementById('menu-list');
   var detailTitle = document.getElementById('detail-title');
+  var detailCode = document.getElementById('detail-code');
   var detailContent = document.getElementById('detail-content');
   var messageText = document.getElementById('message-text');
   var screenName = document.getElementById('screen-name');
@@ -79,18 +80,22 @@
 
   function renderDetail(item) {
     detailTitle.textContent = item.title;
+    detailCode.textContent = (item.kind === 'external' ? 'LINK' : 'DATA') + ' / ' + item.id.toUpperCase();
     screenName.textContent = item.kind === 'external' ? 'LINK' : item.id.toUpperCase();
     if (item.kind === 'external') {
       detailContent.innerHTML = '';
       var box = document.createElement('div');
       box.className = 'external-card';
+      var label = document.createElement('p');
+      label.className = 'panel-label';
+      label.textContent = 'EXTERNAL DATABASE';
       var description = document.createElement('p');
       description.textContent = plainSummary(item);
       var link = document.createElement('a');
       link.className = 'open-link';
       link.href = item.href;
       link.textContent = 'カード相場を開く';
-      box.append(description, link);
+      box.append(label, description, link);
       detailContent.appendChild(box);
     } else {
       detailContent.innerHTML = '<div class="page-content" id="page-content">' + pageHtml(item.page) + '</div>';
@@ -112,6 +117,7 @@
     });
     menuList.removeAttribute('aria-activedescendant');
     detailTitle.textContent = 'MENU';
+    detailCode.textContent = 'DATA / --';
     detailContent.textContent = '方向キーまたはタッチで項目を選択してください。';
     screenName.textContent = 'MENU';
     updateStatusPosition();

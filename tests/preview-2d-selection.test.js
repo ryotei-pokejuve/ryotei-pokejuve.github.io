@@ -53,7 +53,7 @@ const document = {
   addEventListener(type, listener) { (documentListeners[type] ||= []).push(listener); },
 };
 
-for (const id of ['menu-list', 'detail-title', 'detail-content', 'message-text', 'screen-name', 'status-position', 'status-theme', 'theme-toggle', 'item-count']) {
+for (const id of ['menu-list', 'detail-title', 'detail-code', 'detail-content', 'message-text', 'screen-name', 'status-position', 'status-theme', 'theme-toggle', 'item-count']) {
   document.elements[id] = new Element('div', document);
 }
 document.elements['theme-toggle'].append(new Element('span', document));
@@ -115,6 +115,7 @@ assert.equal(
 buttons[1].click();
 assert.equal(mounts.videos, 1, 'focus followed by click mounts once');
 assert.equal(document.elements['screen-name'].textContent, 'VIDEOS', 'HUD screen readout follows the selected content');
+assert.equal(document.elements['detail-code'].textContent, 'DATA / VIDEOS', 'content title plate identifies the selected data file');
 assert.equal(document.elements['status-position'].textContent, '02/03', 'HUD cursor follows mouse selection');
 
 for (const target of [
@@ -162,6 +163,7 @@ assert.equal(document.activeElement, document.elements['menu-list'], 'Escape foc
 assert.equal(document.elements['menu-list'].tabIndex, 0, 'Escape restores the menu container tab stop');
 assert.equal(document.elements['screen-name'].textContent, 'MENU', 'Escape restores the menu screen name');
 assert.equal(document.elements['detail-title'].textContent, 'MENU', 'Escape restores the menu detail title');
+assert.equal(document.elements['detail-code'].textContent, 'DATA / --', 'Escape clears the content title plate');
 assert.equal(
   document.elements['detail-content'].textContent,
   '方向キーまたはタッチで項目を選択してください。',
@@ -228,6 +230,7 @@ assert.match(navigations.at(-1).message, /^CARD MARKET/, 'keyboard navigation oc
 location._href = '';
 buttons[2].click();
 assert.equal(location.href, 'search.html', 'mouse click opens the same external destination');
+assert.equal(document.elements['detail-code'].textContent, 'LINK / MARKET', 'external content uses the link title plate');
 assert.match(navigations.at(-1).message, /^CARD MARKET/, 'mouse navigation occurs after the same external preview message');
 
 location._href = '';

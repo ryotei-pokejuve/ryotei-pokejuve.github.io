@@ -65,6 +65,11 @@ assert.match(rule('.menu-item', mobileMedia), /min-height:\s*48px/, 'mobile menu
 assert.match(rule('#theme-toggle'), /min-height:\s*44px/, 'the theme control meets the touch target minimum');
 assert.match(rule('.open-link'), /min-height:\s*44px/, 'external actions meet the touch target minimum');
 
+assert.match(html, /id="detail-code" class="detail-code" aria-hidden="true"/, 'the content title plate has a decorative data code');
+assert.match(rule('.detail-heading'), /border-bottom:\s*3px\s+solid\s+var\(--terminal-edge\)/, 'the content title plate has a strong A-variant divider');
+assert.match(rule('.page-content'), /border:\s*var\(--bw\)\s+solid\s+var\(--edge\)/, 'real content is contained in an information sub-panel');
+assert.match(rule('.detail-content .yt-async'), /min-height:\s*96px/, 'API-backed empty and loading states reserve a stable panel');
+
 const menuRule = rule('.menu-item');
 const selectedMenuRule = rule('.menu-item[aria-selected="true"]');
 assert.match(menuRule, /min-height:\s*46px/, 'desktop menu items exceed the 44px touch target');
