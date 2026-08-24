@@ -30,7 +30,7 @@
   var pages = window.SITE && window.SITE.PAGES;
   var order = window.SITE && window.SITE.PAGE_ORDER;
   var menu = [];
-  var state = { theme: document.documentElement.dataset.theme, screen: 'menu', cursor: 0, message: '' };
+  var store = null;
   var menuList = document.getElementById('menu-list');
   var detailTitle = document.getElementById('detail-title');
   var detailCode = document.getElementById('detail-code');
@@ -48,11 +48,11 @@
     messageRun += 1;
     if (messageTimer !== null && typeof clearTimeout === 'function') clearTimeout(messageTimer);
     messageTimer = null;
-    messageText.textContent = state.message;
+    messageText.textContent = store.getState().message;
   }
 
   function setMessage(message) {
-    state.message = message;
+    store.setMessage(message);
     finishMessage();
 
     var canAnimate = typeof window.matchMedia === 'function'
@@ -95,7 +95,8 @@
   }
 
   function setTheme(theme) {
-    state.theme = theme;
+    store.setTheme(theme);
+    theme = store.getState().theme;
     document.documentElement.dataset.theme = theme;
     themeToggle.querySelector('span').textContent = theme.toUpperCase();
     statusTheme.textContent = theme.toUpperCase();
@@ -129,11 +130,12 @@
   }
 
   function updateStatusPosition() {
-    statusPosition.textContent = String(state.cursor + 1).padStart(2, '0') + '/' + String(menu.length).padStart(2, '0');
+    var cursor = store.getState().cursor.menu;
+    statusPosition.textContent = String(cursor + 1).padStart(2, '0') + '/' + String(menu.length).padStart(2, '0');
   }
 
   function resetToMenu() {
-    state.screen = 'menu';
+    store.back('メニューへ戻りました。方向キーまたはタッチで項目を選択できます。');
     menuList.tabIndex = 0;
     var buttons = menuList.querySelectorAll('.menu-item');
     buttons.forEach(function (button) {
@@ -153,33 +155,34 @@
   function select(index, focusItem) {
     if (!menu.length || isSelecting) return;
     var nextCursor = (index + menu.length) % menu.length;
-    if (state.screen === 'content' && nextCursor === state.cursor) {
+    var state = store.getState();
+    if (state.screen === 'content' && nextCursor === state.cursor.menu) {
       if (focusItem) menuList.querySelectorAll('.menu-item')[nextCursor].focus();
       return;
     }
     isSelecting = true;
     try {
-      state.cursor = nextCursor;
-      state.screen = 'content';
+      store.select(nextCursor, 'menu', deriveMessage(menu[nextCursor]));
+      state = store.getState();
       var buttons = menuList.querySelectorAll('.menu-item');
       menuList.tabIndex = -1;
       buttons.forEach(function (button, buttonIndex) {
-        var selected = buttonIndex === state.cursor;
+        var selected = buttonIndex === state.cursor.menu;
         button.setAttribute('aria-selected', String(selected));
         button.tabIndex = selected ? 0 : -1;
       });
-      menuList.setAttribute('aria-activedescendant', buttons[state.cursor].id);
-      renderDetail(menu[state.cursor]);
+      menuList.setAttribute('aria-activedescendant', buttons[state.cursor.menu].id);
+      renderDetail(menu[state.cursor.menu]);
       updateStatusPosition();
-      setMessage(deriveMessage(menu[state.cursor]));
-      if (focusItem) buttons[state.cursor].focus();
+      setMessage(state.message);
+      if (focusItem) buttons[state.cursor.menu].focus();
     } finally {
       isSelecting = false;
     }
   }
 
   function activate() {
-    var item = menu[state.cursor];
+    var item = menu[store.getState().cursor.menu];
     if (item && item.kind === 'external') {
       finishMessage();
       window.location.href = item.href;
@@ -193,8 +196,9 @@
   function handleKeydown(event) {
     if (isEditing(event.target) || event.altKey || event.ctrlKey || event.metaKey) return;
     var handled = true;
-    if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') select(state.cursor - 1, true);
-    else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') select(state.cursor + 1, true);
+    var cursor = store.getState().cursor.menu;
+    if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') select(cursor - 1, true);
+    else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') select(cursor + 1, true);
     else if (event.key === 'Enter' && event.target.classList.contains('menu-item')) activate();
     else if (event.key === 'Escape') resetToMenu();
     else handled = false;
@@ -208,7 +212,21 @@
     return;
   }
 
+  if (!window.RYOTEI_STATE || typeof window.RYOTEI_STATE.createStore !== 'function') {
+    detailTitle.textContent = '読み込みエラー';
+    detailContent.textContent = '共通状態ストアを読み込めませんでした。';
+    messageText.textContent = 'プレビューをWebサーバー経由で再読み込みしてください。';
+    return;
+  }
+
   menu = window.RYOTEI_CONTENT_ADAPTER.createEntities(pages, order);
+  store = window.RYOTEI_STATE.createStore({
+    theme: document.documentElement.dataset.theme,
+    view: '2d',
+    screen: 'menu',
+    cursor: { menu: 0, content: 0, settings: 0 },
+    message: '',
+  }, { counts: { menu: menu.length } });
 
   menu.forEach(function (item, index) {
     var button = document.createElement('button');
@@ -233,8 +251,8 @@
   });
 
   document.getElementById('item-count').textContent = String(menu.length).padStart(2, '0');
-  themeToggle.addEventListener('click', function () { setTheme(state.theme === 'dark' ? 'light' : 'dark'); });
+  themeToggle.addEventListener('click', function () { setTheme(store.getState().theme === 'dark' ? 'light' : 'dark'); });
   document.addEventListener('keydown', handleKeydown);
-  setTheme(state.theme === 'light' ? 'light' : 'dark');
+  setTheme(store.getState().theme === 'light' ? 'light' : 'dark');
   select(0, false);
 }());

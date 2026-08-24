@@ -88,6 +88,7 @@ const context = {
   },
 };
 
+vm.runInNewContext(fs.readFileSync('assets/js/preview-2d-state.js', 'utf8'), context);
 vm.runInNewContext(fs.readFileSync('assets/js/preview-2d.js', 'utf8'), context);
 assert.equal(documentListeners.keydown.length, 1, 'the preview registers one shared keydown handler');
 assert.equal(mounts.top, 1, 'initial selection mounts once');
