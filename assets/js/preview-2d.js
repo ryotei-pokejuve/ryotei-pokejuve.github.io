@@ -15,6 +15,42 @@
   var statusTheme = document.getElementById('status-theme');
   var themeToggle = document.getElementById('theme-toggle');
   var isSelecting = false;
+  var messageTimer = null;
+  var messageRun = 0;
+
+  function finishMessage() {
+    messageRun += 1;
+    if (messageTimer !== null && typeof clearTimeout === 'function') clearTimeout(messageTimer);
+    messageTimer = null;
+    messageText.textContent = state.message;
+  }
+
+  function setMessage(message) {
+    state.message = message;
+    finishMessage();
+
+    var canAnimate = typeof window.matchMedia === 'function'
+      && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      && typeof setTimeout === 'function';
+    if (!canAnimate || !message) return;
+
+    var run = messageRun;
+    var position = 0;
+    messageText.textContent = '';
+
+    function typeNextCharacter() {
+      if (run !== messageRun) return;
+      position += 1;
+      messageText.textContent = message.slice(0, position);
+      if (position < message.length) {
+        messageTimer = setTimeout(typeNextCharacter, 20);
+      } else {
+        messageTimer = null;
+      }
+    }
+
+    typeNextCharacter();
+  }
 
   function pageHtml(page) {
     return typeof page.html === 'function' ? page.html() : (page.html || '');
@@ -79,8 +115,7 @@
     detailContent.textContent = '方向キーまたはタッチで項目を選択してください。';
     screenName.textContent = 'MENU';
     updateStatusPosition();
-    state.message = 'メニューへ戻りました。方向キーまたはタッチで項目を選択できます。';
-    messageText.textContent = state.message;
+    setMessage('メニューへ戻りました。方向キーまたはタッチで項目を選択できます。');
     menuList.focus();
   }
 
@@ -105,8 +140,7 @@
       menuList.setAttribute('aria-activedescendant', buttons[state.cursor].id);
       renderDetail(menu[state.cursor]);
       updateStatusPosition();
-      state.message = deriveMessage(menu[state.cursor]);
-      messageText.textContent = state.message;
+      setMessage(deriveMessage(menu[state.cursor]));
       if (focusItem) buttons[state.cursor].focus();
     } finally {
       isSelecting = false;
@@ -115,7 +149,10 @@
 
   function activate() {
     var item = menu[state.cursor];
-    if (item && item.kind === 'external') window.location.href = item.href;
+    if (item && item.kind === 'external') {
+      finishMessage();
+      window.location.href = item.href;
+    }
   }
 
   function isEditing(target) {

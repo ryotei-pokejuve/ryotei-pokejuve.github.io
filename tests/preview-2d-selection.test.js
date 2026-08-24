@@ -86,6 +86,11 @@ const context = {
 
 vm.runInNewContext(fs.readFileSync('assets/js/preview-2d.js', 'utf8'), context);
 assert.equal(mounts.top, 1, 'initial selection mounts once');
+assert.match(
+  document.elements['message-text'].textContent,
+  /^TOP/,
+  'missing matchMedia falls back to the complete message without timers',
+);
 assert.equal(storedValues['ryotei-2d-theme'], 'dark', 'initial theme is persisted');
 
 document.elements['theme-toggle'].click();
