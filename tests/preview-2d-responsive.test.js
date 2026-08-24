@@ -49,6 +49,24 @@ assert.match(rule('.menu-item', mobileMedia), /min-height:\s*48px/, 'mobile menu
 assert.match(rule('#theme-toggle'), /min-height:\s*44px/, 'the theme control meets the touch target minimum');
 assert.match(rule('.open-link'), /min-height:\s*44px/, 'external actions meet the touch target minimum');
 
+const menuRule = rule('.menu-item');
+const selectedMenuRule = rule('.menu-item[aria-selected="true"]');
+assert.match(menuRule, /min-height:\s*46px/, 'desktop menu items exceed the 44px touch target');
+assert.match(menuRule, /touch-action:\s*manipulation/, 'menu taps use the same click activation path without delayed gesture handling');
+assert.match(rule('.menu-item:hover'), /background:\s*var\(--sel-bg\)/, 'hover has a restrained preview state');
+assert.match(rule('.menu-item:focus-visible'), /outline-color:\s*var\(--text\)/, 'keyboard focus remains visible independently of selection');
+assert.match(selectedMenuRule, /background:\s*var\(--accent\)/, 'selection uses the A-variant full inversion');
+assert.match(selectedMenuRule, /color:\s*var\(--accent-ink\)/, 'selected text keeps contrast on the inverted row');
+assert.match(selectedMenuRule, /border-left-color:\s*var\(--terminal-edge\)/, 'selection keeps a non-color-independent left rail');
+assert.match(selectedMenuRule, /box-shadow:\s*var\(--menu-press-shadow\)/, 'selection has the A-variant raised bevel');
+assert.match(rule('.menu-item:active'), /transform:\s*translateY\(2px\)/, 'pressing a row has a distinct depressed state');
+assert.match(rule('.menu-item[aria-selected="true"]::before'), /content:\s*"▶"/, 'selection includes a non-color cursor marker');
+assert.match(
+  rule('.menu-item[aria-selected="true"] .menu-kind'),
+  /color:\s*var\(--accent-ink\)/,
+  'selected metadata participates in the full inversion',
+);
+
 const adRule = rule('.ad-reserve');
 assert.match(adRule, /min-height:\s*90px/, 'the desktop/tablet ad slot reserves height');
 assert.doesNotMatch(adRule, /position:\s*(?:absolute|fixed|sticky)/, 'the ad slot stays in normal flow');

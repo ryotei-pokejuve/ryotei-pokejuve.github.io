@@ -106,6 +106,12 @@ assert.equal(storedValues['ryotei-2d-theme'], 'dark', 'second theme toggle persi
 
 const buttons = document.elements['menu-list'].querySelectorAll('.menu-item');
 assert.equal(document.elements['status-position'].textContent, '01/03', 'HUD cursor starts at the first menu item');
+assert.equal(buttons[0].attributes['aria-selected'], 'true', 'initial cursor has one selected menu item');
+assert.equal(
+  buttons.filter((button) => button.attributes['aria-selected'] === 'true').length,
+  1,
+  'initial render never paints two selected rows',
+);
 buttons[1].click();
 assert.equal(mounts.videos, 1, 'focus followed by click mounts once');
 assert.equal(document.elements['screen-name'].textContent, 'VIDEOS', 'HUD screen readout follows the selected content');
@@ -187,6 +193,28 @@ assert.equal(buttons[2].attributes['aria-selected'], 'true', 'selection resumes 
 assert.equal(buttons[2].tabIndex, 0, 'resumed selection restores one item tab stop');
 assert.equal(document.elements['menu-list'].tabIndex, -1, 'active item replaces the menu container tab stop');
 assert.equal(document.activeElement, buttons[2], 'resumed keyboard selection focuses the selected item');
+
+for (const listener of documentListeners.keydown) {
+  listener({
+    target: buttons[2], key: 'ArrowRight', altKey: false, ctrlKey: false, metaKey: false,
+    preventDefault() {},
+  });
+}
+assert.equal(buttons[0].attributes['aria-selected'], 'true', 'forward arrow navigation wraps from the last item to the first');
+assert.equal(mounts.top, 3, 'wrapped selection renders the destination once');
+
+for (const listener of documentListeners.keydown) {
+  listener({
+    target: buttons[0], key: 'ArrowLeft', altKey: false, ctrlKey: false, metaKey: false,
+    preventDefault() {},
+  });
+}
+assert.equal(buttons[2].attributes['aria-selected'], 'true', 'backward arrow navigation wraps to CARD MARKET');
+assert.equal(
+  buttons.filter((button) => button.attributes['aria-selected'] === 'true').length,
+  1,
+  'wrapped keyboard navigation keeps a single selected row',
+);
 
 for (const listener of documentListeners.keydown) {
   listener({
