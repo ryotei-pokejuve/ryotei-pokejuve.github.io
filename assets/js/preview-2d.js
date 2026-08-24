@@ -59,6 +59,23 @@
     }
   }
 
+  function resetToMenu() {
+    state.screen = 'menu';
+    menuList.tabIndex = 0;
+    var buttons = menuList.querySelectorAll('.menu-item');
+    buttons.forEach(function (button) {
+      button.setAttribute('aria-selected', 'false');
+      button.tabIndex = -1;
+    });
+    menuList.removeAttribute('aria-activedescendant');
+    detailTitle.textContent = 'MENU';
+    detailContent.textContent = '方向キーまたはタッチで項目を選択してください。';
+    screenName.textContent = 'MENU';
+    state.message = 'メニューへ戻りました。方向キーまたはタッチで項目を選択できます。';
+    messageText.textContent = state.message;
+    menuList.focus();
+  }
+
   function select(index, focusItem) {
     if (!menu.length || isSelecting) return;
     var nextCursor = (index + menu.length) % menu.length;
@@ -71,6 +88,7 @@
       state.cursor = nextCursor;
       state.screen = 'content';
       var buttons = menuList.querySelectorAll('.menu-item');
+      menuList.tabIndex = -1;
       buttons.forEach(function (button, buttonIndex) {
         var selected = buttonIndex === state.cursor;
         button.setAttribute('aria-selected', String(selected));
@@ -101,12 +119,8 @@
     if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') select(state.cursor - 1, true);
     else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') select(state.cursor + 1, true);
     else if (event.key === 'Enter' && event.target.classList.contains('menu-item')) activate();
-    else if (event.key === 'Escape') {
-      state.screen = 'menu';
-      screenName.textContent = 'MENU';
-      menuList.focus();
-      messageText.textContent = 'メニューへ戻りました。方向キーまたはタッチで項目を選択できます。';
-    } else handled = false;
+    else if (event.key === 'Escape') resetToMenu();
+    else handled = false;
     if (handled) event.preventDefault();
   }
 

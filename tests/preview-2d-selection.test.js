@@ -20,6 +20,7 @@ class Element {
   append(...children) { this.children.push(...children); }
   appendChild(child) { this.children.push(child); }
   setAttribute(name, value) { this.attributes[name] = String(value); }
+  removeAttribute(name) { delete this.attributes[name]; }
   addEventListener(type, listener) { (this.listeners[type] ||= []).push(listener); }
   dispatch(type, event = {}) {
     for (const listener of this.listeners[type] || []) listener({ target: this, ...event });
@@ -97,5 +98,47 @@ for (const listener of documentListeners.keydown) {
   });
 }
 assert.equal(mounts.videos, 2, 'arrow selection of an API-backed page mounts once');
+
+for (const listener of documentListeners.keydown) {
+  listener({
+    target: buttons[1], key: 'Escape', altKey: false, ctrlKey: false, metaKey: false,
+    preventDefault() {},
+  });
+}
+assert.equal(document.activeElement, document.elements['menu-list'], 'Escape focuses the menu container');
+assert.equal(document.elements['menu-list'].tabIndex, 0, 'Escape restores the menu container tab stop');
+assert.equal(document.elements['screen-name'].textContent, 'MENU', 'Escape restores the menu screen name');
+assert.equal(document.elements['detail-title'].textContent, 'MENU', 'Escape restores the menu detail title');
+assert.equal(
+  document.elements['detail-content'].textContent,
+  '方向キーまたはタッチで項目を選択してください。',
+  'Escape replaces stale detail content with the menu empty state',
+);
+assert.equal(
+  document.elements['message-text'].textContent,
+  'メニューへ戻りました。方向キーまたはタッチで項目を選択できます。',
+  'Escape message matches the restored menu screen',
+);
+assert.equal(
+  buttons.every((button) => button.attributes['aria-selected'] === 'false' && button.tabIndex === -1),
+  true,
+  'Escape leaves the menu container as the only menu tab stop',
+);
+assert.equal(
+  document.elements['menu-list'].attributes['aria-activedescendant'],
+  undefined,
+  'Escape clears the active descendant while no item is selected',
+);
+
+for (const listener of documentListeners.keydown) {
+  listener({
+    target: document.elements['menu-list'], key: 'ArrowRight', altKey: false, ctrlKey: false, metaKey: false,
+    preventDefault() {},
+  });
+}
+assert.equal(buttons[2].attributes['aria-selected'], 'true', 'selection resumes from the remembered cursor after Escape');
+assert.equal(buttons[2].tabIndex, 0, 'resumed selection restores one item tab stop');
+assert.equal(document.elements['menu-list'].tabIndex, -1, 'active item replaces the menu container tab stop');
+assert.equal(document.activeElement, buttons[2], 'resumed keyboard selection focuses the selected item');
 
 console.log('preview-2d selection regression test: PASS');
