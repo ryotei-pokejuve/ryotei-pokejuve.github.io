@@ -1,0 +1,87 @@
+# preview-2d 手動QAチェックリスト
+
+対象: `preview-2d.html`  
+目的: NIGHT_GOAL「CODEX FINAL REVIEW」の23観点を、実機ブラウザで再現可能な形で記録する。  
+判定欄: `未実施 / PASS / FAIL / N/A`。FAIL時は環境、再現手順、期待結果、実際結果、スクリーンショットまたはConsoleログを記録する。
+
+## 実施情報
+
+- 実施日:
+- 実施者:
+- Git commit:
+- OS / ブラウザ / バージョン:
+- 起動方法・URL:
+- Console error件数:
+
+## 画面サイズ別マトリクス
+
+各幅で、ページ初期表示、全メニュー選択、MESSAGE、広告枠、Theme切替まで確認する。高さは実機相当とし、ズーム100%を基本とする。
+
+| Viewport | 横スクロールなし | 文字が判読可能 | 操作領域44px目安 | MENU / CONTENT | MESSAGE | 広告枠 | Theme | 判定・備考 |
+|---|---|---|---|---|---|---|---|---|
+| 320px | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | |
+| 375px | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | |
+| 390px | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | |
+| 430px | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | |
+| Desktop（例: 1440×900） | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | |
+
+## 操作回帰
+
+| # | 観点 | 手順と期待結果 | 判定 | 記録 |
+|---|---|---|---|---|
+| 1 | Mouse | 各MENUをクリックすると選択表示、CONTENT、MESSAGEが同じ項目へ更新される。CARD MARKETはプレビュー更新後に`search.html`へ進む | 未実施 | |
+| 2 | Touch | 320〜430pxのタッチ環境で各項目をタップでき、誤反応や二重遷移がない。CARD MARKETもMouse/Keyboardと同じ遷移になる | 未実施 | |
+| 3 | Keyboard | MENU上で↑↓←→により循環選択でき、選択表示、CONTENT、MESSAGE、フォーカスが同期する | 未実施 | |
+| 4 | Enter | CARD MARKET選択中のEnterで、MESSAGEが外部リンクの説明になった後`search.html`へ進む | 未実施 | |
+| 5 | Tab | Tab / Shift+Tabの標準順序が維持され、Skip link、Theme、MENU項目、CONTENT内リンクへ到達できる。Tabを押してもゲームカーソルが勝手に移動しない | 未実施 | |
+| 6 | Esc | CONTENT表示中にEscを押すとMENU画面へ戻り、MENUコンテナへフォーカスし、古いCONTENTと選択状態を残さない | 未実施 | |
+| 7 | cursor state | 項目を選択→Esc→方向キーの順で操作し、Esc前の位置を基準に選択が再開する。CONTENT表示中に別MENUを直接クリックしても位置が一致する | 未実施 | |
+| 8 | 編集要素との競合 | CONTENT内のinput / textarea / select / contenteditableで方向キー、Enter、Escを操作してもサイト側選択が変わらず、既定入力操作を妨げない | 未実施 | |
+| 9 | keydown一元化 | DevTools/Event Listenersまたはコード確認で、document直下のkeydownが意図した1リスナーのみである | 未実施 | |
+
+## UI・品質レビュー（CODEX FINAL REVIEW対応）
+
+| # | レビュー観点 | 合格基準 | 判定 | 記録 |
+|---|---|---|---|---|
+| 1 | PROJECT.md準拠 | 既存実データを使い、2Dフォールバック、Web操作性、非破壊方針を維持 | 未実施 | |
+| 2 | Claude Design準拠 | P1二重縁、P2三段、P3非色依存選択、P4限定分類色、P6複数入力を確認 | 未実施 | |
+| 3 | 前回正常機能の回帰 | 全MENUと既存リンクが表示・動作し、`index.html`等の本番ページに変更がない | 未実施 | |
+| 4 | JavaScriptエラー | 初期表示と全操作後にConsoleの未処理errorが0件 | 未実施 | |
+| 5 | Mouse | 「操作回帰 #1」をPASS | 未実施 | |
+| 6 | Touch | 「操作回帰 #2」をPASS | 未実施 | |
+| 7 | Keyboard | 「操作回帰 #3〜4」をPASS | 未実施 | |
+| 8 | Tab標準操作 | 「操作回帰 #5」をPASSし、フォーカス表示が視認可能 | 未実施 | |
+| 9 | Esc | 「操作回帰 #6」をPASS | 未実施 | |
+| 10 | cursor state | 「操作回帰 #7」をPASS | 未実施 | |
+| 11 | responsive | レイアウト切替で重なり・欠落・意図しない固定オーバーレイがない | 未実施 | |
+| 12 | 320〜430px | 画面サイズ別マトリクス4幅をすべてPASS | 未実施 | |
+| 13 | Desktop | Desktop行をPASSし、過大な空白や読みにくい行長がない | 未実施 | |
+| 14 | MESSAGE | 選択対象の説明が即時に同期し、操作ヒントが実際の操作と一致 | 未実施 | |
+| 15 | CONTENT | 各画面が実コンテンツまたは正直な空状態を示し、架空の本番データがない | 未実施 | |
+| 16 | Theme | DARK/LIGHTが即時反映され、ラベルと`aria-pressed`が同期し、再読込後もlocalStorageから復元 | 未実施 | |
+| 17 | prefers-reduced-motion | OS設定をReduceにして不要な動きが停止し、情報や操作が失われない | 未実施 | |
+| 18 | 広告枠 | MESSAGE直下に予約領域とADVERTISEMENT表示があり、操作UIと誤認せず、幅変更時もCLSや遮蔽を起こさない | 未実施 | |
+| 19 | SEOへの悪影響 | previewは`noindex,nofollow`であり、本番SEOファイル・既存URL・重要HTMLを変更していない | 未実施 | |
+| 20 | Accessibility | semantic要素、見出し、ラベル、aria-live、選択状態、コントラスト、Keyboard/Mouse/Touchを確認 | 未実施 | |
+| 21 | Performance | 2D表示で3D/WebGL/Three.jsを読み込まず、操作中に長時間タスクや著しいレイアウトシフトがない | 未実施 | |
+| 22 | 第三者素材 | 特定ゲームの画像・キャラクター・ロゴ・フォント・音・テクスチャ等を直接使用していない | 未実施 | |
+| 23 | 将来3D MODE | content/state/navigationを2D固有データとして重複させず、今回3D実装や大型依存を追加していない | 未実施 | |
+| 24 | index.html非変更 | `git diff -- index.html lain.html content.js`が空である | 未実施 | |
+
+注: NIGHT_GOALの必須確認は番号付きで24行（本文では「23項目」と記載）あるため、欠落防止のため全24行を収録している。
+
+## 自動回帰テスト
+
+```powershell
+node tests/preview-2d-selection.test.js
+```
+
+期待結果: `preview-2d selection regression test: PASS`。自動テストはarrow選択、focus+click二重mount防止、Esc、cursor復帰、外部遷移の共通プレビュー、touch由来click、Theme/localStorage、編集要素のkeydown除外を検証する。視覚、実ブラウザのTab順、実タッチ、viewport、Console、reduced motion、広告枠は上記手動確認で補完する。
+
+## 最終判定
+
+- 総合判定: 未実施 / PASS / FAIL
+- Blocker / Critical:
+- Major:
+- Minor:
+- 次の確認者への引き継ぎ:

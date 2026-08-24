@@ -60,6 +60,7 @@ document.elements['theme-toggle'].append(new Element('span', document));
 
 const mounts = { top: 0, videos: 0 };
 const navigations = [];
+const storedValues = {};
 const location = {
   _href: '',
   get href() { return this._href; },
@@ -70,7 +71,7 @@ const location = {
 };
 const context = {
   document,
-  localStorage: { setItem() {} },
+  localStorage: { setItem(key, value) { storedValues[key] = value; } },
   window: {
     location,
     SITE: {
@@ -85,10 +86,38 @@ const context = {
 
 vm.runInNewContext(fs.readFileSync('assets/js/preview-2d.js', 'utf8'), context);
 assert.equal(mounts.top, 1, 'initial selection mounts once');
+assert.equal(storedValues['ryotei-2d-theme'], 'dark', 'initial theme is persisted');
+
+document.elements['theme-toggle'].click();
+assert.equal(document.documentElement.dataset.theme, 'light', 'theme toggle applies the light theme');
+assert.equal(storedValues['ryotei-2d-theme'], 'light', 'theme toggle persists the light theme');
+assert.equal(document.elements['theme-toggle'].attributes['aria-pressed'], 'true', 'light theme is exposed to assistive technology');
+assert.equal(document.elements['theme-toggle'].querySelector('span').textContent, 'LIGHT', 'theme label follows the selected theme');
+
+document.elements['theme-toggle'].click();
+assert.equal(document.documentElement.dataset.theme, 'dark', 'second theme toggle restores the dark theme');
+assert.equal(storedValues['ryotei-2d-theme'], 'dark', 'second theme toggle persists the dark theme');
 
 const buttons = document.elements['menu-list'].querySelectorAll('.menu-item');
 buttons[1].click();
 assert.equal(mounts.videos, 1, 'focus followed by click mounts once');
+
+for (const target of [
+  new Element('input', document),
+  new Element('textarea', document),
+  new Element('select', document),
+  Object.assign(new Element('div', document), { isContentEditable: true }),
+]) {
+  let editingPrevented = false;
+  for (const listener of documentListeners.keydown) {
+    listener({
+      target, key: 'ArrowLeft', altKey: false, ctrlKey: false, metaKey: false,
+      preventDefault() { editingPrevented = true; },
+    });
+  }
+  assert.equal(mounts.top, 1, `${target.tagName} keydown does not change the selection`);
+  assert.equal(editingPrevented, false, `${target.tagName} keydown keeps its browser default`);
+}
 
 let prevented = false;
 for (const listener of documentListeners.keydown) {
