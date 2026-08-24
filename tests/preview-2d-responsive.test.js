@@ -35,6 +35,21 @@ assert.match(
   'status, main, and message windows share the multi-ring hierarchy',
 );
 
+assert.match(html, /<dl class="hud-readouts" aria-label="端末ステータス">/, 'HUD readouts retain their accessible group label');
+assert.match(html, /<span class="hud-signal" aria-hidden="true">/, 'decorative HUD signal is hidden from assistive technology');
+assert.match(rule('.hud-readouts'), /border:\s*2px\s+solid\s+var\(--terminal-edge\)/, 'HUD readouts form an A-variant segmented status unit');
+assert.match(rule('.hud-readout + .hud-readout'), /border-left:\s*2px\s+solid\s+var\(--terminal-edge\)/, 'HUD status values have strong internal segment rules');
+assert.match(css, /\.status-bar::before\s*\{[^}]*border-width:\s*2px\s+0\s+0\s+2px/, 'HUD retains its upper corner bracket');
+assert.match(css, /\.status-bar::after\s*\{[^}]*border-width:\s*0\s+2px\s+2px\s+0/, 'HUD retains its lower corner bracket');
+
+const hudMedia = mediaBlock('@media (max-width: 850px)', '@media (max-width: 760px)');
+assert.match(
+  rule('.status-bar', hudMedia),
+  /grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto\s+auto/,
+  'the HUD wraps before its four desktop columns can collide',
+);
+assert.match(rule('.hud-readouts', hudMedia), /grid-column:\s*1\s*\/\s*-1/, 'HUD readouts occupy a safe second row through 761px');
+
 const tabletMedia = mediaBlock('@media (max-width: 760px)', '@media (max-width: 430px)');
 assert.match(
   tabletMedia,
@@ -45,6 +60,7 @@ assert.match(
 const mobileMedia = mediaBlock('@media (max-width: 430px)', '@media (prefers-reduced-motion: reduce)');
 assert.match(rule('.terminal-shell', mobileMedia), /width:\s*100%/, 'the framed terminal fits the 320px mobile floor');
 assert.match(rule('.terminal-shell', mobileMedia), /border-width:\s*3px/, 'the outer frame remains visible without consuming mobile content width');
+assert.match(rule('.hud-signal', mobileMedia), /display:\s*none/, 'decorative signal yields space at narrow mobile widths');
 assert.match(rule('.menu-item', mobileMedia), /min-height:\s*48px/, 'mobile menu items exceed 44px');
 assert.match(rule('#theme-toggle'), /min-height:\s*44px/, 'the theme control meets the touch target minimum');
 assert.match(rule('.open-link'), /min-height:\s*44px/, 'external actions meet the touch target minimum');
