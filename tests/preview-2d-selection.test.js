@@ -53,7 +53,7 @@ const document = {
   addEventListener(type, listener) { (documentListeners[type] ||= []).push(listener); },
 };
 
-for (const id of ['menu-list', 'detail-title', 'detail-content', 'message-text', 'screen-name', 'theme-toggle', 'item-count']) {
+for (const id of ['menu-list', 'detail-title', 'detail-content', 'message-text', 'screen-name', 'status-position', 'status-theme', 'theme-toggle', 'item-count']) {
   document.elements[id] = new Element('div', document);
 }
 document.elements['theme-toggle'].append(new Element('span', document));
@@ -93,14 +93,18 @@ assert.equal(document.documentElement.dataset.theme, 'light', 'theme toggle appl
 assert.equal(storedValues['ryotei-2d-theme'], 'light', 'theme toggle persists the light theme');
 assert.equal(document.elements['theme-toggle'].attributes['aria-pressed'], 'true', 'light theme is exposed to assistive technology');
 assert.equal(document.elements['theme-toggle'].querySelector('span').textContent, 'LIGHT', 'theme label follows the selected theme');
+assert.equal(document.elements['status-theme'].textContent, 'LIGHT', 'HUD theme readout follows the selected theme');
 
 document.elements['theme-toggle'].click();
 assert.equal(document.documentElement.dataset.theme, 'dark', 'second theme toggle restores the dark theme');
 assert.equal(storedValues['ryotei-2d-theme'], 'dark', 'second theme toggle persists the dark theme');
 
 const buttons = document.elements['menu-list'].querySelectorAll('.menu-item');
+assert.equal(document.elements['status-position'].textContent, '01/03', 'HUD cursor starts at the first menu item');
 buttons[1].click();
 assert.equal(mounts.videos, 1, 'focus followed by click mounts once');
+assert.equal(document.elements['screen-name'].textContent, 'VIDEOS', 'HUD screen readout follows the selected content');
+assert.equal(document.elements['status-position'].textContent, '02/03', 'HUD cursor follows mouse selection');
 
 for (const target of [
   new Element('input', document),

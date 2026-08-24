@@ -11,6 +11,8 @@
   var detailContent = document.getElementById('detail-content');
   var messageText = document.getElementById('message-text');
   var screenName = document.getElementById('screen-name');
+  var statusPosition = document.getElementById('status-position');
+  var statusTheme = document.getElementById('status-theme');
   var themeToggle = document.getElementById('theme-toggle');
   var isSelecting = false;
 
@@ -34,6 +36,7 @@
     state.theme = theme;
     document.documentElement.dataset.theme = theme;
     themeToggle.querySelector('span').textContent = theme.toUpperCase();
+    statusTheme.textContent = theme.toUpperCase();
     themeToggle.setAttribute('aria-pressed', String(theme === 'light'));
     try { localStorage.setItem(THEME_KEY, theme); } catch (error) {}
   }
@@ -59,6 +62,10 @@
     }
   }
 
+  function updateStatusPosition() {
+    statusPosition.textContent = String(state.cursor + 1).padStart(2, '0') + '/' + String(menu.length).padStart(2, '0');
+  }
+
   function resetToMenu() {
     state.screen = 'menu';
     menuList.tabIndex = 0;
@@ -71,6 +78,7 @@
     detailTitle.textContent = 'MENU';
     detailContent.textContent = '方向キーまたはタッチで項目を選択してください。';
     screenName.textContent = 'MENU';
+    updateStatusPosition();
     state.message = 'メニューへ戻りました。方向キーまたはタッチで項目を選択できます。';
     messageText.textContent = state.message;
     menuList.focus();
@@ -96,6 +104,7 @@
       });
       menuList.setAttribute('aria-activedescendant', buttons[state.cursor].id);
       renderDetail(menu[state.cursor]);
+      updateStatusPosition();
       state.message = deriveMessage(menu[state.cursor]);
       messageText.textContent = state.message;
       if (focusItem) buttons[state.cursor].focus();

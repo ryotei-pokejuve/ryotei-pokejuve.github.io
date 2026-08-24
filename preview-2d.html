@@ -25,10 +25,24 @@
   <a class="skip-link" href="#main-content">本文へ移動</a>
   <main class="terminal-shell" aria-labelledby="terminal-title">
     <header class="status-bar win2">
-      <div>
+      <div class="status-identity">
         <p class="eyebrow">RYOTEI INFORMATION TERMINAL</p>
-        <h1 id="terminal-title">2D MODE / <span id="screen-name">MENU</span></h1>
+        <h1 id="terminal-title">RYOTEI / 2D MODE</h1>
       </div>
+      <dl class="hud-readouts" aria-label="端末ステータス">
+        <div class="hud-readout">
+          <dt>SCREEN</dt>
+          <dd id="screen-name">MENU</dd>
+        </div>
+        <div class="hud-readout">
+          <dt>CURSOR</dt>
+          <dd id="status-position">01/00</dd>
+        </div>
+        <div class="hud-readout hud-theme">
+          <dt>THEME</dt>
+          <dd id="status-theme">DARK</dd>
+        </div>
+      </dl>
       <div class="status-actions">
         <span class="mode-chip" aria-label="現在の表示モード">2D</span>
         <button id="theme-toggle" type="button" aria-label="配色テーマを切り替える" aria-pressed="false">THEME: <span>DARK</span></button>
