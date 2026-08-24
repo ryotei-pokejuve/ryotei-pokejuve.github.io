@@ -7,6 +7,7 @@
     isEditing: shared.isEditing,
     keydownAction: shared.keydownAction,
   };
+  root.RYOTEI_NAVIGATION = { resolveView: shared.resolveView };
   if (typeof module === 'object' && module.exports) module.exports = shared;
 }(typeof window === 'object' ? window : globalThis, function () {
   'use strict';
@@ -42,10 +43,21 @@
     return null;
   }
 
+  function resolveView(url) {
+    try {
+      // Read the future renderer preference without enabling an unavailable view.
+      // URL also keeps the existing hash intact because this adapter never writes it.
+      var requestedView = new URL(String(url || ''), 'https://preview.invalid/').searchParams.get('view');
+      if (requestedView === '2d') return requestedView;
+    } catch (error) {}
+    return '2d';
+  }
+
   return {
     createEntities: createEntities,
     isEditing: isEditing,
     keydownAction: keydownAction,
+    resolveView: resolveView,
   };
 }));
 
@@ -244,7 +256,7 @@
   menu = window.RYOTEI_CONTENT_ADAPTER.createEntities(pages, order);
   store = window.RYOTEI_STATE.createStore({
     theme: document.documentElement.dataset.theme,
-    view: '2d',
+    view: window.RYOTEI_NAVIGATION.resolveView(window.location.href),
     screen: 'menu',
     cursor: { menu: 0, content: 0, settings: 0 },
     message: '',
