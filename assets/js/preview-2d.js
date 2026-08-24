@@ -150,7 +150,10 @@
     kind.className = 'menu-kind';
     kind.textContent = item.kind === 'external' ? 'LINK' : 'DATA';
     button.append(label, kind);
-    button.addEventListener('click', function () { select(index, false); });
+    button.addEventListener('click', function () {
+      select(index, false);
+      if (item.kind === 'external') activate();
+    });
     button.addEventListener('focus', function () { select(index, false); });
     menuList.appendChild(button);
   });

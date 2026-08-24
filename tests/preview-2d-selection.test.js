@@ -59,11 +59,20 @@ for (const id of ['menu-list', 'detail-title', 'detail-content', 'message-text',
 document.elements['theme-toggle'].append(new Element('span', document));
 
 const mounts = { top: 0, videos: 0 };
+const navigations = [];
+const location = {
+  _href: '',
+  get href() { return this._href; },
+  set href(value) {
+    this._href = value;
+    navigations.push({ href: value, message: document.elements['message-text'].textContent });
+  },
+};
 const context = {
   document,
   localStorage: { setItem() {} },
   window: {
-    location: { href: '' },
+    location,
     SITE: {
       PAGE_ORDER: ['top', 'videos'],
       PAGES: {
@@ -140,5 +149,24 @@ assert.equal(buttons[2].attributes['aria-selected'], 'true', 'selection resumes 
 assert.equal(buttons[2].tabIndex, 0, 'resumed selection restores one item tab stop');
 assert.equal(document.elements['menu-list'].tabIndex, -1, 'active item replaces the menu container tab stop');
 assert.equal(document.activeElement, buttons[2], 'resumed keyboard selection focuses the selected item');
+
+for (const listener of documentListeners.keydown) {
+  listener({
+    target: buttons[2], key: 'Enter', altKey: false, ctrlKey: false, metaKey: false,
+    preventDefault() {},
+  });
+}
+assert.equal(location.href, 'search.html', 'keyboard Enter opens the external destination');
+assert.match(navigations.at(-1).message, /^CARD MARKET/, 'keyboard navigation occurs after the external preview message');
+
+location._href = '';
+buttons[2].click();
+assert.equal(location.href, 'search.html', 'mouse click opens the same external destination');
+assert.match(navigations.at(-1).message, /^CARD MARKET/, 'mouse navigation occurs after the same external preview message');
+
+location._href = '';
+buttons[2].dispatch('click', { pointerType: 'touch' });
+assert.equal(location.href, 'search.html', 'touch-generated click opens the same external destination');
+assert.match(navigations.at(-1).message, /^CARD MARKET/, 'touch navigation occurs after the same external preview message');
 
 console.log('preview-2d selection regression test: PASS');
