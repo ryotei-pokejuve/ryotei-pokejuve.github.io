@@ -61,6 +61,7 @@ document.elements['theme-toggle'].append(new Element('span', document));
 const mounts = { top: 0, videos: 0 };
 const navigations = [];
 const storedValues = {};
+let throwStorageWrites = false;
 const location = {
   _href: '',
   get href() { return this._href; },
@@ -71,7 +72,10 @@ const location = {
 };
 const context = {
   document,
-  localStorage: { setItem(key, value) { storedValues[key] = value; } },
+  localStorage: { setItem(key, value) {
+    if (throwStorageWrites) throw new Error('storage disabled');
+    storedValues[key] = value;
+  } },
   window: {
     location,
     SITE: {
@@ -85,6 +89,7 @@ const context = {
 };
 
 vm.runInNewContext(fs.readFileSync('assets/js/preview-2d.js', 'utf8'), context);
+assert.equal(documentListeners.keydown.length, 1, 'the preview registers one shared keydown handler');
 assert.equal(mounts.top, 1, 'initial selection mounts once');
 assert.match(
   document.elements['message-text'].textContent,
@@ -92,6 +97,12 @@ assert.match(
   'missing matchMedia falls back to the complete message without timers',
 );
 assert.equal(storedValues['ryotei-2d-theme'], 'dark', 'initial theme is persisted');
+
+throwStorageWrites = true;
+assert.doesNotThrow(() => document.elements['theme-toggle'].click(), 'blocked storage does not break theme changes');
+assert.equal(document.documentElement.dataset.theme, 'light', 'failed persistence does not block the theme UI');
+throwStorageWrites = false;
+document.elements['theme-toggle'].click();
 
 document.elements['theme-toggle'].click();
 assert.equal(document.documentElement.dataset.theme, 'light', 'theme toggle applies the light theme');
@@ -105,6 +116,7 @@ assert.equal(document.documentElement.dataset.theme, 'dark', 'second theme toggl
 assert.equal(storedValues['ryotei-2d-theme'], 'dark', 'second theme toggle persists the dark theme');
 
 const buttons = document.elements['menu-list'].querySelectorAll('.menu-item');
+assert.equal(document.elements['menu-list'].attributes['aria-activedescendant'], buttons[0].id, 'active descendant references the initial option');
 assert.equal(document.elements['status-position'].textContent, '01/03', 'HUD cursor starts at the first menu item');
 assert.equal(buttons[0].attributes['aria-selected'], 'true', 'initial cursor has one selected menu item');
 assert.equal(
@@ -117,6 +129,16 @@ assert.equal(mounts.videos, 1, 'focus followed by click mounts once');
 assert.equal(document.elements['screen-name'].textContent, 'VIDEOS', 'HUD screen readout follows the selected content');
 assert.equal(document.elements['detail-code'].textContent, 'DATA / VIDEOS', 'content title plate identifies the selected data file');
 assert.equal(document.elements['status-position'].textContent, '02/03', 'HUD cursor follows mouse selection');
+
+let tabPrevented = false;
+for (const listener of documentListeners.keydown) {
+  listener({
+    target: buttons[1], key: 'Tab', altKey: false, ctrlKey: false, metaKey: false,
+    preventDefault() { tabPrevented = true; },
+  });
+}
+assert.equal(tabPrevented, false, 'Tab keeps its native focus behavior');
+assert.equal(buttons[1].attributes['aria-selected'], 'true', 'Tab does not change cursor state');
 
 for (const target of [
   new Element('input', document),
@@ -195,6 +217,7 @@ assert.equal(buttons[2].attributes['aria-selected'], 'true', 'selection resumes 
 assert.equal(buttons[2].tabIndex, 0, 'resumed selection restores one item tab stop');
 assert.equal(document.elements['menu-list'].tabIndex, -1, 'active item replaces the menu container tab stop');
 assert.equal(document.activeElement, buttons[2], 'resumed keyboard selection focuses the selected item');
+assert.equal(document.elements['menu-list'].attributes['aria-activedescendant'], buttons[2].id, 'active descendant follows restored keyboard selection');
 
 for (const listener of documentListeners.keydown) {
   listener({
@@ -253,6 +276,7 @@ buttons[0].click();
 assert.equal(document.elements['message-text'].textContent, 'T', 'normal motion starts message typing one character at a time');
 const staleCallback = pendingTimers.values().next().value;
 buttons[1].click();
+assert.equal(document.elements['menu-list'].attributes['aria-activedescendant'], buttons[1].id, 'active descendant follows mouse selection');
 assert.equal(document.elements['message-text'].textContent, 'V', 'a new selection immediately starts its own message');
 staleCallback();
 assert.equal(document.elements['message-text'].textContent, 'V', 'a stale timer cannot overwrite the latest selection message');
