@@ -8,10 +8,10 @@
 
 - 実施日: 2026-08-24
 - 実施者: Codex
-- Git commit: `ef5e3b0`（検証時HEAD。commitは作成していない）
-- OS / ブラウザ / バージョン: Windows / Google Chrome 151.0.7922.172（Headless、DevTools Protocolによるdevice viewport emulation）
+- Git commit: `24e05f4`（TASK-007検証時HEAD。commitは作成していない）
+- OS / ブラウザ / バージョン: Windows / TASK-007では操作可能なブラウザがセッションに公開されず、実ブラウザ追加検証は未実施。既存のChrome 151による320〜430px記録は維持
 - 起動方法・URL: `python -m http.server 8765 --bind 127.0.0.1` / `http://127.0.0.1:8765/preview-2d.html`
-- Console error件数: 今回の画面幅検証では未計測（本表の判定対象外）
+- Console error件数: 未計測（操作可能なブラウザが利用できないため）。JavaScript構文検査とNode回帰テストは全件PASS
 
 ## 画面サイズ別マトリクス
 
@@ -23,7 +23,8 @@
 | 375px | PASS | PASS | PASS | PASS | PASS | PASS | PASS | Chrome実レンダリングを目視確認。`innerWidth = clientWidth = scrollWidth = 375`。全11項目が1行表示で、長い英字ラベルの折返し・はみ出しなし。MENU行48px、Theme 44px。 |
 | 390px | PASS | PASS | PASS | PASS | PASS | PASS | PASS | Chrome実レンダリングを目視確認。`innerWidth = clientWidth = scrollWidth = 390`。全11項目が1行表示で、長い英字ラベルの折返し・はみ出しなし。MENU行48px、Theme 44px。 |
 | 430px | PASS | PASS | PASS | PASS | PASS | PASS | PASS | Chrome実レンダリングを目視確認。`innerWidth = clientWidth = scrollWidth = 430`。全11項目が1行表示で、長い英字ラベルの折返し・はみ出しなし。MENU行48px、Theme 44px。 |
-| Desktop（例: 1440×900） | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | |
+| 760px付近 | 未実施 | 未実施 | 静的契約PASS | 未実施 | 未実施 | 静的契約PASS | 未実施 | CSS契約テストで760px以下の2列MENU、通常フローの広告枠、44px以上の操作領域を確認。実レンダリングは要追試。 |
+| Desktop（例: 1440×900） | 未実施 | 未実施 | 静的契約PASS | 未実施 | 未実施 | 静的契約PASS | 未実施 | CSS契約テストでDesktopの操作領域と広告予約高を確認。実レンダリングは要追試。 |
 
 画面幅別の追加実測: 320 / 375 / 390 / 430pxの各幅で`.menu-list`は2列、各ラベルの要素高と算出`line-height`は同一（1行）で、各ラベルの`scrollWidth > clientWidth`はすべて`false`だった。Themeボタンを各幅でクリックし、`data-theme`、表示ラベル、`aria-pressed`が同期して反転することも確認した。CSS変更は不要と判断した。
 
@@ -74,16 +75,24 @@
 
 ## 自動回帰テスト
 
-```powershell
-node tests/preview-2d-selection.test.js
+TASK-007実行結果（2026-08-24、HEAD `24e05f4`）:
+
+```text
+node --check assets/js/preview-2d.js          PASS
+node --check content.js                       PASS
+node tests/preview-2d-content.test.js         PASS
+node tests/preview-2d-responsive.test.js      PASS
+node tests/preview-2d-selection.test.js       PASS
+node tests/preview-2d-theme-bootstrap.test.js PASS
+git diff --exit-code -- index.html lain.html content.js  PASS（差分なし）
 ```
 
-期待結果: `preview-2d selection regression test: PASS`。自動テストはarrow選択、focus+click二重mount防止、Esc、cursor復帰、外部遷移の共通プレビュー、touch由来click、Theme/localStorage、編集要素のkeydown除外を検証する。視覚、実ブラウザのTab順、実タッチ、viewport、Console、reduced motion、広告枠は上記手動確認で補完する。
+自動テストは実コンテンツ契約、レスポンシブCSS契約、arrow選択、focus+click二重mount防止、Esc、cursor復帰、Mouse/Touch由来click、CARD MARKET遷移、Tab非捕捉、Theme/localStorage、編集要素のkeydown除外、reduced-motion時の文字送り停止を検証した。実ブラウザでのみ確定できるDesktop/760pxの見た目、実Tab順、実タッチ、Console、フォーカスリングの視認性は未実施のため、Claudeまたは人間のブラウザ再確認へ引き継ぐ。
 
 ## 最終判定
 
-- 総合判定: 未実施 / PASS / FAIL
-- Blocker / Critical:
-- Major:
-- Minor:
-- 次の確認者への引き継ぎ:
+- 総合判定: **NEEDS_CLAUDE_REVIEW / CLAUDE_REVIEW_PENDING**
+- Blocker / Critical: なし（自動検査範囲）
+- Major: なし（自動検査範囲）
+- Minor: 操作可能なブラウザがセッションに公開されず、Desktop、760px付近、実Mouse/Touch/Keyboard/Tab、Console、focus-visible、OS設定によるreduced-motionの実ブラウザ確認が未実施
+- 次の確認者への引き継ぎ: 操作可能なブラウザで未実施項目を追試する。主観的なClaude Design最終一致もClaudeレビュー待ち。TASK-007ではpreviewコードの修正は不要と判断し、commitは作成していない
