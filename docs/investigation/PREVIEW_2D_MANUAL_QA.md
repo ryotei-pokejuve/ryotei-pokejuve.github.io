@@ -6,12 +6,12 @@
 
 ## 実施情報
 
-- 実施日:
-- 実施者:
-- Git commit:
-- OS / ブラウザ / バージョン:
-- 起動方法・URL:
-- Console error件数:
+- 実施日: 2026-08-24
+- 実施者: Codex
+- Git commit: `ef5e3b0`（検証時HEAD。commitは作成していない）
+- OS / ブラウザ / バージョン: Windows / Google Chrome 151.0.7922.172（Headless、DevTools Protocolによるdevice viewport emulation）
+- 起動方法・URL: `python -m http.server 8765 --bind 127.0.0.1` / `http://127.0.0.1:8765/preview-2d.html`
+- Console error件数: 今回の画面幅検証では未計測（本表の判定対象外）
 
 ## 画面サイズ別マトリクス
 
@@ -19,11 +19,13 @@
 
 | Viewport | 横スクロールなし | 文字が判読可能 | 操作領域44px目安 | MENU / CONTENT | MESSAGE | 広告枠 | Theme | 判定・備考 |
 |---|---|---|---|---|---|---|---|---|
-| 320px | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | |
-| 375px | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | |
-| 390px | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | |
-| 430px | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | |
+| 320px | PASS | PASS | PASS | PASS | PASS | PASS | PASS | Chrome実レンダリングを目視確認。`innerWidth = clientWidth = scrollWidth = 320`。全11項目が1行表示で、`CARD VIDEOS` / `ACHIEVEMENTS` / `CARD MARKET`を含め折返し・はみ出しなし。MENU行48px、Theme 44px。 |
+| 375px | PASS | PASS | PASS | PASS | PASS | PASS | PASS | Chrome実レンダリングを目視確認。`innerWidth = clientWidth = scrollWidth = 375`。全11項目が1行表示で、長い英字ラベルの折返し・はみ出しなし。MENU行48px、Theme 44px。 |
+| 390px | PASS | PASS | PASS | PASS | PASS | PASS | PASS | Chrome実レンダリングを目視確認。`innerWidth = clientWidth = scrollWidth = 390`。全11項目が1行表示で、長い英字ラベルの折返し・はみ出しなし。MENU行48px、Theme 44px。 |
+| 430px | PASS | PASS | PASS | PASS | PASS | PASS | PASS | Chrome実レンダリングを目視確認。`innerWidth = clientWidth = scrollWidth = 430`。全11項目が1行表示で、長い英字ラベルの折返し・はみ出しなし。MENU行48px、Theme 44px。 |
 | Desktop（例: 1440×900） | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | 未実施 | |
+
+画面幅別の追加実測: 320 / 375 / 390 / 430pxの各幅で`.menu-list`は2列、各ラベルの要素高と算出`line-height`は同一（1行）で、各ラベルの`scrollWidth > clientWidth`はすべて`false`だった。Themeボタンを各幅でクリックし、`data-theme`、表示ラベル、`aria-pressed`が同期して反転することも確認した。CSS変更は不要と判断した。
 
 ## 操作回帰
 
