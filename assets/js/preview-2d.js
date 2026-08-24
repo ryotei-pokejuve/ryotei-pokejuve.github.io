@@ -1,9 +1,13 @@
 (function (root, factory) {
   'use strict';
 
-  var adapter = factory();
-  root.RYOTEI_CONTENT_ADAPTER = adapter;
-  if (typeof module === 'object' && module.exports) module.exports = adapter;
+  var shared = factory();
+  root.RYOTEI_CONTENT_ADAPTER = { createEntities: shared.createEntities };
+  root.RYOTEI_INPUT = {
+    isEditing: shared.isEditing,
+    keydownAction: shared.keydownAction,
+  };
+  if (typeof module === 'object' && module.exports) module.exports = shared;
 }(typeof window === 'object' ? window : globalThis, function () {
   'use strict';
 
@@ -18,7 +22,31 @@
     return entities;
   }
 
-  return { createEntities: createEntities };
+  function isEditing(target) {
+    return Boolean(target && (
+      (typeof target.matches === 'function' && target.matches('input, textarea, select'))
+      || target.isContentEditable
+    ));
+  }
+
+  function isMenuItem(target) {
+    return Boolean(target && target.classList && target.classList.contains('menu-item'));
+  }
+
+  function keydownAction(event) {
+    if (!event || isEditing(event.target) || event.altKey || event.ctrlKey || event.metaKey) return null;
+    if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') return { type: 'move', delta: -1 };
+    if (event.key === 'ArrowDown' || event.key === 'ArrowRight') return { type: 'move', delta: 1 };
+    if (event.key === 'Enter' && isMenuItem(event.target)) return { type: 'enter' };
+    if (event.key === 'Escape') return { type: 'back' };
+    return null;
+  }
+
+  return {
+    createEntities: createEntities,
+    isEditing: isEditing,
+    keydownAction: keydownAction,
+  };
 }));
 
 (function () {
@@ -189,20 +217,14 @@
     }
   }
 
-  function isEditing(target) {
-    return target && (target.matches('input, textarea, select') || target.isContentEditable);
-  }
-
   function handleKeydown(event) {
-    if (isEditing(event.target) || event.altKey || event.ctrlKey || event.metaKey) return;
-    var handled = true;
+    var action = window.RYOTEI_INPUT.keydownAction(event);
+    if (!action) return;
     var cursor = store.getState().cursor.menu;
-    if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') select(cursor - 1, true);
-    else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') select(cursor + 1, true);
-    else if (event.key === 'Enter' && event.target.classList.contains('menu-item')) activate();
-    else if (event.key === 'Escape') resetToMenu();
-    else handled = false;
-    if (handled) event.preventDefault();
+    if (action.type === 'move') select(cursor + action.delta, true);
+    else if (action.type === 'enter') activate();
+    else if (action.type === 'back') resetToMenu();
+    event.preventDefault();
   }
 
   if (!pages || !Array.isArray(order)) {
