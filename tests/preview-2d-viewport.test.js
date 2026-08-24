@@ -193,7 +193,7 @@ async function waitForPage(client) {
       href: location.href,
       detail: document.getElementById('detail-content')?.textContent
     })`);
-    if (lastState.readyState === 'complete' && lastState.menuItems === 11) return;
+    if (lastState.readyState !== 'loading' && lastState.menuItems === 11 && lastState.detail) return;
     await new Promise((resolve) => setTimeout(resolve, 50));
   }
   throw new Error(`preview-2d did not finish rendering: ${JSON.stringify(lastState)}`);
@@ -257,8 +257,8 @@ async function pressTab(client, shift = false) {
     await client.send('Page.enable');
 
     for (const viewport of [
-      { width: 1440, height: 900, label: 'Desktop 1440x900' },
-      { width: 760, height: 900, label: '760px breakpoint' },
+      { width: 1440, height: 900, label: 'Desktop 1440x900', menuColumns: 1, adHeight: 90 },
+      { width: 760, height: 900, label: '760px breakpoint', menuColumns: 2, adHeight: 90 },
     ]) {
       debug('checking', viewport.label);
       const errorStart = consoleErrors.length;
@@ -278,13 +278,25 @@ async function pressTab(client, shift = false) {
         rootScrollWidth: document.documentElement.scrollWidth,
         bodyScrollWidth: document.body.scrollWidth,
         shellRight: document.querySelector('.terminal-shell').getBoundingClientRect().right,
-        menuColumns: getComputedStyle(document.querySelector('.menu-list')).gridTemplateColumns.split(' ').length
+        menuColumns: getComputedStyle(document.querySelector('.menu-list')).gridTemplateColumns.split(' ').length,
+        menuItemHeights: [...document.querySelectorAll('.menu-item')]
+          .map((item) => item.getBoundingClientRect().height),
+        themeHeight: document.getElementById('theme-toggle').getBoundingClientRect().height,
+        adMinHeight: parseFloat(getComputedStyle(document.querySelector('.ad-reserve')).minHeight),
+        adHeight: document.querySelector('.ad-reserve').getBoundingClientRect().height
       }))()`);
       assert.equal(layout.innerWidth, viewport.width, `${viewport.label}: requested viewport is active`);
       assert.ok(layout.rootScrollWidth <= layout.rootClientWidth, `${viewport.label}: document has no horizontal overflow`);
       assert.ok(layout.bodyScrollWidth <= layout.rootClientWidth, `${viewport.label}: body has no horizontal overflow`);
       assert.ok(layout.shellRight <= layout.rootClientWidth + 0.5, `${viewport.label}: terminal shell stays inside viewport`);
-      assert.equal(layout.menuColumns, viewport.width === 760 ? 2 : 1, `${viewport.label}: expected menu grid is rendered`);
+      assert.equal(layout.menuColumns, viewport.menuColumns, `${viewport.label}: expected menu grid is rendered`);
+      assert.ok(
+        layout.menuItemHeights.every((height) => height >= 44),
+        `${viewport.label}: every menu action is at least 44px high`,
+      );
+      assert.ok(layout.themeHeight >= 44, `${viewport.label}: Theme action is at least 44px high`);
+      assert.equal(layout.adMinHeight, viewport.adHeight, `${viewport.label}: ad slot keeps its CSS reserved height`);
+      assert.ok(layout.adHeight >= viewport.adHeight, `${viewport.label}: rendered ad slot keeps its reserved height`);
 
       await client.evaluate(`document.activeElement && document.activeElement.blur()`);
       await pressTab(client);

@@ -23,8 +23,8 @@
 | 375px | PASS | PASS | PASS | PASS | PASS | PASS | PASS | Chrome実レンダリングを目視確認。`innerWidth = clientWidth = scrollWidth = 375`。全11項目が1行表示で、長い英字ラベルの折返し・はみ出しなし。MENU行48px、Theme 44px。 |
 | 390px | PASS | PASS | PASS | PASS | PASS | PASS | PASS | Chrome実レンダリングを目視確認。`innerWidth = clientWidth = scrollWidth = 390`。全11項目が1行表示で、長い英字ラベルの折返し・はみ出しなし。MENU行48px、Theme 44px。 |
 | 430px | PASS | PASS | PASS | PASS | PASS | PASS | PASS | Chrome実レンダリングを目視確認。`innerWidth = clientWidth = scrollWidth = 430`。全11項目が1行表示で、長い英字ラベルの折返し・はみ出しなし。MENU行48px、Theme 44px。 |
-| 760px付近 | 未実施 | 未実施 | 静的契約PASS | 未実施 | 未実施 | 静的契約PASS | 未実施 | CSS契約テストで760px以下の2列MENU、通常フローの広告枠、44px以上の操作領域を確認。実レンダリングは要追試。 |
-| Desktop（例: 1440×900） | 未実施 | 未実施 | 静的契約PASS | 未実施 | 未実施 | 静的契約PASS | 未実施 | CSS契約テストでDesktopの操作領域と広告予約高を確認。実レンダリングは要追試。 |
+| 760px付近 | 自動契約PASS | 要人手確認 | 自動契約PASS | 自動契約PASS | 要人手確認 | 自動契約PASS | 要人手確認 | Headless Chrome/Edge契約テストで横溢れなし、2列MENU、MENU・Theme 44px以上、広告予約高90pxを算出値から確認。文字の判読性、MESSAGE、Themeの視覚品質は自動化不可・要人手確認。 |
+| Desktop（例: 1440×900） | 自動契約PASS | 要人手確認 | 自動契約PASS | 自動契約PASS | 要人手確認 | 自動契約PASS | 要人手確認 | Headless Chrome/Edge契約テストで横溢れなし、1列MENU、MENU・Theme 44px以上、広告予約高90pxを算出値から確認。文字の判読性、MESSAGE、Themeの視覚品質は自動化不可・要人手確認。 |
 
 画面幅別の追加実測: 320 / 375 / 390 / 430pxの各幅で`.menu-list`は2列、各ラベルの要素高と算出`line-height`は同一（1行）で、各ラベルの`scrollWidth > clientWidth`はすべて`false`だった。Themeボタンを各幅でクリックし、`data-theme`、表示ラベル、`aria-pressed`が同期して反転することも確認した。CSS変更は不要と判断した。
 
