@@ -245,6 +245,7 @@ h2 { margin-bottom: 0; font-size: 1rem; letter-spacing: .08em; }
   color: var(--accent-ink);
   font-weight: 700;
 }
+.menu-item[aria-selected="true"]:focus-visible { outline-color: var(--accent-ink); }
 .menu-item[aria-selected="true"]::before { content: "▶"; }
 .menu-item[aria-selected="true"] .menu-kind { color: var(--accent-ink); }
 .menu-item:active {

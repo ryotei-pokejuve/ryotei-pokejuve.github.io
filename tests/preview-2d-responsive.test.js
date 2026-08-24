@@ -86,6 +86,11 @@ assert.match(menuRule, /min-height:\s*46px/, 'desktop menu items exceed the 44px
 assert.match(menuRule, /touch-action:\s*manipulation/, 'menu taps use the same click activation path without delayed gesture handling');
 assert.match(rule('.menu-item:hover'), /background:\s*var\(--sel-bg\)/, 'hover has a restrained preview state');
 assert.match(rule('.menu-item:focus-visible'), /outline-color:\s*var\(--text\)/, 'keyboard focus remains visible independently of selection');
+assert.match(
+  rule('.menu-item[aria-selected="true"]:focus-visible'),
+  /outline-color:\s*var\(--accent-ink\)/,
+  'keyboard focus keeps non-text contrast on the selected accent background',
+);
 assert.match(selectedMenuRule, /background:\s*var\(--accent\)/, 'selection uses the A-variant full inversion');
 assert.match(selectedMenuRule, /color:\s*var\(--accent-ink\)/, 'selected text keeps contrast on the inverted row');
 assert.match(selectedMenuRule, /border-left-color:\s*var\(--terminal-edge\)/, 'selection keeps a non-color-independent left rail');
