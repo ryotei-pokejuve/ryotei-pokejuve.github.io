@@ -238,4 +238,34 @@ buttons[2].dispatch('click', { pointerType: 'touch' });
 assert.equal(location.href, 'search.html', 'touch-generated click opens the same external destination');
 assert.match(navigations.at(-1).message, /^CARD MARKET/, 'touch navigation occurs after the same external preview message');
 
+let nextTimerId = 1;
+const pendingTimers = new Map();
+context.window.matchMedia = () => ({ matches: false });
+context.setTimeout = (callback, delay) => {
+  assert.equal(delay, 20, 'message typing retains the established 20ms interval');
+  const id = nextTimerId++;
+  pendingTimers.set(id, callback);
+  return id;
+};
+context.clearTimeout = (id) => pendingTimers.delete(id);
+
+buttons[0].click();
+assert.equal(document.elements['message-text'].textContent, 'T', 'normal motion starts message typing one character at a time');
+const staleCallback = pendingTimers.values().next().value;
+buttons[1].click();
+assert.equal(document.elements['message-text'].textContent, 'V', 'a new selection immediately starts its own message');
+staleCallback();
+assert.equal(document.elements['message-text'].textContent, 'V', 'a stale timer cannot overwrite the latest selection message');
+while (pendingTimers.size) {
+  const [id, callback] = pendingTimers.entries().next().value;
+  pendingTimers.delete(id);
+  callback();
+}
+assert.match(document.elements['message-text'].textContent, /^VIDEOS：/, 'normal motion eventually reveals the complete message');
+
+context.window.matchMedia = () => ({ matches: true });
+buttons[0].click();
+assert.match(document.elements['message-text'].textContent, /^TOP：/, 'reduced motion reveals the complete message immediately');
+assert.equal(pendingTimers.size, 0, 'reduced motion schedules no typing timer');
+
 console.log('preview-2d selection regression test: PASS');

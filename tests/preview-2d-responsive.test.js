@@ -65,6 +65,16 @@ assert.match(rule('.menu-item', mobileMedia), /min-height:\s*48px/, 'mobile menu
 assert.match(rule('#theme-toggle'), /min-height:\s*44px/, 'the theme control meets the touch target minimum');
 assert.match(rule('.open-link'), /min-height:\s*44px/, 'external actions meet the touch target minimum');
 
+assert.match(html, /id="message-heading" class="message-label">MESSAGE<\/span>/, 'MESSAGE uses the A-variant label plate');
+assert.match(html, /<kbd>↑↓ SELECT<\/kbd><kbd>ENTER OPEN<\/kbd><kbd>ESC MENU<\/kbd>/, 'keyboard hints are grouped into readable key plates');
+assert.match(html, /class="message-caret" aria-hidden="true"/, 'the decorative waiting caret is hidden from assistive technology');
+assert.match(rule('.terminal-shell > .message-window'), /inset\s+0\s+0\s+0\s+2px\s+var\(--accent\)/, 'MESSAGE has the strong A-variant inner accent ring');
+assert.match(rule('.message-label'), /border:\s*2px\s+solid\s+var\(--terminal-edge\)/, 'MESSAGE label is a square double-framed plate');
+assert.match(rule('#message-text'), /line-height:\s*1\.75/, 'MESSAGE body keeps the B-variant readable line height');
+assert.match(rule('.message-window', mobileMedia), /padding:\s*18px\s+30px\s+12px\s+12px/, 'MESSAGE reserves caret space without overflowing narrow screens');
+const reducedMotionMedia = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)'));
+assert.match(rule('.message-caret', reducedMotionMedia), /transform:\s*none/, 'reduced motion stops the decorative waiting caret');
+
 assert.match(html, /id="detail-code" class="detail-code" aria-hidden="true"/, 'the content title plate has a decorative data code');
 assert.match(rule('.detail-heading'), /border-bottom:\s*3px\s+solid\s+var\(--terminal-edge\)/, 'the content title plate has a strong A-variant divider');
 assert.match(rule('.page-content'), /border:\s*var\(--bw\)\s+solid\s+var\(--edge\)/, 'real content is contained in an information sub-panel');
