@@ -25,6 +25,16 @@ assert.match(
 );
 assert.match(rule('html'), /min-width:\s*320px/, 'the supported viewport floor is explicit');
 
+const shellRule = rule('.terminal-shell');
+assert.match(shellRule, /border:\s*4px\s+solid\s+var\(--terminal-edge\)/, 'the terminal has the strong A-variant outer frame');
+assert.match(shellRule, /repeating-linear-gradient/, 'the terminal frame uses a restrained tile treatment');
+assert.match(shellRule, /inset\s+0\s+0\s+0\s+2px\s+var\(--terminal-ring\)/, 'the terminal outer frame includes an inner ring');
+assert.match(
+  rule('.terminal-shell > .win2'),
+  /inset\s+0\s+0\s+0\s+5px\s+var\(--card\)/,
+  'status, main, and message windows share the multi-ring hierarchy',
+);
+
 const tabletMedia = mediaBlock('@media (max-width: 760px)', '@media (max-width: 430px)');
 assert.match(
   tabletMedia,
@@ -33,6 +43,8 @@ assert.match(
 );
 
 const mobileMedia = mediaBlock('@media (max-width: 430px)', '@media (prefers-reduced-motion: reduce)');
+assert.match(rule('.terminal-shell', mobileMedia), /width:\s*100%/, 'the framed terminal fits the 320px mobile floor');
+assert.match(rule('.terminal-shell', mobileMedia), /border-width:\s*3px/, 'the outer frame remains visible without consuming mobile content width');
 assert.match(rule('.menu-item', mobileMedia), /min-height:\s*48px/, 'mobile menu items exceed 44px');
 assert.match(rule('#theme-toggle'), /min-height:\s*44px/, 'the theme control meets the touch target minimum');
 assert.match(rule('.open-link'), /min-height:\s*44px/, 'external actions meet the touch target minimum');
