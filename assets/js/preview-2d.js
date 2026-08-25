@@ -76,23 +76,25 @@
   if (typeof window !== 'object') return;
 
   var THEME_KEY = 'ryotei-2d-theme';
-  var pages = window.SITE && window.SITE.PAGES;
-  var order = window.SITE && window.SITE.PAGE_ORDER;
+  var pages = null;
+  var order = null;
   var menu = [];
   var store = null;
-  var menuList = document.getElementById('menu-list');
-  var detailTitle = document.getElementById('detail-title');
-  var detailCode = document.getElementById('detail-code');
-  var detailContent = document.getElementById('detail-content');
-  var messageText = document.getElementById('message-text');
-  var screenName = document.getElementById('screen-name');
-  var statusPosition = document.getElementById('status-position');
-  var statusTheme = document.getElementById('status-theme');
-  var themeToggle = document.getElementById('theme-toggle');
+  var menuList = null;
+  var detailTitle = null;
+  var detailCode = null;
+  var detailContent = null;
+  var messageText = null;
+  var screenName = null;
+  var statusPosition = null;
+  var statusTheme = null;
+  var themeToggle = null;
   var isSelecting = false;
   var messageTimer = null;
   var messageRun = 0;
-  var isProductionTop = /(?:\/index\.html|\/)$/.test(window.location.pathname || '');
+  var isProductionTop = false;
+  var activeInstance = null;
+  var disposers = [];
 
   function finishMessage() {
     messageRun += 1;
@@ -255,63 +257,111 @@
     event.preventDefault();
   }
 
-  if (!pages || !Array.isArray(order)) {
-    detailTitle.textContent = '読み込みエラー';
-    detailContent.textContent = 'content.js のサイトデータを読み込めませんでした。';
-    messageText.textContent = 'プレビューをWebサーバー経由で再読み込みしてください。';
-    return;
+  function handleThemeToggle() {
+    setTheme(store.getState().theme === 'dark' ? 'light' : 'dark');
   }
 
-  if (!window.RYOTEI_STATE || typeof window.RYOTEI_STATE.createStore !== 'function') {
-    detailTitle.textContent = '読み込みエラー';
-    detailContent.textContent = '共通状態ストアを読み込めませんでした。';
-    messageText.textContent = 'プレビューをWebサーバー経由で再読み込みしてください。';
-    return;
+  function handlePopstate() {
+    var routeIndex = order.indexOf(window.RYOTEI_NAVIGATION.resolveRoute(window.location.href, pages));
+    if (routeIndex >= 0) select(routeIndex, false);
+    else resetToMenu(false);
   }
 
-  menu = window.RYOTEI_CONTENT_ADAPTER.createEntities(pages, order);
-  store = window.RYOTEI_STATE.createStore({
-    theme: document.documentElement.dataset.theme,
-    view: window.RYOTEI_NAVIGATION.resolveView(window.location.href),
-    screen: 'menu',
-    cursor: { menu: 0, content: 0, settings: 0 },
-    message: '',
-  }, { counts: { menu: menu.length } });
+  function unmount() {
+    for (var index = disposers.length - 1; index >= 0; index -= 1) disposers[index]();
+    disposers = [];
+    activeInstance = null;
+  }
 
-  menu.forEach(function (item, index) {
-    var button = document.createElement('button');
-    button.type = 'button';
-    button.id = 'menu-item-' + index;
-    button.className = 'menu-item';
-    button.setAttribute('role', 'option');
-    button.setAttribute('aria-selected', 'false');
-    button.tabIndex = -1;
-    var label = document.createElement('span');
-    label.textContent = item.title;
-    var kind = document.createElement('span');
-    kind.className = 'menu-kind';
-    kind.textContent = item.kind === 'external' ? 'LINK' : 'DATA';
-    button.append(label, kind);
-    button.addEventListener('click', function () {
-      select(index, false);
-      if (item.kind === 'external') activate();
+  function mount(doc) {
+    if (activeInstance) return activeInstance;
+    doc = doc || document;
+    pages = window.SITE && window.SITE.PAGES;
+    order = window.SITE && window.SITE.PAGE_ORDER;
+    menu = [];
+    store = null;
+    menuList = doc.getElementById('menu-list');
+    detailTitle = doc.getElementById('detail-title');
+    detailCode = doc.getElementById('detail-code');
+    detailContent = doc.getElementById('detail-content');
+    messageText = doc.getElementById('message-text');
+    screenName = doc.getElementById('screen-name');
+    statusPosition = doc.getElementById('status-position');
+    statusTheme = doc.getElementById('status-theme');
+    themeToggle = doc.getElementById('theme-toggle');
+    isProductionTop = /(?:\/index\.html|\/)$/.test(window.location.pathname || '');
+    activeInstance = { document: doc };
+
+    if (!pages || !Array.isArray(order)) {
+      detailTitle.textContent = '読み込みエラー';
+      detailContent.textContent = 'content.js のサイトデータを読み込めませんでした。';
+      messageText.textContent = 'プレビューをWebサーバー経由で再読み込みしてください。';
+      return activeInstance;
+    }
+
+    if (!window.RYOTEI_STATE || typeof window.RYOTEI_STATE.createStore !== 'function') {
+      detailTitle.textContent = '読み込みエラー';
+      detailContent.textContent = '共通状態ストアを読み込めませんでした。';
+      messageText.textContent = 'プレビューをWebサーバー経由で再読み込みしてください。';
+      return activeInstance;
+    }
+
+    menu = window.RYOTEI_CONTENT_ADAPTER.createEntities(pages, order);
+    store = window.RYOTEI_STATE.createStore({
+      theme: doc.documentElement.dataset.theme,
+      view: window.RYOTEI_NAVIGATION.resolveView(window.location.href),
+      screen: 'menu',
+      cursor: { menu: 0, content: 0, settings: 0 },
+      message: '',
+    }, { counts: { menu: menu.length } });
+
+    menu.forEach(function (item, index) {
+      var button = doc.createElement('button');
+      button.type = 'button';
+      button.id = 'menu-item-' + index;
+      button.className = 'menu-item';
+      button.setAttribute('role', 'option');
+      button.setAttribute('aria-selected', 'false');
+      button.tabIndex = -1;
+      var label = doc.createElement('span');
+      label.textContent = item.title;
+      var kind = doc.createElement('span');
+      kind.className = 'menu-kind';
+      kind.textContent = item.kind === 'external' ? 'LINK' : 'DATA';
+      button.append(label, kind);
+      button.addEventListener('click', function () {
+        select(index, false);
+        if (item.kind === 'external') activate();
+      });
+      button.addEventListener('focus', function () { select(index, false); });
+      menuList.appendChild(button);
     });
-    button.addEventListener('focus', function () { select(index, false); });
-    menuList.appendChild(button);
-  });
 
-  document.getElementById('item-count').textContent = String(menu.length).padStart(2, '0');
-  themeToggle.addEventListener('click', function () { setTheme(store.getState().theme === 'dark' ? 'light' : 'dark'); });
-  document.addEventListener('keydown', handleKeydown);
-  if (isProductionTop && typeof window.addEventListener === 'function') {
-    window.addEventListener('popstate', function () {
-      var routeIndex = order.indexOf(window.RYOTEI_NAVIGATION.resolveRoute(window.location.href, pages));
-      if (routeIndex >= 0) select(routeIndex, false);
-      else resetToMenu(false);
+    disposers.push(function () {
+      while (menuList.firstChild) menuList.removeChild(menuList.firstChild);
     });
+    themeToggle.addEventListener('click', handleThemeToggle);
+    disposers.push(function () { themeToggle.removeEventListener('click', handleThemeToggle); });
+    doc.addEventListener('keydown', handleKeydown);
+    disposers.push(function () { doc.removeEventListener('keydown', handleKeydown); });
+    if (isProductionTop && typeof window.addEventListener === 'function') {
+      window.addEventListener('popstate', handlePopstate);
+      disposers.push(function () { window.removeEventListener('popstate', handlePopstate); });
+    }
+    disposers.push(function () {
+      messageRun += 1;
+      if (messageTimer !== null && typeof clearTimeout === 'function') clearTimeout(messageTimer);
+      messageTimer = null;
+    });
+
+    doc.getElementById('item-count').textContent = String(menu.length).padStart(2, '0');
+    setTheme(store.getState().theme === 'light' ? 'light' : 'dark');
+    var initialIndex = isProductionTop ? order.indexOf(window.RYOTEI_NAVIGATION.resolveRoute(window.location.href, pages)) : -1;
+    if (isProductionTop && initialIndex < 0) resetToMenu(false);
+    else select(initialIndex >= 0 ? initialIndex : 0, false);
+    return activeInstance;
   }
-  setTheme(store.getState().theme === 'light' ? 'light' : 'dark');
-  var initialIndex = isProductionTop ? order.indexOf(window.RYOTEI_NAVIGATION.resolveRoute(window.location.href, pages)) : -1;
-  if (isProductionTop && initialIndex < 0) resetToMenu(false);
-  else select(initialIndex >= 0 ? initialIndex : 0, false);
+
+  window.RYOTEI_RENDERER_2D = { mount: mount, unmount: unmount };
+  mount(document);
 }());
