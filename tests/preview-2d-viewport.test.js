@@ -7,6 +7,13 @@ const { spawn } = require('node:child_process');
 
 const ROOT = path.resolve(__dirname, '..');
 const PAGE_URL = process.env.PREVIEW_2D_PAGE_URL || '/preview-2d.html';
+const DEFAULT_VIEWPORTS = [
+  { width: 1440, height: 900, label: 'Desktop 1440x900', menuColumns: 1, adHeight: 90 },
+  { width: 760, height: 900, label: '760px breakpoint', menuColumns: 2, adHeight: 90 },
+];
+const VIEWPORTS = process.env.PREVIEW_2D_VIEWPORTS
+  ? JSON.parse(process.env.PREVIEW_2D_VIEWPORTS)
+  : DEFAULT_VIEWPORTS;
 const debug = (...values) => { if (process.env.DEBUG_QA) console.error('[qa]', ...values); };
 
 function findBrowser() {
@@ -256,10 +263,7 @@ async function pressTab(client, shift = false) {
     await client.send('Runtime.enable');
     await client.send('Page.enable');
 
-    for (const viewport of [
-      { width: 1440, height: 900, label: 'Desktop 1440x900', menuColumns: 1, adHeight: 90 },
-      { width: 760, height: 900, label: '760px breakpoint', menuColumns: 2, adHeight: 90 },
-    ]) {
+    for (const viewport of VIEWPORTS) {
       debug('checking', viewport.label);
       const errorStart = consoleErrors.length;
       const exceptionStart = exceptions.length;
@@ -282,6 +286,8 @@ async function pressTab(client, shift = false) {
         menuItemHeights: [...document.querySelectorAll('.menu-item')]
           .map((item) => item.getBoundingClientRect().height),
         themeHeight: document.getElementById('theme-toggle').getBoundingClientRect().height,
+        primaryActionHeights: [...document.querySelectorAll('.mode-link, .open-link')]
+          .map((item) => ({ label: item.textContent.trim(), height: item.getBoundingClientRect().height })),
         adMinHeight: parseFloat(getComputedStyle(document.querySelector('.ad-reserve')).minHeight),
         adHeight: document.querySelector('.ad-reserve').getBoundingClientRect().height
       }))()`);
@@ -295,6 +301,10 @@ async function pressTab(client, shift = false) {
         `${viewport.label}: every menu action is at least 44px high`,
       );
       assert.ok(layout.themeHeight >= 44, `${viewport.label}: Theme action is at least 44px high`);
+      assert.ok(
+        layout.primaryActionHeights.every(({ height }) => height >= 44),
+        `${viewport.label}: every primary link action is at least 44px high: ${JSON.stringify(layout.primaryActionHeights)}`,
+      );
       assert.equal(layout.adMinHeight, viewport.adHeight, `${viewport.label}: ad slot keeps its CSS reserved height`);
       assert.ok(layout.adHeight >= viewport.adHeight, `${viewport.label}: rendered ad slot keeps its reserved height`);
 
