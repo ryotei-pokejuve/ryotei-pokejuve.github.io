@@ -321,11 +321,11 @@ async function pressTab(client, shift = false) {
       await pressTab(client);
       assert.equal(await client.evaluate('document.activeElement.id'), 'theme-toggle', `${viewport.label}: Theme is second in Tab order`);
       await pressTab(client);
-      if (PAGE_URL === '/index.html') {
+      if (PAGE_URL.startsWith('/index.html')) {
         assert.equal(await client.evaluate('document.activeElement.id'), 'lain-toggle', `${viewport.label}: Lain mode follows Theme in production`);
         await pressTab(client);
       }
-      const expectedMenuFocus = PAGE_URL === '/index.html' ? 'menu-list' : 'menu-item-0';
+      const expectedMenuFocus = PAGE_URL.startsWith('/index.html') ? 'menu-list' : 'menu-item-0';
       assert.equal(await client.evaluate('document.activeElement.id'), expectedMenuFocus, `${viewport.label}: menu control follows header actions in Tab order`);
       assert.deepEqual(consoleErrors.slice(errorStart), [], `${viewport.label}: console.error count is zero`);
       assert.deepEqual(exceptions.slice(exceptionStart), [], `${viewport.label}: uncaught JavaScript exception count is zero`);
