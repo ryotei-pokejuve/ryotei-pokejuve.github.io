@@ -76,6 +76,7 @@
   if (typeof window !== 'object') return;
 
   var THEME_KEY = 'ryotei-2d-theme';
+  var WARP_ENTRY_KEY = 'ryotei-warp-entry';
   var pages = null;
   var order = null;
   var menu = [];
@@ -267,6 +268,45 @@
     else resetToMenu(false);
   }
 
+  function playWarpEntry(doc) {
+    if (!isProductionTop) return;
+    try {
+      if (sessionStorage.getItem(WARP_ENTRY_KEY) !== '1') return;
+    } catch (error) {
+      return;
+    }
+
+    var overlay = doc.getElementById('warp-entry-overlay');
+    var reducedMotion = typeof window.matchMedia === 'function'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var warpTimer = null;
+    var finished = false;
+
+    function finishWarpEntry() {
+      if (finished) return;
+      finished = true;
+      if (warpTimer !== null && typeof clearTimeout === 'function') clearTimeout(warpTimer);
+      warpTimer = null;
+      if (overlay) {
+        overlay.classList.remove('is-active');
+        overlay.hidden = true;
+        overlay.removeEventListener('animationend', finishWarpEntry);
+      }
+      try { sessionStorage.removeItem(WARP_ENTRY_KEY); } catch (error) {}
+    }
+
+    disposers.push(finishWarpEntry);
+    if (!overlay || reducedMotion) {
+      finishWarpEntry();
+      return;
+    }
+
+    overlay.hidden = false;
+    overlay.addEventListener('animationend', finishWarpEntry);
+    overlay.classList.add('is-active');
+    if (typeof setTimeout === 'function') warpTimer = setTimeout(finishWarpEntry, 700);
+  }
+
   function unmount() {
     for (var index = disposers.length - 1; index >= 0; index -= 1) disposers[index]();
     disposers = [];
@@ -348,6 +388,7 @@
       window.addEventListener('popstate', handlePopstate);
       disposers.push(function () { window.removeEventListener('popstate', handlePopstate); });
     }
+    playWarpEntry(doc);
     disposers.push(function () {
       messageRun += 1;
       if (messageTimer !== null && typeof clearTimeout === 'function') clearTimeout(messageTimer);

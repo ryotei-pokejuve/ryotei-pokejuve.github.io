@@ -7,9 +7,19 @@
   <meta name="google-adsense-account" content="ca-pub-3405662051867998">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23202030'/%3E%3Crect x='2' y='6' width='12' height='6' fill='%236b6bd9'/%3E%3Crect x='3' y='4' width='4' height='2' fill='%236b6bd9'/%3E%3Crect x='9' y='4' width='4' height='2' fill='%236b6bd9'/%3E%3Crect x='4' y='8' width='2' height='2' fill='%23202030'/%3E%3Crect x='10' y='8' width='2' height='2' fill='%23ffcc00'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="assets/css/2d-tokens.css"><link rel="stylesheet" href="assets/css/preview-2d.css">
+  <style>
+    #warp-entry-overlay { position: fixed; inset: 0; z-index: 2000; pointer-events: none; background: var(--deep); opacity: 0; }
+    #warp-entry-overlay.is-active { animation: warp-entry-in .6s cubic-bezier(.7, 0, .3, 1) both; }
+    @keyframes warp-entry-in {
+      from { clip-path: circle(150% at 50% 50%); opacity: 1; }
+      to { clip-path: circle(0 at 50% 50%); opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) { #warp-entry-overlay.is-active { animation: none; } }
+  </style>
   <script>(function(){try{var saved=localStorage.getItem('ryotei-2d-theme');if(saved==='light'||saved==='dark'){document.documentElement.dataset.theme=saved;return;}var legacy=localStorage.getItem('ryotei-theme');if(legacy==='dark'||legacy==='gba'){document.documentElement.dataset.theme=legacy==='gba'?'light':'dark';return;}}catch(error){}var light=typeof matchMedia==='function'&&matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.dataset.theme=light?'light':'dark';}());</script>
 </head>
 <body>
+  <div id="warp-entry-overlay" hidden aria-hidden="true"></div>
   <a class="skip-link" href="#main-content">本文へ移動</a>
   <main class="terminal-shell" aria-labelledby="terminal-title">
     <header class="status-bar win2">
