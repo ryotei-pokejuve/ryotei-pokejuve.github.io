@@ -1,0 +1,85 @@
+/* RYOTEI SITE 2D MODE design tokens.
+ * This foundation is intentionally not connected to the existing pages yet.
+ */
+
+:root[data-theme="dark"] {
+  --bg: #171c24;
+  --deep: #10141a;
+  --card: #1b212a;
+  --edge: #2c3644;
+  --line: #212936;
+  --bw: 1px;
+  --text: #e6ecf3;
+  --dim: #7c8b9c;
+  --faint: #4d5b6c;
+  --accent: #7fd4c1;
+  --accent-ink: #0e1116;
+  --sel-bg: rgba(127, 212, 193, 0.12);
+  --sel-ink: #eaf7f3;
+  --bar-bg: #10141a;
+  --bar-ink: #e6ecf3;
+  --bar-dim: #7c8b9c;
+  --pip-off: #263040;
+  --chip-ink: #0e1116;
+  --ring: inset 0 0 0 1px var(--edge);
+  --lift: none;
+  --msg-ring: inset 0 0 0 1px var(--edge);
+}
+
+:root[data-theme="light"] {
+  --bg: #efe9db;
+  --deep: #e5dcc8;
+  --card: #fdfaf1;
+  --edge: #241f19;
+  --line: #e0d7c0;
+  --bw: 2px;
+  --text: #241f19;
+  --dim: #7a7157;
+  --faint: #a1977c;
+  --accent: #2f6f5e;
+  --accent-ink: #f6f2e8;
+  --sel-bg: #f0d79a;
+  --sel-ink: #241f19;
+  --bar-bg: #2f6f5e;
+  --bar-ink: #f6f2e8;
+  --bar-dim: #cfe3da;
+  --pip-off: #ddd4bc;
+  --chip-ink: #fdfaf1;
+  --ring: inset 0 0 0 2px #e6dec7;
+  --lift: 0 3px 0 rgba(36, 31, 25, 0.3);
+  --msg-ring: inset 0 0 0 3px #9cc0b4;
+}
+
+:root {
+  /* Category pairs: mineral, plant, water, fire, wind, earth, light, dark. */
+  --cat-mineral-bg: #6d5fb8;
+  --cat-mineral-ink: #fdfaf1;
+  --cat-plant-bg: #327049;
+  --cat-plant-ink: #fdfaf1;
+  --cat-water-bg: #336c96;
+  --cat-water-ink: #fdfaf1;
+  --cat-fire-bg: #a94f2d;
+  --cat-fire-ink: #fdfaf1;
+  --cat-wind-bg: #3a7276;
+  --cat-wind-ink: #fdfaf1;
+  --cat-earth-bg: #7d6231;
+  --cat-earth-ink: #fdfaf1;
+  --cat-light-bg: #d9b455;
+  --cat-light-ink: #241f19;
+  --cat-dark-bg: #56596e;
+  --cat-dark-ink: #fdfaf1;
+
+  /* Status pairs: surveyed, unexplored, closed. */
+  --state-surveyed-bg: #327049;
+  --state-surveyed-ink: #fdfaf1;
+  --state-unexplored-bg: #336c96;
+  --state-unexplored-ink: #fdfaf1;
+  --state-closed-bg: #8e4444;
+  --state-closed-ink: #fdfaf1;
+}
+
+/* P1: the outer border and inset ring form the two window edges. */
+.win2 {
+  border: var(--bw) solid var(--edge);
+  box-shadow: var(--ring);
+}

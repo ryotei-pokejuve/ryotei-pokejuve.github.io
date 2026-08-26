@@ -2,3 +2,4 @@ User-agent: *
 Disallow: /admin.html
 Disallow: /supabase/
 Disallow: /lain.html
+Disallow: /preview-2d.html
