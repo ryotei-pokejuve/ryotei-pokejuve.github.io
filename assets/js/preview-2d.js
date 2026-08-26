@@ -142,11 +142,11 @@
   }
 
   function plainSummary(item) {
-    if (item.kind === 'external') return 'カードを検索し、価格情報を確認する既存ページを開きます。';
+    if (item.kind === 'external') return 'カードの相場を調べてみよう…カード名や型番から参考価格を検索できます。';
     var scratch = document.createElement('div');
     scratch.innerHTML = pageHtml(item.page);
     var text = (scratch.textContent || '').replace(/\s+/g, ' ').trim();
-    return text ? text.slice(0, 110) : item.title + ' の情報を表示します。';
+    return text || item.title + ' の情報を表示します。';
   }
 
   function deriveMessage(item) {
@@ -212,7 +212,12 @@
       var link = document.createElement('a');
       link.className = 'open-link';
       link.href = item.href;
-      link.textContent = 'カード相場を開く';
+      link.textContent = 'カード相場を調べる';
+      link.addEventListener('click', function () {
+        beep(740, 0.06);
+        finishMessage();
+        window.location.href = item.href;
+      });
       box.append(label, description, link);
       detailContent.appendChild(box);
     } else {
@@ -280,21 +285,11 @@
     }
   }
 
-  function activate() {
-    var item = menu[store.getState().cursor.menu];
-    if (item && item.kind === 'external') {
-      beep(740, 0.06);
-      finishMessage();
-      window.location.href = item.href;
-    }
-  }
-
   function handleKeydown(event) {
     var action = window.RYOTEI_INPUT.keydownAction(event);
     if (!action) return;
     var cursor = store.getState().cursor.menu;
     if (action.type === 'move') select(cursor + action.delta, true);
-    else if (action.type === 'enter') activate();
     else if (action.type === 'back') resetToMenu();
     event.preventDefault();
   }
@@ -514,10 +509,7 @@
       kind.className = 'menu-kind';
       kind.textContent = item.kind === 'external' ? 'LINK' : 'DATA';
       button.append(label, kind);
-      button.addEventListener('click', function () {
-        select(index, false);
-        if (item.kind === 'external') activate();
-      });
+      button.addEventListener('click', function () { select(index, false); });
       button.addEventListener('focus', function () { select(index, false); });
       menuList.appendChild(button);
     });

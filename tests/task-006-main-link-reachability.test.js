@@ -177,9 +177,28 @@ async function tabToId(client, id) {
       await openIndex(client, indexUrl);
     }
 
+    // Official spec: MENU selection -> cushion screen -> explicit start action -> existing search page.
+    // Selecting CARD MARKET must never navigate by itself; only the cushion screen's own start
+    // control (mouse, keyboard, or touch) may open the existing search page.
     const marketIndex = await client.evaluate(`[...document.querySelectorAll('.menu-item')].findIndex((item) => item.textContent.includes('CARD MARKET'))`);
     assert.ok(marketIndex >= 0, 'CARD MARKET is present in the production menu');
+
     await client.evaluate(`document.querySelectorAll('.menu-item')[${marketIndex}].click()`);
+    assert.equal(
+      await client.evaluate(`location.pathname`),
+      '/index.html',
+      'a mouse click on the CARD MARKET row opens the cushion screen instead of navigating immediately',
+    );
+    assert.equal(
+      await client.evaluate(`document.getElementById('detail-title').textContent`),
+      'CARD MARKET',
+      'the cushion screen headline names CARD MARKET',
+    );
+    assert.ok(
+      await client.evaluate(`!!document.querySelector('#detail-content .open-link[href="search.html"]')`),
+      'the cushion screen offers an explicit start control pointing at the existing search page',
+    );
+    await client.evaluate(`document.querySelector('#detail-content .open-link').click()`);
     await waitForPath(client, '/search.html');
     await openIndex(client, indexUrl);
 
@@ -191,7 +210,40 @@ async function tabToId(client, id) {
       'keyboard selection reaches CARD MARKET from the menu Tab stop',
     );
     await pressKey(client, 'Enter', 'Enter', 13);
+    assert.equal(
+      await client.evaluate(`location.pathname`),
+      '/index.html',
+      'Enter on the CARD MARKET row opens the cushion screen instead of navigating directly',
+    );
+    await tabToFooterLink(client, 'search.html');
+    await pressKey(client, 'Enter', 'Enter', 13);
     await waitForPath(client, '/search.html');
+    await openIndex(client, indexUrl);
+
+    await client.command('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, mobile: true, deviceScaleFactor: 1 });
+    await client.command('Emulation.setTouchEmulationEnabled', { enabled: true });
+    const marketIndexTouch = await client.evaluate(`[...document.querySelectorAll('.menu-item')].findIndex((item) => item.textContent.includes('CARD MARKET'))`);
+    const marketPoint = await client.evaluate(`(() => {
+      const rect = document.querySelectorAll('.menu-item')[${marketIndexTouch}].getBoundingClientRect();
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    })()`);
+    await client.command('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: marketPoint.x, y: marketPoint.y, id: 1 }] });
+    await client.command('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    assert.equal(
+      await client.evaluate(`location.pathname`),
+      '/index.html',
+      'a touch tap on the CARD MARKET row opens the cushion screen instead of navigating immediately',
+    );
+    const startPoint = await client.evaluate(`(() => {
+      const rect = document.querySelector('#detail-content .open-link').getBoundingClientRect();
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    })()`);
+    await client.command('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: startPoint.x, y: startPoint.y, id: 1 }] });
+    await client.command('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await waitForPath(client, '/search.html');
+    await client.command('Emulation.setTouchEmulationEnabled', { enabled: false });
+    await client.command('Emulation.clearDeviceMetricsOverride');
 
     console.log('TASK-006 main link reachability browser test: PASS');
   } finally {

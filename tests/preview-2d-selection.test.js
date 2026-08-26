@@ -37,7 +37,19 @@ class Element {
     this.focus();
     this.dispatch('click');
   }
-  querySelector(selector) { return selector === 'span' ? this.children[0] : null; }
+  querySelector(selector) {
+    if (selector === 'span') return this.children[0];
+    if (selector.startsWith('.')) {
+      const className = selector.slice(1);
+      const stack = [...this.children];
+      while (stack.length) {
+        const node = stack.shift();
+        if (node.className && node.className.split(/\s+/).includes(className)) return node;
+        if (node.children && node.children.length) stack.push(...node.children);
+      }
+    }
+    return null;
+  }
   querySelectorAll(selector) {
     return selector === '.menu-item' ? this.children.filter((child) => child.className === 'menu-item') : [];
   }
@@ -242,25 +254,47 @@ assert.equal(
   'wrapped keyboard navigation keeps a single selected row',
 );
 
+// New official spec: MENU selection -> cushion screen -> explicit start action -> existing search page.
+// Selecting CARD MARKET (already done above via wrap-around arrow navigation) must render a cushion
+// screen in the content pane instead of navigating immediately.
+assert.equal(document.elements['detail-code'].textContent, 'LINK / MARKET', 'external content uses the link title plate');
+assert.match(
+  document.elements['message-text'].textContent,
+  /^CARD MARKET：カードの相場を調べてみよう/,
+  'selecting CARD MARKET shows the cushion-screen guidance message',
+);
+let marketLink = document.elements['detail-content'].querySelector('.open-link');
+assert.ok(marketLink, 'the cushion screen exposes an explicit start control');
+assert.equal(marketLink.href, 'search.html', 'the start control targets the existing search page');
+assert.match(marketLink.textContent, /カード相場を調べる/, 'the start control uses an explicit call-to-action label');
+
 for (const listener of documentListeners.keydown) {
   listener({
     target: buttons[2], key: 'Enter', altKey: false, ctrlKey: false, metaKey: false,
     preventDefault() {},
   });
 }
-assert.equal(location.href, 'search.html', 'keyboard Enter opens the external destination');
-assert.match(navigations.at(-1).message, /^CARD MARKET/, 'keyboard navigation occurs after the external preview message');
+assert.equal(location.href, '', 'keyboard Enter on the CARD MARKET row opens the cushion screen instead of navigating directly');
+
+marketLink.click();
+assert.equal(location.href, 'search.html', 'activating the cushion screen start control opens the external destination');
+assert.match(navigations.at(-1).message, /^CARD MARKET/, 'navigation occurs after the cushion-screen message');
 
 location._href = '';
+buttons[0].click();
 buttons[2].click();
-assert.equal(location.href, 'search.html', 'mouse click opens the same external destination');
-assert.equal(document.elements['detail-code'].textContent, 'LINK / MARKET', 'external content uses the link title plate');
-assert.match(navigations.at(-1).message, /^CARD MARKET/, 'mouse navigation occurs after the same external preview message');
+assert.equal(location.href, '', 'a mouse click on the CARD MARKET row selects the cushion screen without navigating away');
+marketLink = document.elements['detail-content'].querySelector('.open-link');
+marketLink.click();
+assert.equal(location.href, 'search.html', 'clicking the start control after a mouse selection opens the destination');
 
 location._href = '';
+buttons[0].click();
 buttons[2].dispatch('click', { pointerType: 'touch' });
-assert.equal(location.href, 'search.html', 'touch-generated click opens the same external destination');
-assert.match(navigations.at(-1).message, /^CARD MARKET/, 'touch navigation occurs after the same external preview message');
+assert.equal(location.href, '', 'a touch-generated selection of the CARD MARKET row does not navigate immediately');
+marketLink = document.elements['detail-content'].querySelector('.open-link');
+marketLink.dispatch('click', { pointerType: 'touch' });
+assert.equal(location.href, 'search.html', 'a touch activation of the start control opens the destination');
 
 let nextTimerId = 1;
 const pendingTimers = new Map();
