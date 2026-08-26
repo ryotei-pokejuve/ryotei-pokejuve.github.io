@@ -76,6 +76,7 @@
   if (typeof window !== 'object') return;
 
   var THEME_KEY = 'ryotei-2d-theme';
+  var SOUND_KEY = 'ryotei-2d-sound';
   var WARP_ENTRY_KEY = 'ryotei-warp-entry';
   var pages = null;
   var order = null;
@@ -90,6 +91,10 @@
   var statusPosition = null;
   var statusTheme = null;
   var themeToggle = null;
+  var soundToggle = null;
+  var soundOn = false;
+  var soundReady = false;
+  var audioContext = null;
   var isSelecting = false;
   var messageTimer = null;
   var messageRun = 0;
@@ -155,6 +160,39 @@
     statusTheme.textContent = theme.toUpperCase();
     themeToggle.setAttribute('aria-pressed', String(theme === 'light'));
     try { localStorage.setItem(THEME_KEY, theme); } catch (error) {}
+  }
+
+  function beep(frequency, duration) {
+    if (!soundOn || !soundReady) return;
+    try {
+      var AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (typeof AudioContext !== 'function') return;
+      audioContext = audioContext || new AudioContext();
+      var oscillator = audioContext.createOscillator();
+      var gain = audioContext.createGain();
+      var length = duration || 0.06;
+      oscillator.type = 'sine';
+      oscillator.frequency.value = frequency;
+      oscillator.connect(gain);
+      gain.connect(audioContext.destination);
+      gain.gain.setValueAtTime(0.04, audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + length);
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + length);
+    } catch (error) {}
+  }
+
+  function setSound(enabled, confirmWithSound) {
+    soundOn = Boolean(enabled);
+    if (!soundToggle) return;
+    soundToggle.querySelector('span').textContent = soundOn ? 'ON' : 'OFF';
+    soundToggle.setAttribute('aria-pressed', String(soundOn));
+    try { localStorage.setItem(SOUND_KEY, soundOn ? 'on' : 'off'); } catch (error) {}
+    if (confirmWithSound && soundOn) beep(660, 0.06);
+  }
+
+  function loadSoundPreference() {
+    try { return localStorage.getItem(SOUND_KEY) === 'on'; } catch (error) { return false; }
   }
 
   function renderDetail(item) {
@@ -234,6 +272,7 @@
       }
       updateStatusPosition();
       setMessage(state.message);
+      beep(440, 0.045);
       if (focusItem) buttons[state.cursor.menu].focus();
     } finally {
       isSelecting = false;
@@ -243,6 +282,7 @@
   function activate() {
     var item = menu[store.getState().cursor.menu];
     if (item && item.kind === 'external') {
+      beep(740, 0.06);
       finishMessage();
       window.location.href = item.href;
     }
@@ -260,6 +300,10 @@
 
   function handleThemeToggle() {
     setTheme(store.getState().theme === 'dark' ? 'light' : 'dark');
+  }
+
+  function handleSoundToggle() {
+    setSound(!soundOn, true);
   }
 
   function handlePopstate() {
@@ -310,6 +354,7 @@
   function unmount() {
     for (var index = disposers.length - 1; index >= 0; index -= 1) disposers[index]();
     disposers = [];
+    soundReady = false;
     activeInstance = null;
   }
 
@@ -329,6 +374,10 @@
     statusPosition = doc.getElementById('status-position');
     statusTheme = doc.getElementById('status-theme');
     themeToggle = doc.getElementById('theme-toggle');
+    soundToggle = doc.getElementById('sound-toggle');
+    soundOn = false;
+    soundReady = false;
+    audioContext = null;
     isProductionTop = /(?:\/index\.html|\/)$/.test(window.location.pathname || '');
     activeInstance = { document: doc };
 
@@ -382,6 +431,11 @@
     });
     themeToggle.addEventListener('click', handleThemeToggle);
     disposers.push(function () { themeToggle.removeEventListener('click', handleThemeToggle); });
+    if (soundToggle) {
+      setSound(loadSoundPreference(), false);
+      soundToggle.addEventListener('click', handleSoundToggle);
+      disposers.push(function () { soundToggle.removeEventListener('click', handleSoundToggle); });
+    }
     doc.addEventListener('keydown', handleKeydown);
     disposers.push(function () { doc.removeEventListener('keydown', handleKeydown); });
     if (isProductionTop && typeof window.addEventListener === 'function') {
@@ -393,6 +447,10 @@
       messageRun += 1;
       if (messageTimer !== null && typeof clearTimeout === 'function') clearTimeout(messageTimer);
       messageTimer = null;
+      if (audioContext && typeof audioContext.close === 'function') {
+        try { audioContext.close(); } catch (error) {}
+      }
+      audioContext = null;
     });
 
     doc.getElementById('item-count').textContent = String(menu.length).padStart(2, '0');
@@ -400,6 +458,7 @@
     var initialIndex = isProductionTop ? order.indexOf(window.RYOTEI_NAVIGATION.resolveRoute(window.location.href, pages)) : -1;
     if (isProductionTop && initialIndex < 0) resetToMenu(false);
     else select(initialIndex >= 0 ? initialIndex : 0, false);
+    soundReady = true;
     return activeInstance;
   }
 

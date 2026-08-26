@@ -286,6 +286,7 @@ async function pressTab(client, shift = false) {
         menuItemHeights: [...document.querySelectorAll('.menu-item')]
           .map((item) => item.getBoundingClientRect().height),
         themeHeight: document.getElementById('theme-toggle').getBoundingClientRect().height,
+        soundHeight: document.getElementById('sound-toggle')?.getBoundingClientRect().height || null,
         primaryActionHeights: [...document.querySelectorAll('.mode-link, .open-link')]
           .map((item) => ({ label: item.textContent.trim(), height: item.getBoundingClientRect().height })),
         adMinHeight: parseFloat(getComputedStyle(document.querySelector('.ad-reserve')).minHeight),
@@ -301,6 +302,7 @@ async function pressTab(client, shift = false) {
         `${viewport.label}: every menu action is at least 44px high`,
       );
       assert.ok(layout.themeHeight >= 44, `${viewport.label}: Theme action is at least 44px high`);
+      if (PAGE_URL.startsWith('/index.html')) assert.ok(layout.soundHeight >= 44, `${viewport.label}: Sound action is at least 44px high`);
       assert.ok(
         layout.primaryActionHeights.every(({ height }) => height >= 44),
         `${viewport.label}: every primary link action is at least 44px high: ${JSON.stringify(layout.primaryActionHeights)}`,
@@ -329,10 +331,15 @@ async function pressTab(client, shift = false) {
       assert.equal(firstFocus.visible, true, `${viewport.label}: focused skip link is visible on screen`);
 
       await pressTab(client);
-      assert.equal(await client.evaluate('document.activeElement.id'), 'theme-toggle', `${viewport.label}: Theme is second in Tab order`);
-      await pressTab(client);
       if (PAGE_URL.startsWith('/index.html')) {
+        assert.equal(await client.evaluate('document.activeElement.id'), 'sound-toggle', `${viewport.label}: Sound is second in Tab order`);
+        await pressTab(client);
+        assert.equal(await client.evaluate('document.activeElement.id'), 'theme-toggle', `${viewport.label}: Theme follows Sound in production`);
+        await pressTab(client);
         assert.equal(await client.evaluate('document.activeElement.id'), 'lain-toggle', `${viewport.label}: Lain mode follows Theme in production`);
+        await pressTab(client);
+      } else {
+        assert.equal(await client.evaluate('document.activeElement.id'), 'theme-toggle', `${viewport.label}: Theme is second in Tab order`);
         await pressTab(client);
       }
       const expectedMenuFocus = PAGE_URL.startsWith('/index.html') ? 'menu-list' : 'menu-item-0';

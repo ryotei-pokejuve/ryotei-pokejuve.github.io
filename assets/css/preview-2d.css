@@ -172,6 +172,7 @@ h2 { margin-bottom: 0; font-size: 1rem; letter-spacing: .08em; }
   color: var(--accent-ink);
   font: 700 .75rem Consolas, monospace;
 }
+#sound-toggle,
 #theme-toggle {
   min-height: 44px;
   border: var(--bw) solid var(--edge);
@@ -577,8 +578,9 @@ h2 { margin-bottom: 0; font-size: 1rem; letter-spacing: .08em; }
   .hud-signal { display: none; }
   .hud-readout { min-width: 0; padding: 2px 8px; }
   .hud-theme { display: none; }
-  .status-actions { flex-shrink: 0; }
-  #theme-toggle { padding: 5px 8px; font-size: .75rem; }
+  .status-actions { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+  .status-actions .mode-chip { display: none; }
+  #sound-toggle, #theme-toggle, .status-actions .mode-link { min-width: 0; justify-content: center; padding: 5px 4px; font-size: .68rem; white-space: nowrap; }
   .pane-heading, .detail-content { padding: 10px; }
   .message-window { padding: 18px 30px 12px 12px; }
   .message-label { left: 8px; }
