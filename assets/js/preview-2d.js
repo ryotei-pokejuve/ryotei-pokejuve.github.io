@@ -78,6 +78,7 @@
   var THEME_KEY = 'ryotei-2d-theme';
   var SOUND_KEY = 'ryotei-2d-sound';
   var WARP_ENTRY_KEY = 'ryotei-warp-entry';
+  var PUSH_START_KEY = 'ryotei-push-start-consumed';
   var pages = null;
   var order = null;
   var menu = [];
@@ -351,6 +352,97 @@
     if (typeof setTimeout === 'function') warpTimer = setTimeout(finishWarpEntry, 700);
   }
 
+  function getSessionValue(key) {
+    try { return sessionStorage.getItem(key); } catch (error) { return null; }
+  }
+
+  function hidePushStartGate(doc) {
+    var gate = doc.getElementById('push-start-gate');
+    if (!gate) return;
+    gate.setAttribute('aria-hidden', 'true');
+    gate.hidden = true;
+  }
+
+  function mountPushStartGate(doc) {
+    var gate = doc.getElementById('push-start-gate');
+    var pushStartButton = doc.getElementById('push-start-button');
+    if (!gate || !pushStartButton) return;
+
+    var active = true;
+    var previousFocus = doc.activeElement;
+    var touchOptions = { passive: false };
+
+    function removeListeners() {
+      doc.removeEventListener('keydown', handlePushStartKeydown, true);
+      doc.removeEventListener('focusin', handlePushStartFocus, true);
+      pushStartButton.removeEventListener('touchstart', handlePushStartTouch, touchOptions);
+      pushStartButton.removeEventListener('click', handlePushStartClick);
+    }
+
+    function restoreFocus() {
+      var focusTarget = previousFocus;
+      if (!focusTarget
+        || focusTarget === gate
+        || gate.contains(focusTarget)
+        || !focusTarget.isConnected
+        || typeof focusTarget.focus !== 'function') {
+        focusTarget = menuList;
+      }
+      if (focusTarget && typeof focusTarget.focus === 'function') focusTarget.focus();
+    }
+
+    function closePushStartGate(restore) {
+      if (!active) return;
+      active = false;
+      try { sessionStorage.setItem(PUSH_START_KEY, '1'); } catch (error) {}
+      hidePushStartGate(doc);
+      removeListeners();
+      if (restore) restoreFocus();
+    }
+
+    function handlePushStartKeydown(event) {
+      if (!active) return;
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        event.stopPropagation();
+        pushStartButton.click();
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.key === 'Tab') pushStartButton.focus();
+    }
+
+    function handlePushStartFocus(event) {
+      if (active && !gate.contains(event.target)) pushStartButton.focus();
+    }
+
+    function handlePushStartTouch(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      closePushStartGate(true);
+    }
+
+    function handlePushStartClick(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      closePushStartGate(true);
+    }
+
+    doc.addEventListener('keydown', handlePushStartKeydown, true);
+    doc.addEventListener('focusin', handlePushStartFocus, true);
+    pushStartButton.addEventListener('touchstart', handlePushStartTouch, touchOptions);
+    pushStartButton.addEventListener('click', handlePushStartClick);
+    gate.hidden = false;
+    gate.setAttribute('aria-hidden', 'false');
+    pushStartButton.focus();
+    disposers.push(function () {
+      active = false;
+      hidePushStartGate(doc);
+      removeListeners();
+    });
+  }
+
   function unmount() {
     for (var index = disposers.length - 1; index >= 0; index -= 1) disposers[index]();
     disposers = [];
@@ -379,6 +471,10 @@
     soundReady = false;
     audioContext = null;
     isProductionTop = /(?:\/index\.html|\/)$/.test(window.location.pathname || '');
+    var warpEntryRequested = getSessionValue(WARP_ENTRY_KEY) === '1';
+    var pushStartConsumed = getSessionValue(PUSH_START_KEY) === '1';
+    var shouldPlayWarpEntry = isProductionTop && warpEntryRequested;
+    var shouldShowPushStart = isProductionTop && !shouldPlayWarpEntry && !pushStartConsumed;
     activeInstance = { document: doc };
 
     if (!pages || !Array.isArray(order)) {
@@ -442,7 +538,6 @@
       window.addEventListener('popstate', handlePopstate);
       disposers.push(function () { window.removeEventListener('popstate', handlePopstate); });
     }
-    playWarpEntry(doc);
     disposers.push(function () {
       messageRun += 1;
       if (messageTimer !== null && typeof clearTimeout === 'function') clearTimeout(messageTimer);
@@ -459,6 +554,11 @@
     if (isProductionTop && initialIndex < 0) resetToMenu(false);
     else select(initialIndex >= 0 ? initialIndex : 0, false);
     soundReady = true;
+    if (shouldPlayWarpEntry) {
+      hidePushStartGate(doc);
+      playWarpEntry(doc);
+    }
+    else if (shouldShowPushStart) mountPushStartGate(doc);
     return activeInstance;
   }
 

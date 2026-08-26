@@ -99,7 +99,12 @@ async function openIndex(client, indexUrl) {
   let count = 0;
   for (let attempt = 0; attempt < 100; attempt += 1) {
     count = await client.evaluate(`document.querySelectorAll('.menu-item').length`);
-    if (count > 0) return;
+    if (count > 0) {
+      await client.evaluate(`sessionStorage.setItem('ryotei-push-start-consumed', '1');
+        window.RYOTEI_RENDERER_2D.unmount();
+        window.RYOTEI_RENDERER_2D.mount(document);`);
+      return;
+    }
     await new Promise((resolve) => setTimeout(resolve, 25));
   }
   assert.fail(`production menu did not render: ${count}`);

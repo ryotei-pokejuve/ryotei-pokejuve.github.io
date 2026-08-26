@@ -275,6 +275,11 @@ async function pressTab(client, shift = false) {
       });
       await client.send('Page.reload', { ignoreCache: true });
       await waitForPage(client);
+      if (PAGE_URL.startsWith('/index.html')) {
+        await client.evaluate(`sessionStorage.setItem('ryotei-push-start-consumed', '1');
+          window.RYOTEI_RENDERER_2D.unmount();
+          window.RYOTEI_RENDERER_2D.mount(document);`);
+      }
 
       const layout = await client.evaluate(`(() => ({
         innerWidth,

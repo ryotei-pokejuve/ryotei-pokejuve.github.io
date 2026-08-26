@@ -49,6 +49,44 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
 }
 .skip-link:focus { transform: none; }
 
+.push-start-gate {
+  position: fixed;
+  z-index: 2100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, .78);
+}
+.push-start-gate[hidden] { display: none; }
+.push-start-panel {
+  width: min(100%, 32rem);
+  padding: 24px;
+  border: var(--bw) solid var(--edge);
+  background: var(--card);
+  color: var(--text);
+  text-align: center;
+}
+.push-start-title {
+  margin-bottom: 20px;
+  color: var(--accent);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: clamp(.9rem, 3.5vw, 1.15rem);
+  letter-spacing: .12em;
+}
+.push-start-button {
+  width: min(100%, 18rem);
+  min-height: 44px;
+  border: var(--bw) solid var(--edge);
+  background: var(--accent);
+  color: var(--accent-ink);
+  cursor: pointer;
+  font: 700 1rem Consolas, "Courier New", monospace;
+  letter-spacing: .12em;
+}
+.push-start-button:hover,
+.push-start-button:active { background: var(--sel-bg); color: var(--text); }
+
 .terminal-shell {
   display: grid;
   grid-template-rows: auto minmax(420px, 1fr) auto auto;
