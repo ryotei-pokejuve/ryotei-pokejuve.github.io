@@ -429,11 +429,16 @@ button, select { touch-action: manipulation; }
       <p>新しいシリーズを追加できます。追加後はパック登録・パック編集・検索ページのグループに自動で表示されます。</p>
       <label for="series-new-name">シリーズ名</label>
       <input id="series-new-name" type="text" maxlength="80" placeholder="例: 新シリーズ">
-      <label for="series-new-after">追加する位置</label>
+      <label for="series-new-after">基準シリーズ</label>
       <select id="series-new-after">
         <option value="">読み込み中…</option>
       </select>
-      <p style="margin:6px 0 10px;font-size:12px;">選んだシリーズの<strong>すぐ下</strong>に追加します。</p>
+      <label for="series-new-position">追加位置</label>
+      <select id="series-new-position">
+        <option value="after">下に追加</option>
+        <option value="before">上に追加</option>
+      </select>
+      <p style="margin:6px 0 10px;font-size:12px;">選んだシリーズの<strong>上または下</strong>に追加します。</p>
       <button class="btn" id="series-new-save" type="button">シリーズを追加</button>
       <div id="series-new-status" class="status-msg"></div>
     </div>
@@ -546,6 +551,7 @@ button, select { touch-action: manipulation; }
 
     seriesNewName: document.getElementById("series-new-name"),
     seriesNewAfter: document.getElementById("series-new-after"),
+    seriesNewPosition: document.getElementById("series-new-position"),
     seriesNewSave: document.getElementById("series-new-save"),
     seriesNewStatus: document.getElementById("series-new-status"),
     packManageSelect: document.getElementById("pack-manage-select"),
@@ -832,7 +838,8 @@ button, select { touch-action: manipulation; }
     els.seriesNewSave.disabled=true;
     ADMIN.adminCreateCardSeries({
       name:name,
-      afterSeriesName: els.seriesNewAfter.value || null
+      referenceSeriesName: els.seriesNewAfter.value || null,
+      position: els.seriesNewPosition.value || "after"
     }).then(function(){
       return loadSeriesOptions(name);
     }).then(function(){

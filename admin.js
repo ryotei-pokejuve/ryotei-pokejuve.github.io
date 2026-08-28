@@ -155,7 +155,8 @@
   function adminCreateCardSeries(fields){
     return client().schema("api").rpc("admin_create_card_series", {
       p_name: fields.name,
-      p_after_series_name: fields.afterSeriesName || null
+      p_reference_series_name: fields.referenceSeriesName || null,
+      p_position: fields.position || "after"
     }).then(function(res){
       if(res.error) throw res.error;
       return res.data;
