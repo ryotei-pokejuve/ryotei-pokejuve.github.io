@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>管理画面 - りょていのサイト</title>
 <meta name="robots" content="noindex, nofollow">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https://idnhamxtwxfcxflenxko.supabase.co;">
@@ -118,6 +118,20 @@
     padding: 8px 4px; border-bottom: 1px dotted var(--text-sub); font-size: 13px;
   }
   .result-row .r-name{ flex:1; min-width:0; }
+  .result-main{ display:flex; align-items:center; gap:10px; flex:1; min-width:0; }
+  .result-text{ min-width:0; }
+  .result-thumb{
+    width:52px; height:72px; object-fit:contain; flex:0 0 auto;
+    border:2px solid var(--window-border-outer); background:#fff;
+  }
+  .result-thumb-placeholder{
+    width:52px; height:72px; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    border:2px solid var(--window-border-outer); background:#eee;
+    font-size:9px; color:var(--text-sub); text-align:center;
+  }
+  #admin-result-count{ margin-top:10px; font-size:12px; color:var(--text-sub); text-align:center; }
+  #admin-load-more-wrap{ text-align:center; margin-top:10px; display:none; }
   .result-row button{
     padding: 6px 10px; font-size: 11px; min-height: 36px;
     background: var(--accent); color:#fff; border: 2px solid var(--window-border-outer);
@@ -126,11 +140,136 @@
   #image-preview-wrap{ margin-top: 8px; }
   #image-preview{ max-width: 120px; max-height: 160px; border: 2px solid var(--window-border-outer); display:none; }
 
+  #price-card-results{ list-style:none; padding:0; margin:8px 0 0; }
+  #price-card-results .result-row{ margin-bottom:8px; }
   #price-target{ font-size: 13px; padding: 8px; background: rgba(61,127,212,.1); border: 2px solid var(--accent); margin-bottom: 8px; }
 
   @media (prefers-reduced-motion: reduce){
     *{ animation: none !important; transition: none !important; }
   }
+
+/* ===== Smartphone admin UI ===== */
+html { -webkit-text-size-adjust: 100%; }
+body { overflow-x: hidden; }
+button, input, select, textarea { font: inherit; }
+button, select { touch-action: manipulation; }
+
+@media (max-width: 720px){
+  body{
+    margin:0;
+    padding:0;
+    font-size:16px;
+  }
+
+  .container,
+  .admin-wrap,
+  main{
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+    padding:10px !important;
+    box-sizing:border-box;
+  }
+
+  .pixel-window{
+    margin:0 0 12px !important;
+    padding:12px !important;
+    box-sizing:border-box;
+  }
+
+  h1{ font-size:1.35rem; line-height:1.35; }
+  h2{ font-size:1.1rem; line-height:1.4; }
+
+  .search-row{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:8px !important;
+  }
+
+  input,
+  select,
+  textarea,
+  .btn{
+    width:100%;
+    min-width:0;
+    box-sizing:border-box;
+  }
+
+  input,
+  select,
+  textarea{
+    min-height:48px;
+    font-size:16px; /* iPhoneの入力時自動ズーム防止 */
+    padding:10px;
+  }
+
+  textarea{ min-height:90px; }
+
+  .btn{
+    min-height:48px;
+    padding:10px 12px;
+    font-size:16px;
+  }
+
+  .inline-actions{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:8px !important;
+  }
+
+  #admin-results{
+    padding-left:0 !important;
+    list-style:none;
+  }
+
+  #admin-results li{
+    margin:0 0 8px;
+  }
+
+  #admin-results button,
+  #admin-results a{
+    min-height:48px;
+    width:100%;
+    box-sizing:border-box;
+  }
+
+  #image-preview-wrap{
+    width:100%;
+    max-width:320px;
+    margin:8px auto;
+  }
+
+  #image-preview{
+    display:block;
+    width:100%;
+    height:auto;
+    max-height:440px;
+    object-fit:contain;
+  }
+
+  #new-set-panel{
+    padding:12px;
+  }
+
+  #price-target{
+    overflow-wrap:anywhere;
+  }
+
+  /* 下部の保存操作を親指で押しやすくする */
+  #card-form .mobile-sticky-save{
+    position:sticky;
+    bottom:0;
+    z-index:20;
+    padding:8px 0 calc(8px + env(safe-area-inset-bottom));
+    background:var(--bg, #fff);
+  }
+}
+
+@media (max-width: 380px){
+  body{ font-size:15px; }
+  .pixel-window{ padding:9px !important; }
+}
+
 </style>
 </head>
 <body>
@@ -143,9 +282,9 @@
     <h2>LOGIN</h2>
     <form id="login-form">
       <label for="login-email">メールアドレス</label>
-      <input id="login-email" type="email" autocomplete="username" required>
+      <input id="login-email" type="email" autocomplete="username" autocomplete="username" required>
       <label for="login-password">パスワード</label>
-      <input id="login-password" type="password" autocomplete="current-password" required>
+      <input id="login-password" type="password" autocomplete="current-password" autocomplete="current-password" required>
       <button class="btn" type="submit">ログイン</button>
       <div id="login-status" class="status-msg"></div>
     </form>
@@ -190,6 +329,10 @@
         <button class="btn" id="admin-search-btn" type="button">検索</button>
       </div>
       <ul id="admin-results"></ul>
+      <div id="admin-result-count"></div>
+      <div id="admin-load-more-wrap">
+        <button class="btn secondary" id="admin-load-more-btn" type="button">もっと見る</button>
+      </div>
     </div>
 
     <div class="pixel-window">
@@ -254,28 +397,64 @@
         <div id="image-preview-wrap"><img id="image-preview" alt="プレビュー"></div>
         <label for="card-image-note">画像の出典メモ（任意）</label>
         <textarea id="card-image-note"></textarea>
-        <button class="btn" type="submit" id="card-submit-btn">登録する</button>
-        <button class="btn secondary" type="button" id="card-reset-btn">新規登録にリセット</button>
+
+        <div id="short-feature-box" style="margin-top:14px;padding:10px;border:2px dashed var(--accent);background:rgba(61,127,212,.08);">
+          <label style="display:flex;align-items:center;gap:8px;color:var(--text-color);">
+            <input id="short-feature-active" type="checkbox" style="width:auto;min-height:auto;">
+            PRICEページに掲載する
+          </label>
+          <label for="short-feature-url">YouTubeショートURL（任意）</label>
+          <input id="short-feature-url" type="text" placeholder="https://youtube.com/shorts/...">
+          <label for="short-feature-published">動画投稿日（任意）</label>
+          <input id="short-feature-published" type="datetime-local">
+          <button class="btn secondary" type="button" id="short-feature-save" disabled>掲載設定を保存</button>
+          <div id="short-feature-status" class="status-msg"></div>
+        </div>
+
+        <div class="mobile-sticky-save">
+          <button class="btn" type="submit" id="card-submit-btn">登録する</button>
+          <button class="btn secondary" type="button" id="card-reset-btn">新規登録にリセット</button>
+        </div>
         <div id="card-status" class="status-msg"></div>
       </form>
     </div>
 
     <div class="pixel-window">
       <h2>価格登録</h2>
-      <div id="price-target">カードが選択されていません（上のカード検索・登録から選んでください）</div>
+      <label for="price-card-search">価格を登録するカードを検索</label>
+      <div class="search-row">
+        <input id="price-card-search" type="search" placeholder="カード名・カード番号">
+        <button class="btn secondary" id="price-card-search-btn" type="button">検索</button>
+      </div>
+      <ul id="price-card-results"></ul>
+      <div id="price-card-result-count" style="margin:8px 0;font-size:12px;color:var(--text-sub);"></div>
+      <div id="price-card-load-more-wrap" style="display:none;text-align:center;margin:8px 0 12px;">
+        <button class="btn secondary" id="price-card-load-more" type="button">もっと見る</button>
+      </div>
+      <div id="price-target">カードが選択されていません（ここで検索して選択してください）</div>
       <form id="price-form">
-        <label for="price-value">価格（円）</label>
-        <input id="price-value" type="number" min="1" required>
-        <label for="price-type">種別</label>
-        <select id="price-type">
-          <option value="sell">販売</option>
-          <option value="buy">買取</option>
+        <label for="price-source">価格元</label>
+        <select id="price-source" required>
+          <option value="">価格元を選択</option>
         </select>
+        <div id="shop-price-pair">
+          <label for="price-sell-value">販売価格（円）</label>
+          <input id="price-sell-value" type="number" min="1" inputmode="numeric" placeholder="例: 3980">
+          <label for="price-buy-value">買取価格（円）</label>
+          <input id="price-buy-value" type="number" min="1" inputmode="numeric" placeholder="例: 2500">
+        </div>
+        <div id="market-price-single" style="display:none;">
+          <label for="price-market-value">メルカリ相場（円）</label>
+          <input id="price-market-value" type="number" min="1" inputmode="numeric" placeholder="例: 3500">
+        </div>
+        <div style="font-size:12px;color:var(--text-sub);margin:6px 0 10px;">
+          カードラッシュ・晴れる屋2は販売/買取を同時登録できます。片方だけでも登録できます。
+        </div>
         <label for="price-condition">状態区分</label>
         <input id="price-condition" type="text" value="default">
         <label for="price-observed">価格の日時</label>
         <input id="price-observed" type="datetime-local">
-        <button class="btn" type="submit" id="price-submit-btn" disabled>価格を登録する</button>
+        <button class="btn" type="submit" id="price-submit-btn" disabled>価格をまとめて登録する</button>
         <div id="price-status" class="status-msg"></div>
       </form>
     </div>
@@ -305,6 +484,9 @@
     filterRarity: document.getElementById("admin-filter-rarity"),
     searchBtn: document.getElementById("admin-search-btn"),
     results: document.getElementById("admin-results"),
+    resultCount: document.getElementById("admin-result-count"),
+    loadMoreWrap: document.getElementById("admin-load-more-wrap"),
+    loadMoreBtn: document.getElementById("admin-load-more-btn"),
 
     cardFormTitle: document.getElementById("card-form-title"),
     cardForm: document.getElementById("card-form"),
@@ -330,11 +512,26 @@
     cardSubmitBtn: document.getElementById("card-submit-btn"),
     cardResetBtn: document.getElementById("card-reset-btn"),
     cardStatus: document.getElementById("card-status"),
+    shortFeatureActive: document.getElementById("short-feature-active"),
+    shortFeatureUrl: document.getElementById("short-feature-url"),
+    shortFeaturePublished: document.getElementById("short-feature-published"),
+    shortFeatureSave: document.getElementById("short-feature-save"),
+    shortFeatureStatus: document.getElementById("short-feature-status"),
 
+    priceCardSearch: document.getElementById("price-card-search"),
+    priceCardSearchBtn: document.getElementById("price-card-search-btn"),
+    priceCardResults: document.getElementById("price-card-results"),
+    priceCardResultCount: document.getElementById("price-card-result-count"),
+    priceCardLoadMoreWrap: document.getElementById("price-card-load-more-wrap"),
+    priceCardLoadMore: document.getElementById("price-card-load-more"),
     priceTarget: document.getElementById("price-target"),
+    priceSource: document.getElementById("price-source"),
     priceForm: document.getElementById("price-form"),
-    priceValue: document.getElementById("price-value"),
-    priceType: document.getElementById("price-type"),
+    shopPricePair: document.getElementById("shop-price-pair"),
+    marketPriceSingle: document.getElementById("market-price-single"),
+    priceSellValue: document.getElementById("price-sell-value"),
+    priceBuyValue: document.getElementById("price-buy-value"),
+    priceMarketValue: document.getElementById("price-market-value"),
     priceCondition: document.getElementById("price-condition"),
     priceObserved: document.getElementById("price-observed"),
     priceSubmitBtn: document.getElementById("price-submit-btn"),
@@ -398,6 +595,14 @@
 
   var selectedCardId = null;
   var setsLoaded = false;
+  var adminSearchOffset = 0;
+  var adminSearchTotal = 0;
+  var adminSearchLoading = false;
+  var ADMIN_PAGE_SIZE = 20;
+  var priceSearchOffset = 0;
+  var priceSearchTotal = 0;
+  var priceSearchLoading = false;
+  var PRICE_SEARCH_PAGE_SIZE = 20;
 
   function showStatus(el, message, isError){
     el.textContent = message;
@@ -425,6 +630,49 @@
     return d.toISOString().slice(0, 16);
   }
 
+  function isoToDatetimeLocal(iso){
+    if(!iso) return "";
+    var d = new Date(iso);
+    if(isNaN(d.getTime())) return "";
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0, 16);
+  }
+
+  var priceSourceById = {};
+
+  function updatePriceTypeForSource(){
+    var source = priceSourceById[els.priceSource.value];
+    var isMercari = !!(source && source.name === "メルカリ");
+    els.shopPricePair.style.display = isMercari ? "none" : "block";
+    els.marketPriceSingle.style.display = isMercari ? "block" : "none";
+    if(isMercari){
+      els.priceSellValue.value = "";
+      els.priceBuyValue.value = "";
+    } else {
+      els.priceMarketValue.value = "";
+    }
+  }
+
+  function loadPriceSources(){
+    return ADMIN.listPriceSources().then(function(rows){
+      priceSourceById = {};
+      els.priceSource.innerHTML = '<option value="">価格元を選択</option>';
+      (rows || []).forEach(function(row){
+        priceSourceById[row.id] = row;
+        var opt = document.createElement("option");
+        opt.value = row.id;
+        opt.textContent = row.name;
+        els.priceSource.appendChild(opt);
+      });
+      updatePriceTypeForSource();
+    }).catch(function(err){
+      console.error(err);
+      showStatus(els.priceStatus, "価格元の読み込みに失敗しました: " + friendlyError(err), true);
+    });
+  }
+
+  els.priceSource.addEventListener("change", updatePriceTypeForSource);
+
   // ---- ログイン状態の切り替え ----
   // ログアウト状態（初期表示・手動ログアウト・セッション失効・管理者以外のログイン、すべて共通）に
   // 戻すときは、フォームや検索結果、選択中カードなど画面上の情報を必ずクリアする。
@@ -442,6 +690,7 @@
     if(!setsLoaded){
       setsLoaded = true;
       loadCardSets();
+      loadPriceSources();
     }
     runAdminSearch();
   }
@@ -574,38 +823,106 @@
     });
   });
 
-  // ---- カード検索（一般公開のsearch_cardsを流用。閲覧は管理者以外もできる情報なので問題ない） ----
-  function runAdminSearch(){
+  // ---- カード検索（画像表示＋ページング） ----
+  function renderAdminResult(card){
+    var li = document.createElement("li");
+    li.className = "result-row";
+
+    var main = document.createElement("div");
+    main.className = "result-main";
+
+    var safeImage = MARKET.sanitizeImageUrl(card.image_url || "");
+    if(safeImage){
+      var img = document.createElement("img");
+      img.className = "result-thumb";
+      img.src = safeImage;
+      img.alt = card.name || "カード画像";
+      img.loading = "lazy";
+      main.appendChild(img);
+    } else {
+      var noImage = document.createElement("div");
+      noImage.className = "result-thumb-placeholder";
+      noImage.textContent = "NO IMAGE";
+      main.appendChild(noImage);
+    }
+
+    var textWrap = document.createElement("div");
+    textWrap.className = "result-text";
+    var nameSpan = document.createElement("span");
+    nameSpan.className = "r-name";
+    nameSpan.textContent = card.name + "（" + (card.card_number || "") + (card.rarity ? " / " + card.rarity : "") + "）";
+    textWrap.appendChild(nameSpan);
+    main.appendChild(textWrap);
+    li.appendChild(main);
+
+    var editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.textContent = "編集";
+    editBtn.addEventListener("click", function(){ loadCardForEdit(card.id); });
+    li.appendChild(editBtn);
+
+    els.results.appendChild(li);
+  }
+
+  function updateAdminSearchFooter(){
+    var shown = els.results.children.length;
+    if(adminSearchTotal > 0){
+      els.resultCount.textContent = shown + " / " + adminSearchTotal + "件表示";
+    } else {
+      els.resultCount.textContent = shown ? shown + "件表示" : "検索結果はありません";
+    }
+    els.loadMoreWrap.style.display = shown < adminSearchTotal ? "block" : "none";
+  }
+
+  function runAdminSearch(append){
+    if(adminSearchLoading) return;
+    adminSearchLoading = true;
+
+    if(!append){
+      adminSearchOffset = 0;
+      adminSearchTotal = 0;
+      els.results.innerHTML = "";
+      els.resultCount.textContent = "読み込み中...";
+      els.loadMoreWrap.style.display = "none";
+    }
+
+    els.loadMoreBtn.disabled = true;
+    els.loadMoreBtn.textContent = "読み込み中...";
+
     MARKET.searchCards({
       query: els.searchInput.value,
       rarity: els.filterRarity.value || null,
       setId: els.filterSet.value || null,
-      limit: 20,
-      offset: 0
+      limit: ADMIN_PAGE_SIZE,
+      offset: adminSearchOffset
     }).then(function(rows){
-      els.results.innerHTML = "";
-      rows.forEach(function(card){
-        var li = document.createElement("li");
-        li.className = "result-row";
-
-        var nameSpan = document.createElement("span");
-        nameSpan.className = "r-name";
-        nameSpan.textContent = card.name + "（" + (card.card_number || "") + (card.rarity ? " / " + card.rarity : "") + "）";
-        li.appendChild(nameSpan);
-
-        var editBtn = document.createElement("button");
-        editBtn.type = "button";
-        editBtn.textContent = "編集";
-        editBtn.addEventListener("click", function(){ loadCardForEdit(card.id); });
-        li.appendChild(editBtn);
-
-        els.results.appendChild(li);
-      });
-    }).catch(function(err){ console.error(err); });
+      rows = rows || [];
+      if(rows.length && rows[0].total_count != null){
+        adminSearchTotal = Number(rows[0].total_count) || 0;
+      }
+      rows.forEach(renderAdminResult);
+      adminSearchOffset += rows.length;
+      updateAdminSearchFooter();
+    }).catch(function(err){
+      console.error(err);
+      if(!append) els.resultCount.textContent = "検索に失敗しました";
+    }).finally(function(){
+      adminSearchLoading = false;
+      els.loadMoreBtn.disabled = false;
+      els.loadMoreBtn.textContent = "もっと見る";
+    });
   }
-  els.searchBtn.addEventListener("click", runAdminSearch);
-  els.filterSet.addEventListener("change", runAdminSearch);
-  els.filterRarity.addEventListener("change", runAdminSearch);
+
+  els.searchBtn.addEventListener("click", function(){ runAdminSearch(false); });
+  els.filterSet.addEventListener("change", function(){ runAdminSearch(false); });
+  els.filterRarity.addEventListener("change", function(){ runAdminSearch(false); });
+  els.loadMoreBtn.addEventListener("click", function(){ runAdminSearch(true); });
+  els.searchInput.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){
+      e.preventDefault();
+      runAdminSearch(false);
+    }
+  });
 
   // ---- カスタムレアリティ ----
   function isBuiltInRarity(value){
@@ -663,6 +980,7 @@
       els.cardImageNote.value = card.image_source_note || "";
       updateImagePreview();
       setPriceTarget(card.id, card.name);
+      loadShortFeature(card.id);
     }).catch(function(err){
       showStatus(els.cardStatus, friendlyError(err), true);
     });
@@ -678,6 +996,11 @@
     updateCustomRarityUI();
     updateImagePreview();
     clearStatus(els.cardStatus);
+    els.shortFeatureActive.checked = false;
+    els.shortFeatureUrl.value = "";
+    els.shortFeaturePublished.value = "";
+    els.shortFeatureSave.disabled = true;
+    clearStatus(els.shortFeatureStatus);
     // 誤って別のカードに価格を登録してしまわないよう、価格登録の対象も必ずリセットする
     clearPriceTarget();
   }
@@ -685,9 +1008,11 @@
 
   function clearPriceTarget(){
     selectedCardId = null;
-    els.priceTarget.textContent = "カードが選択されていません（上のカード検索・登録から選んでください）";
+    els.priceTarget.textContent = "カードが選択されていません（ここで検索して選択してください）";
     els.priceSubmitBtn.disabled = true;
     els.priceForm.reset();
+    els.priceObserved.value = nowForDatetimeLocal();
+    updatePriceTypeForSource();
     clearStatus(els.priceStatus);
   }
 
@@ -741,11 +1066,151 @@
       els.cardFormTitle.textContent = "カード編集";
       els.cardSubmitBtn.textContent = "更新する";
       setPriceTarget(newId, els.cardName.value);
+      els.shortFeatureSave.disabled = false;
       runAdminSearch();
     }).catch(function(err){
       els.cardSubmitBtn.disabled = false;
       showStatus(els.cardStatus, friendlyError(err), true);
     });
+  });
+
+  // ---- ショート掲載設定 ----
+  function loadShortFeature(cardId){
+    els.shortFeatureSave.disabled = true;
+    clearStatus(els.shortFeatureStatus);
+    ADMIN.adminGetShortFeature(cardId).then(function(row){
+      els.shortFeatureActive.checked = !!(row && row.is_active);
+      els.shortFeatureUrl.value = (row && row.youtube_url) || "";
+      els.shortFeaturePublished.value = isoToDatetimeLocal(row && row.published_at);
+      els.shortFeatureSave.disabled = false;
+    }).catch(function(err){
+      els.shortFeatureActive.checked = false;
+      els.shortFeatureUrl.value = "";
+      els.shortFeaturePublished.value = "";
+      els.shortFeatureSave.disabled = false;
+      showStatus(els.shortFeatureStatus, "掲載情報の取得に失敗しました: " + friendlyError(err), true);
+    });
+  }
+
+  els.shortFeatureSave.addEventListener("click", function(){
+    if(!selectedCardId){
+      showStatus(els.shortFeatureStatus, "先にカードを選択してください。", true);
+      return;
+    }
+    clearStatus(els.shortFeatureStatus);
+    els.shortFeatureSave.disabled = true;
+    var publishedIso = els.shortFeaturePublished.value
+      ? new Date(els.shortFeaturePublished.value).toISOString()
+      : null;
+
+    ADMIN.adminSetShortFeature({
+      cardId: selectedCardId,
+      isActive: els.shortFeatureActive.checked,
+      youtubeUrl: els.shortFeatureUrl.value.trim(),
+      publishedAt: publishedIso
+    }).then(function(){
+      els.shortFeatureSave.disabled = false;
+      showStatus(
+        els.shortFeatureStatus,
+        els.shortFeatureActive.checked ? "PRICEページ掲載をONにしました。" : "PRICEページ掲載をOFFにしました。",
+        false
+      );
+    }).catch(function(err){
+      els.shortFeatureSave.disabled = false;
+      showStatus(els.shortFeatureStatus, friendlyError(err), true);
+    });
+  });
+
+  // ---- 価格登録専用カード検索 ----
+  function appendPriceCardResult(card){
+    var li = document.createElement("li");
+    li.className = "result-row";
+
+    var main = document.createElement("div");
+    main.className = "result-main";
+
+    var safeImage = MARKET.sanitizeImageUrl(card.image_url || "");
+    if(safeImage){
+      var img = document.createElement("img");
+      img.className = "result-thumb";
+      img.src = safeImage;
+      img.alt = "";
+      img.loading = "lazy";
+      main.appendChild(img);
+    } else {
+      var ph = document.createElement("div");
+      ph.className = "result-thumb-placeholder";
+      ph.textContent = "NO IMAGE";
+      main.appendChild(ph);
+    }
+
+    var text = document.createElement("span");
+    text.className = "r-name";
+    text.textContent = card.name + "（" + (card.card_number || "") +
+      (card.rarity ? " / " + card.rarity : "") + " / " + (card.set_name || "") + "）";
+    main.appendChild(text);
+    li.appendChild(main);
+
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "価格登録";
+    btn.addEventListener("click", function(){
+      setPriceTarget(card.id, card.name + " / " + (card.set_name || "") + " / " + (card.card_number || ""));
+      var src = priceSourceById[els.priceSource.value];
+      if(src && src.name === "メルカリ") els.priceMarketValue.focus();
+      else els.priceSellValue.focus();
+    });
+    li.appendChild(btn);
+    els.priceCardResults.appendChild(li);
+  }
+
+  function runPriceCardSearch(append){
+    if(priceSearchLoading) return;
+    var q = els.priceCardSearch.value.trim();
+    if(!q){
+      els.priceCardResults.innerHTML = "";
+      els.priceCardResultCount.textContent = "カード名またはカード番号を入力してください。";
+      els.priceCardLoadMoreWrap.style.display = "none";
+      return;
+    }
+    priceSearchLoading = true;
+    if(!append){
+      priceSearchOffset = 0;
+      priceSearchTotal = 0;
+      els.priceCardResults.innerHTML = "";
+    }
+    els.priceCardSearchBtn.disabled = true;
+    els.priceCardLoadMore.disabled = true;
+
+    MARKET.searchCards({
+      query: q,
+      limit: PRICE_SEARCH_PAGE_SIZE,
+      offset: priceSearchOffset
+    }).then(function(rows){
+      rows = rows || [];
+      rows.forEach(appendPriceCardResult);
+      if(rows.length && rows[0].total_count != null) priceSearchTotal = Number(rows[0].total_count) || 0;
+      priceSearchOffset += rows.length;
+      els.priceCardResultCount.textContent = priceSearchOffset + " / " + priceSearchTotal + "件表示";
+      els.priceCardLoadMoreWrap.style.display = priceSearchOffset < priceSearchTotal ? "block" : "none";
+      els.priceCardSearchBtn.disabled = false;
+      els.priceCardLoadMore.disabled = false;
+      priceSearchLoading = false;
+    }).catch(function(err){
+      els.priceCardSearchBtn.disabled = false;
+      els.priceCardLoadMore.disabled = false;
+      priceSearchLoading = false;
+      els.priceCardResultCount.textContent = "検索に失敗しました: " + friendlyError(err);
+    });
+  }
+
+  els.priceCardSearchBtn.addEventListener("click", function(){ runPriceCardSearch(false); });
+  els.priceCardLoadMore.addEventListener("click", function(){ runPriceCardSearch(true); });
+  els.priceCardSearch.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){
+      e.preventDefault();
+      runPriceCardSearch(false);
+    }
   });
 
   // ---- 価格登録の対象カード ----
@@ -757,25 +1222,74 @@
     clearStatus(els.priceStatus);
   }
 
+  // 価格日時は画面を開いた時点で現在日時を初期値にする
+  els.priceObserved.value = nowForDatetimeLocal();
+
   els.priceForm.addEventListener("submit", function(e){
     e.preventDefault();
     clearStatus(els.priceStatus);
+
     if(!selectedCardId){
       showStatus(els.priceStatus, "先にカードを選択してください。", true);
       return;
     }
-    els.priceSubmitBtn.disabled = true;
+    if(!els.priceSource.value){
+      showStatus(els.priceStatus, "価格元を選択してください。", true);
+      els.priceSource.focus();
+      return;
+    }
+
+    var source = priceSourceById[els.priceSource.value];
+    var isMercari = !!(source && source.name === "メルカリ");
     var observedIso = els.priceObserved.value ? new Date(els.priceObserved.value).toISOString() : new Date().toISOString();
-    ADMIN.adminRecordPrice({
-      cardId: selectedCardId,
-      price: Number(els.priceValue.value),
-      observedAt: observedIso,
-      priceType: els.priceType.value,
-      condition: els.priceCondition.value || "default"
-    }).then(function(newId){
+    var condition = els.priceCondition.value || "default";
+    var jobs = [];
+    var labels = [];
+
+    if(isMercari){
+      var marketPrice = Number(els.priceMarketValue.value);
+      if(marketPrice > 0){
+        jobs.push(ADMIN.adminRecordPrice({
+          cardId: selectedCardId, price: marketPrice, observedAt: observedIso,
+          sourceId: els.priceSource.value, priceType: "market", condition: condition
+        }));
+        labels.push("相場");
+      }
+    } else {
+      var sellPrice = Number(els.priceSellValue.value);
+      var buyPrice = Number(els.priceBuyValue.value);
+      if(sellPrice > 0){
+        jobs.push(ADMIN.adminRecordPrice({
+          cardId: selectedCardId, price: sellPrice, observedAt: observedIso,
+          sourceId: els.priceSource.value, priceType: "sell", condition: condition
+        }));
+        labels.push("販売");
+      }
+      if(buyPrice > 0){
+        jobs.push(ADMIN.adminRecordPrice({
+          cardId: selectedCardId, price: buyPrice, observedAt: observedIso,
+          sourceId: els.priceSource.value, priceType: "buy", condition: condition
+        }));
+        labels.push("買取");
+      }
+    }
+
+    if(!jobs.length){
+      showStatus(els.priceStatus, isMercari ? "メルカリ相場を入力してください。" : "販売価格か買取価格を1つ以上入力してください。", true);
+      return;
+    }
+
+    els.priceSubmitBtn.disabled = true;
+    Promise.all(jobs).then(function(ids){
       els.priceSubmitBtn.disabled = false;
-      if(newId){
-        showStatus(els.priceStatus, "価格を登録しました。", false);
+      var srcName = source ? source.name : "価格元";
+      var inserted = ids.filter(function(id){ return !!id; }).length;
+      if(inserted > 0){
+        showStatus(els.priceStatus, srcName + " の " + labels.join("・") + "価格を登録しました。", false);
+        els.priceSellValue.value = "";
+        els.priceBuyValue.value = "";
+        els.priceMarketValue.value = "";
+        els.priceObserved.value = nowForDatetimeLocal();
       } else {
         showStatus(els.priceStatus, "同じ内容の価格が既に登録されています（変更なし）。", false);
       }

@@ -3,10 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,follow">
-<meta name="description" content="ポケモンカードの詳細・相場情報。">
+<meta name="description" content="りょていのYouTube Shortsで紹介したポケモンカードと参考価格のまとめ。">
+<title>SHORTS PRICE｜りょていのサイト</title>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https://idnhamxtwxfcxflenxko.supabase.co;">
-<title>カード詳細｜りょていのサイト</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -72,102 +71,87 @@
 </head>
 <body>
 <main class="page">
-  <a class="back" id="back-link" href="search.html">← 検索結果へもどる</a>
-  <div id="loading">読み込み中…</div>
-  <div id="error" class="error" style="display:none">カード情報を読み込めませんでした。</div>
-  <section id="content" style="display:none">
-    <div class="card-head">
-      <div id="image-wrap"></div>
-      <div>
-        <div class="card-name" id="card-name"></div>
-        <div class="meta-row"><span class="meta-label">番号</span><span id="card-number"></span></div>
-        <div class="meta-row"><span class="meta-label">レアリティ</span><span id="card-rarity"></span></div>
-        <div class="meta-row"><span class="meta-label">収録パック</span><span id="card-set"></span></div>
-      </div>
-    </div>
-    <section id="price-section" style="display:none">
-      <h2>PRICE</h2>
-      <div class="price-box" id="price-box"></div>
-      <div class="updated" id="latest-updated"></div>
-    </section>
-  </section>
+  <a class="back" href="index.html">← トップへもどる</a>
+  <h1>SHORTS PRICE</h1>
+  <p>ショート動画で紹介したカードの参考価格まとめです。登録されている価格だけ表示します。</p>
+  <div id="status">読み込み中…</div>
+  <div id="grid" class="short-grid"></div>
+  <div id="count" class="count"></div>
+  <div id="more-wrap" class="more-wrap" style="display:none"><button id="more" class="more" type="button">もっと見る</button></div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3/dist/umd/supabase.js" integrity="sha256-7ABBdtEBrsd67vJmqhyUQRKH/iA5xl6l9scvXhSzhH0=" crossorigin="anonymous"></script>
 <script src="market.js"></script>
 <script>
 (function(){
   "use strict";
-  var id = new URLSearchParams(location.search).get("id");
-  var loading = document.getElementById("loading");
-  var error = document.getElementById("error");
-  var content = document.getElementById("content");
-  var priceSection = document.getElementById("price-section");
-  var priceBox = document.getElementById("price-box");
-  var latestUpdated = document.getElementById("latest-updated");
+  var PAGE = 20, offset = 0, total = 0, loading = false;
+  var grid = document.getElementById("grid"), status = document.getElementById("status");
+  var count = document.getElementById("count"), moreWrap = document.getElementById("more-wrap"), more = document.getElementById("more");
 
-  document.getElementById("back-link").addEventListener("click", function(e){
-    if(history.length > 1){ e.preventDefault(); history.back(); }
-  });
+  function priceLine(parent,label,value){
+    if(value === null || value === undefined) return;
+    var line=document.createElement("div"); line.className="short-price-line";
+    var l=document.createElement("span"); l.textContent=label;
+    var v=document.createElement("strong"); v.textContent=MARKET.formatYen(value);
+    line.append(l,v); parent.appendChild(line);
+  }
 
-  function addImage(card){
-    var wrap = document.getElementById("image-wrap");
-    var safe = MARKET.sanitizeImageUrl(card.image_url);
-    if(safe){
-      var img = document.createElement("img");
-      img.className = "card-img"; img.src = safe; img.alt = card.name || ""; wrap.appendChild(img);
-    } else {
-      var ph = document.createElement("div"); ph.className = "no-img"; ph.textContent = "NO IMAGE"; wrap.appendChild(ph);
+  function source(parent,name,pairs){
+    var has = pairs.some(function(x){ return x[1] !== null && x[1] !== undefined; });
+    if(!has) return;
+    var title=document.createElement("div"); title.className="short-source"; title.textContent=name; parent.appendChild(title);
+    pairs.forEach(function(x){ priceLine(parent,x[0],x[1]); });
+  }
+
+  function cardEl(card){
+    var el=document.createElement("article"); el.className="short-card";
+    var top=document.createElement("a"); top.className="short-link short-card-top";
+    top.href="card.html?id="+encodeURIComponent(card.card_id);
+
+    var safe=MARKET.sanitizeImageUrl(card.image_url);
+    if(safe){ var img=document.createElement("img"); img.className="short-thumb"; img.src=safe; img.alt=""; img.loading="lazy"; top.appendChild(img); }
+    else { var ph=document.createElement("div"); ph.className="short-noimg"; ph.textContent="NO IMAGE"; top.appendChild(ph); }
+
+    var info=document.createElement("div");
+    var name=document.createElement("div"); name.className="short-name"; name.textContent=card.name||""; info.appendChild(name);
+    var meta=document.createElement("div"); meta.className="short-meta"; meta.textContent=(card.card_number||"")+(card.rarity?" / "+card.rarity:""); info.appendChild(meta);
+    var set=document.createElement("div"); set.className="short-meta"; set.textContent=card.set_name||""; info.appendChild(set);
+    top.appendChild(info); el.appendChild(top);
+
+    var prices=document.createElement("div"); prices.className="short-prices";
+    source(prices,"カードラッシュ",[["販売",card.cardrush_sell],["買取",card.cardrush_buy]]);
+    source(prices,"晴れる屋2",[["販売",card.hareruya_sell],["買取",card.hareruya_buy]]);
+    source(prices,"メルカリ",[["相場",card.mercari_market]]);
+    if(prices.children.length) el.appendChild(prices);
+
+    if(card.youtube_url){
+      try {
+        var u=new URL(card.youtube_url);
+        if(u.protocol==="https:"){
+          var y=document.createElement("a"); y.className="youtube"; y.href=u.href; y.target="_blank"; y.rel="noopener noreferrer"; y.textContent="ショート動画を見る"; el.appendChild(y);
+        }
+      } catch(e){}
     }
+    return el;
   }
 
-  function renderPrices(rows){
-    priceBox.innerHTML = "";
-    if(!rows || !rows.length){ priceSection.style.display = "none"; return; }
-
-    var groups = {};
-    var latest = null;
-    rows.forEach(function(r){
-      (groups[r.source_name] ||= []).push(r);
-      var d = new Date(r.observed_at);
-      if(!latest || d > latest) latest = d;
+  function load(append){
+    if(loading) return; loading=true; more.disabled=true;
+    if(!append){ offset=0; total=0; grid.innerHTML=""; }
+    MARKET.listShortPriceCards({limit:PAGE,offset:offset}).then(function(rows){
+      rows=rows||[]; rows.forEach(function(r){ grid.appendChild(cardEl(r)); });
+      if(rows.length && rows[0].total_count != null) total=Number(rows[0].total_count)||0;
+      offset += rows.length;
+      status.textContent = total ? "" : "掲載中のカードはまだありません。";
+      count.textContent = total ? (offset+" / "+total+"件表示") : "";
+      moreWrap.style.display = offset < total ? "block" : "none";
+      more.disabled=false; loading=false;
+    }).catch(function(err){
+      console.error(err); status.textContent="読み込みに失敗しました。"; more.disabled=false; loading=false;
     });
-
-    ["カードラッシュ","晴れる屋2","メルカリ"].forEach(function(source){
-      var rs = groups[source];
-      if(!rs || !rs.length) return;
-      var block = document.createElement("div"); block.className = "source-block";
-      var title = document.createElement("div"); title.className = "source-name"; title.textContent = source; block.appendChild(title);
-      ["sell","buy","market"].forEach(function(type){
-        var r = rs.find(function(x){ return x.price_type === type; });
-        if(!r) return;
-        var line = document.createElement("div"); line.className = "price-line";
-        var label = document.createElement("span"); label.className = "price-label";
-        label.textContent = type === "sell" ? "販売価格" : (type === "buy" ? "買取価格" : "相場");
-        var value = document.createElement("span"); value.className = "price-value"; value.textContent = MARKET.formatYen(r.price);
-        line.append(label,value); block.appendChild(line);
-      });
-      priceBox.appendChild(block);
-    });
-
-    priceSection.style.display = priceBox.children.length ? "block" : "none";
-    latestUpdated.textContent = latest ? "最終更新: " + MARKET.formatDateTime(latest.toISOString()) : "";
   }
-
-  if(!id){ loading.style.display="none"; error.style.display="block"; return; }
-
-  Promise.all([MARKET.getCard(id), MARKET.getCardMarketPrices(id)]).then(function(result){
-    var card = result[0], prices = result[1];
-    if(!card) throw new Error("card not found");
-    document.title = (card.name || "カード詳細") + "｜りょていのサイト";
-    document.getElementById("card-name").textContent = card.name || "";
-    document.getElementById("card-number").textContent = card.card_number || "";
-    document.getElementById("card-rarity").textContent = card.rarity || "ー";
-    document.getElementById("card-set").textContent = card.set_name || "";
-    addImage(card); renderPrices(prices);
-    loading.style.display="none"; content.style.display="block";
-  }).catch(function(err){
-    console.error(err); loading.style.display="none"; error.style.display="block";
-  });
+  more.addEventListener("click",function(){load(true);});
+  load(false);
 })();
 </script>
 </body>

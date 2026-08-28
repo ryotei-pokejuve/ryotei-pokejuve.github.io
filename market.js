@@ -63,6 +63,28 @@
     });
   }
 
+  // カードごとの最新価格（カードラッシュ/晴れる屋2/メルカリ）
+  function getCardMarketPrices(cardId){
+    return client().schema("api").rpc("get_card_market_prices", {
+      p_card_id: cardId
+    }).then(function(res){
+      if(res.error) throw res.error;
+      return res.data || [];
+    });
+  }
+
+  // Shorts PRICE ページ掲載カード
+  function listShortPriceCards(opts){
+    opts = opts || {};
+    return client().schema("api").rpc("list_short_price_cards", {
+      p_limit: opts.limit || 20,
+      p_offset: opts.offset || 0
+    }).then(function(res){
+      if(res.error) throw res.error;
+      return res.data || [];
+    });
+  }
+
   // パック（card_sets）一覧（api.list_card_sets）。絞り込みUIの選択肢に使う
   function listCardSets(){
     return client().schema("api").rpc("list_card_sets", {}).then(function(res){
@@ -117,6 +139,8 @@
     searchCards: searchCards,
     getCard: getCard,
     getPriceHistory: getPriceHistory,
+    getCardMarketPrices: getCardMarketPrices,
+    listShortPriceCards: listShortPriceCards,
     listCardSets: listCardSets,
     sanitizeImageUrl: sanitizeImageUrl,
     formatYen: formatYen,

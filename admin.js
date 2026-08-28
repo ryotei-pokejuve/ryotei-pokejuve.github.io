@@ -120,17 +120,49 @@
     });
   }
 
+  // 管理画面用: 利用可能な価格元一覧
+  function listPriceSources(){
+    return client().schema("api").rpc("list_price_sources", {}).then(function(res){
+      if(res.error) throw res.error;
+      return res.data || [];
+    });
+  }
+
   // 管理者専用: 価格登録（api.admin_record_price）
   function adminRecordPrice(fields){
     return client().schema("api").rpc("admin_record_price", {
       p_card_id: fields.cardId,
       p_price: fields.price,
       p_observed_at: fields.observedAt || new Date().toISOString(),
+      p_source_id: fields.sourceId || null,
       p_price_type: fields.priceType || "sell",
       p_condition: fields.condition || "default"
     }).then(function(res){
       if(res.error) throw res.error;
       return res.data; // 登録されたprice_observationsのid（重複時はnull）
+    });
+  }
+
+  // 管理者専用: ショート掲載情報取得
+  function adminGetShortFeature(cardId){
+    return client().schema("api").rpc("admin_get_short_feature", {
+      p_card_id: cardId
+    }).then(function(res){
+      if(res.error) throw res.error;
+      return (res.data && res.data[0]) || null;
+    });
+  }
+
+  // 管理者専用: ショート掲載ON/OFF
+  function adminSetShortFeature(fields){
+    return client().schema("api").rpc("admin_set_short_feature", {
+      p_card_id: fields.cardId,
+      p_is_active: !!fields.isActive,
+      p_youtube_url: fields.youtubeUrl || null,
+      p_published_at: fields.publishedAt || null
+    }).then(function(res){
+      if(res.error) throw res.error;
+      return res.data;
     });
   }
 
@@ -143,7 +175,10 @@
     adminGetCard: adminGetCard,
     adminUpsertCard: adminUpsertCard,
     adminCreateCardSet: adminCreateCardSet,
-    adminRecordPrice: adminRecordPrice
+    listPriceSources: listPriceSources,
+    adminRecordPrice: adminRecordPrice,
+    adminGetShortFeature: adminGetShortFeature,
+    adminSetShortFeature: adminSetShortFeature
   };
 
 })(window);
