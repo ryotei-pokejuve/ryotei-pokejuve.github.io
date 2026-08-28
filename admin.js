@@ -107,6 +107,19 @@
     });
   }
 
+
+  // 管理者専用: 新しいパックを登録（api.admin_create_card_set）
+  function adminCreateCardSet(fields){
+    return client().schema("api").rpc("admin_create_card_set", {
+      p_code: fields.code || null,
+      p_name: fields.name,
+      p_release_date: fields.releaseDate || null
+    }).then(function(res){
+      if(res.error) throw res.error;
+      return res.data; // 作成されたcard_sets.id
+    });
+  }
+
   // 管理者専用: 価格登録（api.admin_record_price）
   function adminRecordPrice(fields){
     return client().schema("api").rpc("admin_record_price", {
@@ -129,6 +142,7 @@
     checkAdminAccess: checkAdminAccess,
     adminGetCard: adminGetCard,
     adminUpsertCard: adminUpsertCard,
+    adminCreateCardSet: adminCreateCardSet,
     adminRecordPrice: adminRecordPrice
   };
 

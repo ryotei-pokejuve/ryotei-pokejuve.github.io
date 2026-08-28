@@ -66,13 +66,22 @@
 
   label{ display:block; font-size: 12.5px; color: var(--text-sub); margin: 10px 0 4px; }
   input[type="text"], input[type="email"], input[type="password"], input[type="number"],
-  input[type="datetime-local"], input[type="search"], select, textarea{
+  input[type="datetime-local"], input[type="date"], input[type="search"], select, textarea{
     width:100%; padding: 9px; font-family: inherit; font-size: 14px;
     border: 3px solid var(--window-border-outer);
     box-shadow: inset 0 0 0 2px var(--window-border-inner);
     background:#fff; color: var(--text-color);
   }
   textarea{ resize: vertical; min-height: 50px; }
+  .custom-field{ display:none; margin-top:6px; }
+  .custom-field.open{ display:block; }
+  .inline-actions{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:6px; }
+  .inline-actions .btn{ margin-top:0; }
+  #new-set-panel{
+    display:none; margin-top:10px; padding:10px;
+    border:2px dashed var(--accent); background:rgba(61,127,212,.08);
+  }
+  #new-set-panel.open{ display:block; }
 
   .btn{
     padding: 10px 16px; font-size: 12.5px; min-height:44px;
@@ -155,11 +164,28 @@
         <select id="admin-filter-set"><option value="">パック（すべて）</option></select>
         <select id="admin-filter-rarity">
           <option value="">レアリティ（すべて）</option>
+          <option value="__NULL__">未設定</option>
+          <option value="ー">ー</option>
+          <option value="C">C</option>
+          <option value="U">U</option>
+          <option value="R">R</option>
+          <option value="RR">RR</option>
+          <option value="RRR">RRR</option>
+          <option value="AR">AR</option>
           <option value="SR">SR</option>
           <option value="SAR">SAR</option>
-          <option value="AR">AR</option>
-          <option value="RR">RR</option>
-          <option value="R">R</option>
+          <option value="UR">UR</option>
+          <option value="HR">HR</option>
+          <option value="PROMO">PROMO</option>
+          <option value="CHR">CHR</option>
+          <option value="CSR">CSR</option>
+          <option value="S">S</option>
+          <option value="SSR">SSR</option>
+          <option value="ACE">ACE</option>
+          <option value="K">K</option>
+          <option value="MUR">MUR</option>
+          <option value="BWR">BWR</option>
+          <option value="旧裏R">旧裏R</option>
         </select>
         <button class="btn" id="admin-search-btn" type="button">検索</button>
       </div>
@@ -172,12 +198,55 @@
         <input type="hidden" id="card-id">
         <label for="card-set">パック</label>
         <select id="card-set" required></select>
+        <div class="inline-actions">
+          <button class="btn secondary" type="button" id="new-set-toggle">＋ 新しいパックを追加</button>
+        </div>
+        <div id="new-set-panel">
+          <label for="new-set-code">パックコード</label>
+          <input id="new-set-code" type="text" maxlength="40" placeholder="例: SV99">
+          <label for="new-set-name">パック名</label>
+          <input id="new-set-name" type="text" maxlength="120" placeholder="例: ハイクラスパック ○○">
+          <label for="new-set-release-date">発売日（任意）</label>
+          <input id="new-set-release-date" type="date">
+          <div class="inline-actions">
+            <button class="btn" type="button" id="new-set-save">パックを登録</button>
+            <button class="btn secondary" type="button" id="new-set-cancel">キャンセル</button>
+          </div>
+          <div id="new-set-status" class="status-msg"></div>
+        </div>
         <label for="card-name">カード名</label>
         <input id="card-name" type="text" required>
         <label for="card-number">番号</label>
         <input id="card-number" type="text" required>
         <label for="card-rarity">レアリティ</label>
-        <input id="card-rarity" type="text">
+        <select id="card-rarity">
+          <option value="">未設定</option>
+          <option value="ー">ー</option>
+          <option value="C">C</option>
+          <option value="U">U</option>
+          <option value="R">R</option>
+          <option value="RR">RR</option>
+          <option value="RRR">RRR</option>
+          <option value="AR">AR</option>
+          <option value="SR">SR</option>
+          <option value="SAR">SAR</option>
+          <option value="UR">UR</option>
+          <option value="HR">HR</option>
+          <option value="PROMO">PROMO</option>
+          <option value="CHR">CHR</option>
+          <option value="CSR">CSR</option>
+          <option value="S">S</option>
+          <option value="SSR">SSR</option>
+          <option value="ACE">ACE</option>
+          <option value="K">K</option>
+          <option value="MUR">MUR</option>
+          <option value="BWR">BWR</option>
+          <option value="旧裏R">旧裏R</option>
+          <option value="__CUSTOM__">＋ カスタム入力</option>
+        </select>
+        <div id="card-rarity-custom-wrap" class="custom-field">
+          <input id="card-rarity-custom" type="text" maxlength="40" placeholder="例: ☆ / ★ / LEGEND">
+        </div>
         <label for="card-variant">バリアント（ホロ・ミラー等の識別。通常は空欄でよい）</label>
         <input id="card-variant" type="text">
         <label for="card-image-url">画像URL（https のみ）</label>
@@ -241,9 +310,19 @@
     cardForm: document.getElementById("card-form"),
     cardId: document.getElementById("card-id"),
     cardSet: document.getElementById("card-set"),
+    newSetToggle: document.getElementById("new-set-toggle"),
+    newSetPanel: document.getElementById("new-set-panel"),
+    newSetCode: document.getElementById("new-set-code"),
+    newSetName: document.getElementById("new-set-name"),
+    newSetReleaseDate: document.getElementById("new-set-release-date"),
+    newSetSave: document.getElementById("new-set-save"),
+    newSetCancel: document.getElementById("new-set-cancel"),
+    newSetStatus: document.getElementById("new-set-status"),
     cardName: document.getElementById("card-name"),
     cardNumber: document.getElementById("card-number"),
     cardRarity: document.getElementById("card-rarity"),
+    cardRarityCustomWrap: document.getElementById("card-rarity-custom-wrap"),
+    cardRarityCustom: document.getElementById("card-rarity-custom"),
     cardVariant: document.getElementById("card-variant"),
     cardImageUrl: document.getElementById("card-image-url"),
     imagePreview: document.getElementById("image-preview"),
@@ -261,6 +340,61 @@
     priceSubmitBtn: document.getElementById("price-submit-btn"),
     priceStatus: document.getElementById("price-status")
   };
+
+
+  // パックをシリーズ別にまとめてプルダウン表示する。
+  // APIがcodeを返す場合はcodeを優先し、返さない場合はnameから判定する。
+  function getSetGroup(s){
+    var code = String((s && s.code) || "").trim().toUpperCase();
+    var name = String((s && s.name) || "").trim();
+    var key = code || name.toUpperCase();
+
+    if(/プロモ/.test(name) || /^(SV-P|S-P|SMP|XYP|BWP|DPP|SM-P|XY-P|BW-P|ADV-P)$/.test(code)) return "プロモ";
+    if(/^SV/.test(key)) return "SVシリーズ";
+    if(/^SM/.test(key)) return "SMシリーズ";
+    if(/^XY/.test(key)) return "XYシリーズ";
+    if(/^BW/.test(key)) return "BWシリーズ";
+    if(/^(DPT|DP)/.test(key)) return "DP・DPtシリーズ";
+    if(/^(ADV|PCG)/.test(key)) return "ADV・PCGシリーズ";
+    if(/^(PMCG|NEO|E\b|WEB\b|VS\b)/.test(key)) return "旧裏・e・VS";
+    if(/^S(?:\d|[A-Z-])/.test(key)) return "Sシリーズ";
+    return "その他";
+  }
+
+  function setOptionLabel(s){
+    var code = String((s && s.code) || "").trim();
+    var name = String((s && s.name) || "").trim();
+    return code && name && name.indexOf(code) !== 0 ? code + "  " + name : (name || code);
+  }
+
+  function appendGroupedSetOptions(select, sets){
+    var order = [
+      "SVシリーズ", "Sシリーズ", "SMシリーズ", "XYシリーズ", "BWシリーズ",
+      "DP・DPtシリーズ", "ADV・PCGシリーズ", "旧裏・e・VS", "プロモ", "その他"
+    ];
+    var groups = {};
+    order.forEach(function(label){ groups[label] = []; });
+
+    (sets || []).forEach(function(s){
+      groups[getSetGroup(s)].push(s);
+    });
+
+    order.forEach(function(label){
+      if(!groups[label].length) return;
+      groups[label].sort(function(a, b){
+        return setOptionLabel(a).localeCompare(setOptionLabel(b), "ja", { numeric: true });
+      });
+      var group = document.createElement("optgroup");
+      group.label = label;
+      groups[label].forEach(function(s){
+        var opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = setOptionLabel(s);
+        group.appendChild(opt);
+      });
+      select.appendChild(group);
+    });
+  }
 
   var selectedCardId = null;
   var setsLoaded = false;
@@ -353,19 +487,92 @@
   });
 
   // ---- パック一覧の読み込み（検索フィルタ・登録フォーム両方で使う） ----
-  function loadCardSets(){
-    MARKET.listCardSets().then(function(sets){
-      sets.forEach(function(s){
-        var opt1 = document.createElement("option");
-        opt1.value = s.id; opt1.textContent = s.name;
-        els.filterSet.appendChild(opt1);
-
-        var opt2 = document.createElement("option");
-        opt2.value = s.id; opt2.textContent = s.name;
-        els.cardSet.appendChild(opt2);
-      });
-    }).catch(function(err){ console.error(err); });
+  function clearSetOptions(select, firstLabel){
+    select.innerHTML = "";
+    var first = document.createElement("option");
+    first.value = "";
+    first.textContent = firstLabel;
+    select.appendChild(first);
   }
+
+  function loadCardSets(selectCardId){
+    return MARKET.listCardSets().then(function(sets){
+      var previousFilter = els.filterSet.value;
+      var previousCard = selectCardId || els.cardSet.value;
+
+      clearSetOptions(els.filterSet, "パック（すべて）");
+      clearSetOptions(els.cardSet, "パックを選択");
+
+      appendGroupedSetOptions(els.filterSet, sets);
+      appendGroupedSetOptions(els.cardSet, sets);
+
+      if(previousFilter) els.filterSet.value = previousFilter;
+      if(previousCard) els.cardSet.value = previousCard;
+
+      return sets;
+    }).catch(function(err){
+      console.error(err);
+      throw err;
+    });
+  }
+
+  // ---- 新しいパックの追加 ----
+  function setNewSetPanel(open){
+    els.newSetPanel.classList.toggle("open", !!open);
+    if(open){
+      clearStatus(els.newSetStatus);
+      els.newSetName.focus();
+    }
+  }
+
+  els.newSetToggle.addEventListener("click", function(){
+    setNewSetPanel(!els.newSetPanel.classList.contains("open"));
+  });
+
+  els.newSetCancel.addEventListener("click", function(){
+    setNewSetPanel(false);
+    els.newSetCode.value = "";
+    els.newSetName.value = "";
+    els.newSetReleaseDate.value = "";
+    clearStatus(els.newSetStatus);
+  });
+
+  els.newSetSave.addEventListener("click", function(){
+    clearStatus(els.newSetStatus);
+
+    var name = els.newSetName.value.trim();
+    var code = els.newSetCode.value.trim();
+    var releaseDate = els.newSetReleaseDate.value || null;
+
+    if(!name){
+      showStatus(els.newSetStatus, "パック名を入力してください。", true);
+      els.newSetName.focus();
+      return;
+    }
+
+    els.newSetSave.disabled = true;
+    ADMIN.adminCreateCardSet({
+      code: code,
+      name: name,
+      releaseDate: releaseDate
+    }).then(function(newSetId){
+      return loadCardSets(newSetId).then(function(){
+        els.newSetSave.disabled = false;
+        els.cardSet.value = newSetId;
+        showStatus(els.newSetStatus, "パックを登録しました。このパックを選択しています。", false);
+        els.newSetCode.value = "";
+        els.newSetName.value = "";
+        els.newSetReleaseDate.value = "";
+      });
+    }).catch(function(err){
+      els.newSetSave.disabled = false;
+      var msg = friendlyError(err);
+      if(String(msg).indexOf("duplicate") !== -1 || String(msg).indexOf("unique") !== -1){
+        msg = "同じパックコードがすでに登録されています。";
+      }
+      showStatus(els.newSetStatus, msg, true);
+    });
+  });
 
   // ---- カード検索（一般公開のsearch_cardsを流用。閲覧は管理者以外もできる情報なので問題ない） ----
   function runAdminSearch(){
@@ -400,6 +607,42 @@
   els.filterSet.addEventListener("change", runAdminSearch);
   els.filterRarity.addEventListener("change", runAdminSearch);
 
+  // ---- カスタムレアリティ ----
+  function isBuiltInRarity(value){
+    var builtIn = ["", "ー", "C", "U", "R", "RR", "RRR", "AR", "SR", "SAR", "UR", "HR",
+      "PROMO", "CHR", "CSR", "S", "SSR", "ACE", "K", "MUR", "BWR", "旧裏R"];
+    return builtIn.indexOf(value || "") !== -1;
+  }
+
+  function updateCustomRarityUI(){
+    var custom = els.cardRarity.value === "__CUSTOM__";
+    els.cardRarityCustomWrap.classList.toggle("open", custom);
+    if(custom){
+      els.cardRarityCustom.focus();
+    }
+  }
+
+  function getCardRarityValue(){
+    if(els.cardRarity.value !== "__CUSTOM__"){
+      return els.cardRarity.value;
+    }
+    return els.cardRarityCustom.value.trim();
+  }
+
+  function setCardRarityValue(value){
+    value = value || "";
+    if(isBuiltInRarity(value)){
+      els.cardRarity.value = value;
+      els.cardRarityCustom.value = "";
+    } else {
+      els.cardRarity.value = "__CUSTOM__";
+      els.cardRarityCustom.value = value;
+    }
+    updateCustomRarityUI();
+  }
+
+  els.cardRarity.addEventListener("change", updateCustomRarityUI);
+
   // ---- カード編集フォームへの読み込み ----
   function loadCardForEdit(cardId){
     clearStatus(els.cardStatus);
@@ -414,7 +657,7 @@
       els.cardSet.value = card.set_id;
       els.cardName.value = card.name || "";
       els.cardNumber.value = card.card_number || "";
-      els.cardRarity.value = card.rarity || "";
+      setCardRarityValue(card.rarity || "");
       els.cardVariant.value = card.variant || "";
       els.cardImageUrl.value = card.image_url || "";
       els.cardImageNote.value = card.image_source_note || "";
@@ -430,6 +673,9 @@
     els.cardSubmitBtn.textContent = "登録する";
     els.cardForm.reset();
     els.cardId.value = "";
+    els.cardRarityCustom.value = "";
+    setNewSetPanel(false);
+    updateCustomRarityUI();
     updateImagePreview();
     clearStatus(els.cardStatus);
     // 誤って別のカードに価格を登録してしまわないよう、価格登録の対象も必ずリセットする
@@ -466,13 +712,20 @@
       showStatus(els.cardStatus, "パックを選択してください。", true);
       return;
     }
+    var rarityValue = getCardRarityValue();
+    if(els.cardRarity.value === "__CUSTOM__" && !rarityValue){
+      showStatus(els.cardStatus, "カスタムレアリティを入力してください。", true);
+      els.cardRarityCustom.focus();
+      return;
+    }
+
     els.cardSubmitBtn.disabled = true;
     ADMIN.adminUpsertCard({
       id: els.cardId.value || null,
       setId: els.cardSet.value,
       name: els.cardName.value,
       cardNumber: els.cardNumber.value,
-      rarity: els.cardRarity.value,
+      rarity: rarityValue,
       variant: els.cardVariant.value,
       imageUrl: els.cardImageUrl.value,
       imageSourceNote: els.cardImageNote.value

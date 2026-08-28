@@ -206,11 +206,28 @@
       </select>
       <select id="filter-rarity">
         <option value="">レアリティ（すべて）</option>
+        <option value="__NULL__">未設定</option>
+        <option value="ー">ー</option>
+        <option value="C">C</option>
+        <option value="U">U</option>
+        <option value="R">R</option>
+        <option value="RR">RR</option>
+        <option value="RRR">RRR</option>
+        <option value="AR">AR</option>
         <option value="SR">SR</option>
         <option value="SAR">SAR</option>
-        <option value="AR">AR</option>
-        <option value="RR">RR</option>
-        <option value="R">R</option>
+        <option value="UR">UR</option>
+        <option value="HR">HR</option>
+        <option value="PROMO">PROMO</option>
+        <option value="CHR">CHR</option>
+        <option value="CSR">CSR</option>
+        <option value="S">S</option>
+        <option value="SSR">SSR</option>
+        <option value="ACE">ACE</option>
+        <option value="K">K</option>
+        <option value="MUR">MUR</option>
+        <option value="BWR">BWR</option>
+        <option value="旧裏R">旧裏R</option>
       </select>
     </div>
     <div id="status-line"></div>
@@ -260,6 +277,61 @@
     pageInfo: document.getElementById("page-info")
   };
 
+
+  // パックをシリーズ別にまとめてプルダウン表示する。
+  // APIがcodeを返す場合はcodeを優先し、返さない場合はnameから判定する。
+  function getSetGroup(s){
+    var code = String((s && s.code) || "").trim().toUpperCase();
+    var name = String((s && s.name) || "").trim();
+    var key = code || name.toUpperCase();
+
+    if(/プロモ/.test(name) || /^(SV-P|S-P|SMP|XYP|BWP|DPP|SM-P|XY-P|BW-P|ADV-P)$/.test(code)) return "プロモ";
+    if(/^SV/.test(key)) return "SVシリーズ";
+    if(/^SM/.test(key)) return "SMシリーズ";
+    if(/^XY/.test(key)) return "XYシリーズ";
+    if(/^BW/.test(key)) return "BWシリーズ";
+    if(/^(DPT|DP)/.test(key)) return "DP・DPtシリーズ";
+    if(/^(ADV|PCG)/.test(key)) return "ADV・PCGシリーズ";
+    if(/^(PMCG|NEO|E\b|WEB\b|VS\b)/.test(key)) return "旧裏・e・VS";
+    if(/^S(?:\d|[A-Z-])/.test(key)) return "Sシリーズ";
+    return "その他";
+  }
+
+  function setOptionLabel(s){
+    var code = String((s && s.code) || "").trim();
+    var name = String((s && s.name) || "").trim();
+    return code && name && name.indexOf(code) !== 0 ? code + "  " + name : (name || code);
+  }
+
+  function appendGroupedSetOptions(select, sets){
+    var order = [
+      "SVシリーズ", "Sシリーズ", "SMシリーズ", "XYシリーズ", "BWシリーズ",
+      "DP・DPtシリーズ", "ADV・PCGシリーズ", "旧裏・e・VS", "プロモ", "その他"
+    ];
+    var groups = {};
+    order.forEach(function(label){ groups[label] = []; });
+
+    (sets || []).forEach(function(s){
+      groups[getSetGroup(s)].push(s);
+    });
+
+    order.forEach(function(label){
+      if(!groups[label].length) return;
+      groups[label].sort(function(a, b){
+        return setOptionLabel(a).localeCompare(setOptionLabel(b), "ja", { numeric: true });
+      });
+      var group = document.createElement("optgroup");
+      group.label = label;
+      groups[label].forEach(function(s){
+        var opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = setOptionLabel(s);
+        group.appendChild(opt);
+      });
+      select.appendChild(group);
+    });
+  }
+
   els.input.value = state.query || "";
   els.rarity.value = state.rarity || "";
 
@@ -270,12 +342,7 @@
 
   // パック一覧を読み込んで選択肢に追加（失敗しても検索自体は使えるようにする）
   MARKET.listCardSets().then(function(sets){
-    sets.forEach(function(s){
-      var opt = document.createElement("option");
-      opt.value = s.id;
-      opt.textContent = s.name;
-      els.set.appendChild(opt);
-    });
+    appendGroupedSetOptions(els.set, sets);
     els.set.value = state.setId || "";
   }).catch(function(err){
     console.error(err);
