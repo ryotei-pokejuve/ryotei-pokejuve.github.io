@@ -10,148 +10,203 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#f7f0d8; --ink:#263466; --sub:#626581; --orange:#ee6540;
-    --blue:#337de3; --line:#34457a; --panel:#edf0e7; --white:#fff;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; min-height:100vh; background:#696ab4;
-    font-family:'DotGothic16',sans-serif; color:var(--ink);
-  }
-  .page{
-    width:min(720px, calc(100% - 16px)); margin:0 auto; min-height:100vh;
-    padding:14px 18px 40px; background:var(--bg);
-    border-left:5px solid #252958; border-right:5px solid #252958;
-  }
-  a{color:var(--blue)}
-  .back{display:inline-block;margin-bottom:12px;text-decoration:none}
-  h1,h2{font-family:'Press Start 2P','DotGothic16',sans-serif}
-  h1{font-size:20px;margin:4px 0 18px}
-  h2{font-size:15px;margin:22px 0 12px;padding-bottom:5px;border-bottom:3px solid var(--blue)}
-  .error,.empty{padding:14px;border:2px solid var(--line);margin-top:12px}
-  .card-head{display:grid;grid-template-columns:160px 1fr;gap:18px;align-items:start}
-  .card-img{width:160px;max-height:224px;object-fit:contain;border:3px solid #2b315f;background:#fff}
-  .no-img{width:160px;height:220px;display:grid;place-items:center;border:3px solid #2b315f;background:#eee}
-  .card-name{font-size:20px;font-weight:bold;margin:0 0 16px}
-  .meta-row{display:grid;grid-template-columns:150px 1fr;gap:4px;padding:7px 2px;border-bottom:2px dotted #46517c}
-  .meta-label{color:var(--orange);font-weight:bold}
-  .price-box{border:2px solid var(--blue);background:rgba(224,232,226,.8);padding:12px 14px;margin-top:14px}
-  .source-block{padding:9px 2px;border-bottom:1px dotted #70758e}
-  .source-block:last-child{border-bottom:0}
-  .source-name{font-weight:bold;font-size:16px;margin-bottom:5px}
-  .price-line{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
-  .price-label{color:var(--sub)}
-  .price-value{font-size:18px;color:var(--blue);font-weight:bold}
-  .updated{font-size:12px;color:var(--sub);text-align:right;margin-top:8px}
-  .short-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-  .short-card{border:3px solid #293363;background:#fbf6e6;padding:10px;min-width:0}
-  .short-link{text-decoration:none;color:inherit}
-  .short-card-top{display:grid;grid-template-columns:105px 1fr;gap:10px}
-  .short-thumb{width:105px;height:147px;object-fit:contain;background:#fff;border:2px solid #303762}
-  .short-noimg{width:105px;height:147px;display:grid;place-items:center;background:#eee;border:2px solid #303762;font-size:11px}
-  .short-name{font-size:17px;font-weight:bold;overflow-wrap:anywhere}
-  .short-meta{font-size:12px;color:var(--sub);margin-top:5px}
-  .short-prices{margin-top:8px;border-top:2px solid var(--blue);padding-top:6px}
-  .short-source{font-weight:bold;margin-top:6px}
-  .short-price-line{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:2px 0}
-  .youtube{display:inline-block;margin-top:10px;padding:8px 10px;border:2px solid var(--orange);text-decoration:none;color:var(--orange);font-weight:bold}
-  .more-wrap{text-align:center;margin:18px 0}
-  .more{min-height:46px;padding:9px 22px;border:3px solid #28305d;background:var(--blue);color:#fff;font-family:inherit;cursor:pointer}
-  .count{text-align:center;color:var(--sub);font-size:12px;margin:8px}
-  @media(max-width:600px){
-    .page{width:100%;border-width:0;padding:12px}
-    .card-head{grid-template-columns:118px 1fr;gap:10px}
-    .card-img,.no-img{width:118px;height:auto;max-height:170px}
-    .no-img{height:165px}
-    .meta-row{grid-template-columns:90px 1fr}
-    .short-grid{grid-template-columns:1fr}
-  }
+:root{--bg:#f7f0d8;--ink:#263466;--sub:#626581;--orange:#ee6540;--blue:#337de3;--line:#34457a;--white:#fff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#696ab4;font-family:'DotGothic16',sans-serif;color:var(--ink)}
+.page{width:min(820px,calc(100% - 16px));margin:0 auto;min-height:100vh;padding:14px 18px 40px;background:var(--bg);border-left:5px solid #252958;border-right:5px solid #252958}
+a{color:var(--blue)} .back{display:inline-block;margin-bottom:12px;text-decoration:none}
+h1{font-family:'Press Start 2P','DotGothic16',sans-serif;font-size:20px;margin:4px 0 12px}
+.intro{margin:0 0 14px;color:var(--sub)}
+.filters{border:3px solid var(--line);background:#fffaf0;padding:12px;margin-bottom:16px}
+.filter-grid{display:grid;grid-template-columns:2fr 1.3fr 1fr 1.3fr;gap:8px}
+.filter-grid input,.filter-grid select{width:100%;min-height:42px;border:2px solid var(--line);background:#fff;padding:7px 9px;font:inherit;color:var(--ink)}
+.filter-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:9px}
+.btn{min-height:40px;border:2px solid #28305d;background:var(--blue);color:#fff;padding:7px 14px;font:inherit;cursor:pointer}
+.btn.sub{background:#fff;color:var(--ink)}
+.result-summary{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:10px 0;color:var(--sub);font-size:13px}
+.error,.empty{padding:14px;border:2px solid var(--line);margin-top:12px}
+.short-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.short-card{border:3px solid #293363;background:#fbf6e6;padding:10px;min-width:0}
+.short-link{text-decoration:none;color:inherit}
+.short-card-top{display:grid;grid-template-columns:105px 1fr;gap:10px}
+.short-thumb{width:105px;height:147px;object-fit:contain;background:#fff;border:2px solid #303762}
+.short-noimg{width:105px;height:147px;display:grid;place-items:center;background:#eee;border:2px solid #303762;font-size:11px}
+.short-name{font-size:17px;font-weight:bold;overflow-wrap:anywhere}
+.short-meta{font-size:12px;color:var(--sub);margin-top:5px}
+.pack-box{margin-top:8px;padding:7px;border:1px dashed #70758e;background:#fff}
+.pack-title{font-weight:bold;color:var(--orange);font-size:12px}
+.pack-detail{font-size:12px;margin-top:2px}
+.short-prices{margin-top:8px;border-top:2px solid var(--blue);padding-top:6px}
+.short-source{font-weight:bold;margin-top:6px}
+.short-price-line{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:2px 0}
+.youtube{display:inline-block;margin-top:10px;padding:8px 10px;border:2px solid var(--orange);text-decoration:none;color:var(--orange);font-weight:bold}
+.more-wrap{text-align:center;margin:18px 0}
+.more{min-height:46px;padding:9px 22px;border:3px solid #28305d;background:var(--blue);color:#fff;font-family:inherit;cursor:pointer}
+.count{text-align:center;color:var(--sub);font-size:12px;margin:8px}
+@media(max-width:760px){.filter-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){
+  .page{width:100%;border-width:0;padding:12px}.short-grid{grid-template-columns:1fr}
+  .filter-grid{grid-template-columns:1fr}.filter-actions{justify-content:stretch}.filter-actions .btn{flex:1}
+}
 </style>
 </head>
 <body>
 <main class="page">
-  <a class="back" href="index.html">← トップへもどる</a>
-  <h1>SHORTS PRICE</h1>
-  <p>ショート動画で紹介したカードの参考価格まとめです。登録されている価格だけ表示します。</p>
+<a class="back" href="index.html">← トップへもどる</a>
+<h1>SHORTS PRICE</h1>
+<p class="intro">ショート動画で紹介したカードの参考価格まとめです。登録されている価格だけ表示します。</p>
+
+<section class="filters" aria-label="検索と絞り込み">
+  <div class="filter-grid">
+    <input id="q" type="search" placeholder="カード名・番号・パック名">
+    <select id="set"><option value="">パック：すべて</option></select>
+    <select id="rarity">
+      <option value="">レアリティ：すべて</option>
+      <option>C</option><option>U</option><option>R</option><option>RR</option><option>RRR</option>
+      <option>AR</option><option>CHR</option><option>SR</option><option>SAR</option><option>HR</option><option>UR</option>
+      <option>SSR</option><option>CSR</option><option>ACE</option><option>PR</option>
+      <option value="__NULL__">レアリティ不明</option>
+    </select>
+    <select id="sort">
+      <option value="newest">Shorts新着順</option>
+      <option value="name_asc">五十音順 あ→ん</option>
+      <option value="name_desc">五十音順 ん→あ</option>
+      <option value="price_desc">メルカリ相場 高い順</option>
+      <option value="price_asc">メルカリ相場 安い順</option>
+      <option value="release_desc">パック発売日 新しい順</option>
+      <option value="release_asc">パック発売日 古い順</option>
+    </select>
+  </div>
+  <div class="filter-actions">
+    <button id="clear" class="btn sub" type="button">条件クリア</button>
+    <button id="apply" class="btn" type="button">けんさく</button>
+  </div>
+</section>
+
+<div class="result-summary">
   <div id="status">読み込み中…</div>
-  <div id="grid" class="short-grid"></div>
-  <div id="count" class="count"></div>
-  <div id="more-wrap" class="more-wrap" style="display:none"><button id="more" class="more" type="button">もっと見る</button></div>
+  <div id="summary"></div>
+</div>
+<div id="grid" class="short-grid"></div>
+<div id="count" class="count"></div>
+<div id="more-wrap" class="more-wrap" style="display:none"><button id="more" class="more" type="button">もっと見る</button></div>
 </main>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3/dist/umd/supabase.js" integrity="sha256-7ABBdtEBrsd67vJmqhyUQRKH/iA5xl6l9scvXhSzhH0=" crossorigin="anonymous"></script>
 <script src="market.js"></script>
 <script>
 (function(){
-  "use strict";
-  var PAGE = 20, offset = 0, total = 0, loading = false;
-  var grid = document.getElementById("grid"), status = document.getElementById("status");
-  var count = document.getElementById("count"), moreWrap = document.getElementById("more-wrap"), more = document.getElementById("more");
+"use strict";
+var PAGE=20,offset=0,total=0,loading=false;
+var grid=document.getElementById("grid"),status=document.getElementById("status"),summary=document.getElementById("summary");
+var count=document.getElementById("count"),moreWrap=document.getElementById("more-wrap"),more=document.getElementById("more");
+var q=document.getElementById("q"),setSel=document.getElementById("set"),rarity=document.getElementById("rarity"),sort=document.getElementById("sort");
+var apply=document.getElementById("apply"),clear=document.getElementById("clear");
 
-  function priceLine(parent,label,value){
-    if(value === null || value === undefined) return;
-    var line=document.createElement("div"); line.className="short-price-line";
-    var l=document.createElement("span"); l.textContent=label;
-    var v=document.createElement("strong"); v.textContent=MARKET.formatYen(value);
-    line.append(l,v); parent.appendChild(line);
+function fmtDate(v){
+  if(!v)return "ー";
+  var d=new Date(v+"T00:00:00");
+  if(isNaN(d.getTime()))return v;
+  return d.toLocaleDateString("ja-JP",{year:"numeric",month:"2-digit",day:"2-digit"});
+}
+function priceLine(parent,label,value){
+  if(value===null||value===undefined)return;
+  var line=document.createElement("div");line.className="short-price-line";
+  var l=document.createElement("span");l.textContent=label;
+  var v=document.createElement("strong");v.textContent=MARKET.formatYen(value);
+  line.append(l,v);parent.appendChild(line);
+}
+function source(parent,name,pairs){
+  var has=pairs.some(function(x){return x[1]!==null&&x[1]!==undefined});
+  if(!has)return;
+  var title=document.createElement("div");title.className="short-source";title.textContent=name;parent.appendChild(title);
+  pairs.forEach(function(x){priceLine(parent,x[0],x[1])});
+}
+function cardEl(card){
+  var el=document.createElement("article");el.className="short-card";
+  var top=document.createElement("a");top.className="short-link short-card-top";top.href="card.html?id="+encodeURIComponent(card.card_id);
+  var safe=MARKET.sanitizeImageUrl(card.image_url);
+  if(safe){var img=document.createElement("img");img.className="short-thumb";img.src=safe;img.alt="";img.loading="lazy";top.appendChild(img)}
+  else{var ph=document.createElement("div");ph.className="short-noimg";ph.textContent="NO IMAGE";top.appendChild(ph)}
+  var info=document.createElement("div");
+  var name=document.createElement("div");name.className="short-name";name.textContent=card.name||"";info.appendChild(name);
+  var meta=document.createElement("div");meta.className="short-meta";meta.textContent=(card.card_number||"")+(card.rarity?" / "+card.rarity:"");info.appendChild(meta);
+
+  var pack=document.createElement("div");pack.className="pack-box";
+  var pt=document.createElement("div");pt.className="pack-title";pt.textContent="PACK";pack.appendChild(pt);
+  var pd=document.createElement("div");pd.className="pack-detail";
+  pd.textContent=(card.set_name||"不明")+(card.set_code?" ["+card.set_code+"]":"");pack.appendChild(pd);
+  var rd=document.createElement("div");rd.className="pack-detail";rd.textContent="発売日："+fmtDate(card.release_date);pack.appendChild(rd);
+  info.appendChild(pack);
+  top.appendChild(info);el.appendChild(top);
+
+  var prices=document.createElement("div");prices.className="short-prices";
+  source(prices,"カードラッシュ",[["販売",card.cardrush_sell],["買取",card.cardrush_buy]]);
+  source(prices,"晴れる屋2",[["販売",card.hareruya_sell],["買取",card.hareruya_buy]]);
+  source(prices,"メルカリ",[["相場",card.mercari_market]]);
+  if(prices.children.length)el.appendChild(prices);
+
+  if(card.youtube_url){
+    try{var u=new URL(card.youtube_url);if(u.protocol==="https:"){var y=document.createElement("a");y.className="youtube";y.href=u.href;y.target="_blank";y.rel="noopener noreferrer";y.textContent="ショート動画を見る";el.appendChild(y)}}catch(e){}
   }
+  return el;
+}
+function opts(){
+  return {query:q.value.trim(),setId:setSel.value||null,rarity:rarity.value||null,sort:sort.value||"newest",limit:PAGE,offset:offset};
+}
+function load(append){
+  if(loading)return;
+  loading=true;more.disabled=true;
+  if(!append){offset=0;total=0;grid.innerHTML="";status.textContent="読み込み中…";count.textContent="";summary.textContent=""}
+  MARKET.listShortPriceCards(opts()).then(function(rows){
+    rows=rows||[];rows.forEach(function(r){grid.appendChild(cardEl(r))});
+    if(rows.length&&rows[0].total_count!=null)total=Number(rows[0].total_count)||0;
+    offset+=rows.length;
+    status.textContent=total?"":"条件に合うカードはありません。";
+    summary.textContent=total?total+"件":"";
+    count.textContent=total?(offset+" / "+total+"件表示"):"";
+    moreWrap.style.display=offset<total?"block":"none";
+    more.disabled=false;loading=false;
+  }).catch(function(err){
+    console.error(err);status.textContent="読み込みに失敗しました。";more.disabled=false;loading=false;
+  });
+}
+function reload(){load(false)}
 
-  function source(parent,name,pairs){
-    var has = pairs.some(function(x){ return x[1] !== null && x[1] !== undefined; });
-    if(!has) return;
-    var title=document.createElement("div"); title.className="short-source"; title.textContent=name; parent.appendChild(title);
-    pairs.forEach(function(x){ priceLine(parent,x[0],x[1]); });
-  }
+MARKET.listCardSets().then(function(sets){
+  var groups={}, order={};
+  (sets||[]).forEach(function(s){
+    var series=String(s.series_name||"その他").trim()||"その他";
+    if(!groups[series]) groups[series]=[];
+    groups[series].push(s);
+    order[series]=Math.min(order[series] == null ? 9999 : order[series], Number(s.series_order||500));
+  });
 
-  function cardEl(card){
-    var el=document.createElement("article"); el.className="short-card";
-    var top=document.createElement("a"); top.className="short-link short-card-top";
-    top.href="card.html?id="+encodeURIComponent(card.card_id);
-
-    var safe=MARKET.sanitizeImageUrl(card.image_url);
-    if(safe){ var img=document.createElement("img"); img.className="short-thumb"; img.src=safe; img.alt=""; img.loading="lazy"; top.appendChild(img); }
-    else { var ph=document.createElement("div"); ph.className="short-noimg"; ph.textContent="NO IMAGE"; top.appendChild(ph); }
-
-    var info=document.createElement("div");
-    var name=document.createElement("div"); name.className="short-name"; name.textContent=card.name||""; info.appendChild(name);
-    var meta=document.createElement("div"); meta.className="short-meta"; meta.textContent=(card.card_number||"")+(card.rarity?" / "+card.rarity:""); info.appendChild(meta);
-    var set=document.createElement("div"); set.className="short-meta"; set.textContent=card.set_name||""; info.appendChild(set);
-    top.appendChild(info); el.appendChild(top);
-
-    var prices=document.createElement("div"); prices.className="short-prices";
-    source(prices,"カードラッシュ",[["販売",card.cardrush_sell],["買取",card.cardrush_buy]]);
-    source(prices,"晴れる屋2",[["販売",card.hareruya_sell],["買取",card.hareruya_buy]]);
-    source(prices,"メルカリ",[["相場",card.mercari_market]]);
-    if(prices.children.length) el.appendChild(prices);
-
-    if(card.youtube_url){
-      try {
-        var u=new URL(card.youtube_url);
-        if(u.protocol==="https:"){
-          var y=document.createElement("a"); y.className="youtube"; y.href=u.href; y.target="_blank"; y.rel="noopener noreferrer"; y.textContent="ショート動画を見る"; el.appendChild(y);
-        }
-      } catch(e){}
-    }
-    return el;
-  }
-
-  function load(append){
-    if(loading) return; loading=true; more.disabled=true;
-    if(!append){ offset=0; total=0; grid.innerHTML=""; }
-    MARKET.listShortPriceCards({limit:PAGE,offset:offset}).then(function(rows){
-      rows=rows||[]; rows.forEach(function(r){ grid.appendChild(cardEl(r)); });
-      if(rows.length && rows[0].total_count != null) total=Number(rows[0].total_count)||0;
-      offset += rows.length;
-      status.textContent = total ? "" : "掲載中のカードはまだありません。";
-      count.textContent = total ? (offset+" / "+total+"件表示") : "";
-      moreWrap.style.display = offset < total ? "block" : "none";
-      more.disabled=false; loading=false;
-    }).catch(function(err){
-      console.error(err); status.textContent="読み込みに失敗しました。"; more.disabled=false; loading=false;
+  Object.keys(groups).sort(function(a,b){
+    return (order[a]-order[b]) || a.localeCompare(b,"ja");
+  }).forEach(function(series){
+    var rows=groups[series];
+    rows.sort(function(a,b){
+      return String(a.code||"").localeCompare(String(b.code||""),"ja",{numeric:true}) ||
+             String(a.name||"").localeCompare(String(b.name||""),"ja");
     });
-  }
-  more.addEventListener("click",function(){load(true);});
-  load(false);
+    var group=document.createElement("optgroup");
+    group.label=series;
+    rows.forEach(function(s){
+      var opt=document.createElement("option");
+      opt.value=s.id;
+      opt.textContent=(s.code?s.code+" ":"")+(s.name||"");
+      group.appendChild(opt);
+    });
+    setSel.appendChild(group);
+  });
+}).catch(function(err){console.error(err)});
+
+apply.addEventListener("click",reload);
+q.addEventListener("keydown",function(e){if(e.key==="Enter")reload()});
+clear.addEventListener("click",function(){q.value="";setSel.value="";rarity.value="";sort.value="newest";});
+more.addEventListener("click",function(){load(true)});
+load(false);
 })();
 </script>
 </body>

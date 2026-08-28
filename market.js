@@ -37,6 +37,22 @@
     });
   }
 
+  // 検索ページ用: 表示件数・並び順対応
+  function searchCardsSorted(opts){
+    opts = opts || {};
+    return client().schema("api").rpc("search_cards_sorted", {
+      p_query: opts.query || null,
+      p_set_id: opts.setId || null,
+      p_rarity: opts.rarity || null,
+      p_sort: opts.sort || "default",
+      p_limit: opts.limit || 20,
+      p_offset: opts.offset || 0
+    }).then(function(res){
+      if(res.error) throw res.error;
+      return res.data || [];
+    });
+  }
+
   // カード詳細（api.get_card）
   function getCard(cardId, priceType, condition){
     return client().schema("api").rpc("get_card", {
@@ -73,10 +89,14 @@
     });
   }
 
-  // Shorts PRICE ページ掲載カード
+  // Shorts PRICE ページ掲載カード（検索・絞り込み・並び替え対応）
   function listShortPriceCards(opts){
     opts = opts || {};
     return client().schema("api").rpc("list_short_price_cards", {
+      p_query: opts.query || null,
+      p_set_id: opts.setId || null,
+      p_rarity: opts.rarity || null,
+      p_sort: opts.sort || "newest",
       p_limit: opts.limit || 20,
       p_offset: opts.offset || 0
     }).then(function(res){
@@ -87,7 +107,15 @@
 
   // パック（card_sets）一覧（api.list_card_sets）。絞り込みUIの選択肢に使う
   function listCardSets(){
-    return client().schema("api").rpc("list_card_sets", {}).then(function(res){
+    return client().schema("api").rpc("list_card_sets_v3", {}).then(function(res){
+      if(res.error) throw res.error;
+      return res.data || [];
+    });
+  }
+
+  // シリーズ一覧
+  function listCardSeries(){
+    return client().schema("api").rpc("list_card_series", {}).then(function(res){
       if(res.error) throw res.error;
       return res.data || [];
     });
@@ -137,11 +165,13 @@
 
   global.MARKET = {
     searchCards: searchCards,
+    searchCardsSorted: searchCardsSorted,
     getCard: getCard,
     getPriceHistory: getPriceHistory,
     getCardMarketPrices: getCardMarketPrices,
     listShortPriceCards: listShortPriceCards,
     listCardSets: listCardSets,
+    listCardSeries: listCardSeries,
     sanitizeImageUrl: sanitizeImageUrl,
     formatYen: formatYen,
     formatDateTime: formatDateTime,

@@ -155,7 +155,7 @@
   }
   .card-name{ font-size: 12.5px; line-height:1.4; margin-bottom:4px; word-break: break-word; }
   .card-meta{ font-size: 10.5px; color: var(--text-sub); margin-bottom: 2px; }
-  .card-price{ font-size: 13px; color: var(--accent-2); font-weight:bold; }
+  .card-rarity{ font-size: 13px; color: var(--accent-2); font-weight:bold; }
 
   #pager{
     display:flex; justify-content: space-between; align-items:center;
@@ -197,7 +197,26 @@
 
     <form id="search-form">
       <input id="search-input" type="search" placeholder="カード名・番号で検索（例: リーリエ）" autocomplete="off">
-      <button id="search-btn" type="submit">けんさく</button>
+      
+      <label class="filter-block">
+        <span>表示件数</span>
+        <select id="page-size">
+          <option value="20">20件</option>
+          <option value="50">50件</option>
+          <option value="100">100件</option>
+        </select>
+      </label>
+      <label class="filter-block">
+        <span>並び順</span>
+        <select id="sort-order">
+          <option value="default">標準</option>
+          <option value="name_asc">五十音順 あ→ん</option>
+          <option value="name_desc">五十音順 ん→あ</option>
+          <option value="number_asc">カード番号 小→大</option>
+          <option value="number_desc">カード番号 大→小</option>
+        </select>
+      </label>
+<button id="search-btn" type="submit">けんさく</button>
     </form>
     <button id="filter-toggle" type="button" aria-expanded="false">絞り込み ▾</button>
     <div id="filter-panel">
@@ -254,8 +273,9 @@
 (function(){
   "use strict";
 
-  var PAGE_SIZE = 18;
-  var state = MARKET.loadSearchState() || { query: "", rarity: "", setId: "", offset: 0 };
+    var state = MARKET.loadSearchState() || { query: "", rarity: "", setId: "", offset: 0, limit: 20, sort: "default" };
+  state.limit = Number(state.limit) || 20;
+  state.sort = state.sort || "default";
   var isInitialLoad = true;
   var searchSeq = 0; // 古いレスポンスが後から届いても画面を上書きしないための連番
 
@@ -274,13 +294,17 @@
     searchBtn: document.getElementById("search-btn"),
     prev: document.getElementById("prev-btn"),
     next: document.getElementById("next-btn"),
-    pageInfo: document.getElementById("page-info")
+    pageInfo: document.getElementById("page-info"),
+    pageSize: document.getElementById("page-size"),
+    sortOrder: document.getElementById("sort-order")
   };
 
 
   // パックをシリーズ別にまとめてプルダウン表示する。
   // APIがcodeを返す場合はcodeを優先し、返さない場合はnameから判定する。
   function getSetGroup(s){
+    var explicit = String((s && s.series_name) || "").trim();
+    if(explicit) return explicit;
     var code = String((s && s.code) || "").trim().toUpperCase();
     var name = String((s && s.name) || "").trim();
     var key = code || name.toUpperCase();
@@ -290,10 +314,11 @@
     if(/^SM/.test(key)) return "SMシリーズ";
     if(/^XY/.test(key)) return "XYシリーズ";
     if(/^BW/.test(key)) return "BWシリーズ";
+    if(/^(L1|L2|L3|LL$|LP$|BK$|BR$|EL$|EM$)/.test(key)) return "LEGEND";
     if(/^(DPT|DP)/.test(key)) return "DP・DPtシリーズ";
     if(/^(ADV|PCG)/.test(key)) return "ADV・PCGシリーズ";
     if(/^(PMCG|NEO|E\b|WEB\b|VS\b)/.test(key)) return "旧裏・e・VS";
-    if(/^S(?:\d|[A-Z-])/.test(key)) return "Sシリーズ";
+    if(/^S(?:\d|[A-Z-])/.test(key)) return "ソード・シールド";
     return "その他";
   }
 
@@ -304,29 +329,22 @@
   }
 
   function appendGroupedSetOptions(select, sets){
-    var order = [
-      "SVシリーズ", "Sシリーズ", "SMシリーズ", "XYシリーズ", "BWシリーズ",
-      "DP・DPtシリーズ", "ADV・PCGシリーズ", "旧裏・e・VS", "プロモ", "その他"
-    ];
-    var groups = {};
-    order.forEach(function(label){ groups[label] = []; });
-
-    (sets || []).forEach(function(s){
-      groups[getSetGroup(s)].push(s);
+    var groups={};
+    var order={};
+    (sets||[]).forEach(function(s){
+      var label=String(s.series_name||"その他").trim()||"その他";
+      if(!groups[label]) groups[label]=[];
+      groups[label].push(s);
+      order[label]=Math.min(order[label] == null ? 9999 : order[label], Number(s.series_order||500));
     });
-
-    order.forEach(function(label){
-      if(!groups[label].length) return;
-      groups[label].sort(function(a, b){
-        return setOptionLabel(a).localeCompare(setOptionLabel(b), "ja", { numeric: true });
-      });
-      var group = document.createElement("optgroup");
-      group.label = label;
-      groups[label].forEach(function(s){
-        var opt = document.createElement("option");
-        opt.value = s.id;
-        opt.textContent = setOptionLabel(s);
-        group.appendChild(opt);
+    Object.keys(groups).sort(function(a,b){
+      return (order[a]-order[b]) || a.localeCompare(b,"ja");
+    }).forEach(function(label){
+      var rows=groups[label];
+      rows.sort(function(a,b){return setOptionLabel(a).localeCompare(setOptionLabel(b),"ja",{numeric:true})});
+      var group=document.createElement("optgroup"); group.label=label;
+      rows.forEach(function(s){
+        var opt=document.createElement("option"); opt.value=s.id; opt.textContent=setOptionLabel(s); group.appendChild(opt);
       });
       select.appendChild(group);
     });
@@ -334,6 +352,8 @@
 
   els.input.value = state.query || "";
   els.rarity.value = state.rarity || "";
+  els.pageSize.value = String(state.limit);
+  els.sortOrder.value = state.sort;
 
   els.filterToggle.addEventListener("click", function(){
     var open = els.filterPanel.classList.toggle("open");
@@ -348,45 +368,23 @@
     console.error(err);
   });
 
-  var debounceTimer = null;
-  function debouncedSearch(){
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(function(){
-      state.offset = 0;
-      runSearch();
-    }, 350);
-  }
-
-  els.input.addEventListener("input", function(){
-    state.query = els.input.value;
-    if(state.query.length === 0 || state.query.length >= 2){
-      debouncedSearch();
-    }
-  });
-  els.rarity.addEventListener("change", function(){
-    state.rarity = els.rarity.value;
-    state.offset = 0;
-    runSearch();
-  });
-  els.set.addEventListener("change", function(){
-    state.setId = els.set.value;
-    state.offset = 0;
-    runSearch();
-  });
   els.form.addEventListener("submit", function(e){
     e.preventDefault();
-    clearTimeout(debounceTimer);
     state.query = els.input.value;
+    state.rarity = els.rarity.value;
+    state.setId = els.set.value;
+    state.limit = Number(els.pageSize.value) || 20;
+    state.sort = els.sortOrder.value || "default";
     state.offset = 0;
     runSearch();
   });
 
   els.prev.addEventListener("click", function(){
-    state.offset = Math.max(0, state.offset - PAGE_SIZE);
+    state.offset = Math.max(0, state.offset - state.limit);
     runSearch();
   });
   els.next.addEventListener("click", function(){
-    state.offset = state.offset + PAGE_SIZE;
+    state.offset = state.offset + state.limit;
     runSearch();
   });
   els.retry.addEventListener("click", function(){
@@ -430,7 +428,7 @@
 
     var metaEl = document.createElement("div");
     metaEl.className = "card-meta";
-    metaEl.textContent = (card.card_number || "") + (card.rarity ? " ／ " + card.rarity : "");
+    metaEl.textContent = card.card_number || "";
     a.appendChild(metaEl);
 
     var setEl = document.createElement("div");
@@ -438,10 +436,10 @@
     setEl.textContent = card.set_name || "";
     a.appendChild(setEl);
 
-    var priceEl = document.createElement("div");
-    priceEl.className = "card-price";
-    priceEl.textContent = MARKET.formatYen(card.current_price);
-    a.appendChild(priceEl);
+    var rarityEl = document.createElement("div");
+    rarityEl.className = "card-rarity";
+    rarityEl.textContent = card.rarity ? "レアリティ：" + card.rarity : "レアリティ：ー";
+    a.appendChild(rarityEl);
 
     return a;
   }
@@ -462,11 +460,12 @@
     els.empty.style.display = "none";
     els.error.style.display = "none";
 
-    MARKET.searchCards({
+    MARKET.searchCardsSorted({
       query: state.query,
       rarity: state.rarity || null,
       setId: state.setId || null,
-      limit: PAGE_SIZE,
+      limit: state.limit,
+      sort: state.sort,
       offset: state.offset
     }).then(function(rows){
       if(seq !== searchSeq) return; // すでに新しい検索が走っている場合は結果を捨てる
@@ -482,11 +481,11 @@
       }
 
       var total = rows.length > 0 ? rows[0].total_count : 0;
-      var currentPage = Math.floor(state.offset / PAGE_SIZE) + 1;
-      var totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      var currentPage = Math.floor(state.offset / state.limit) + 1;
+      var totalPages = Math.max(1, Math.ceil(total / state.limit));
       els.pageInfo.textContent = total > 0 ? (currentPage + " / " + totalPages + " ページ（全" + total + "件）") : "";
       els.prev.disabled = state.offset <= 0;
-      els.next.disabled = state.offset + PAGE_SIZE >= total;
+      els.next.disabled = state.offset + state.limit >= total;
 
       // 詳細ページから戻ってきた直後だけ、以前のスクロール位置を復元する
       if(isInitialLoad){
