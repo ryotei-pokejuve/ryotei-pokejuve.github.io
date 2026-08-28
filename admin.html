@@ -807,7 +807,7 @@ button, select { touch-action: manipulation; }
     (loadedSeries || []).filter(function(s){ return s.name !== "その他"; }).forEach(function(s){
       var opt=document.createElement("option");
       opt.value=s.name;
-      opt.textContent=s.name + " の下";
+      opt.textContent=s.name + "シリーズ";
       els.seriesNewAfter.appendChild(opt);
     });
     if(els.seriesNewAfter.options.length){
