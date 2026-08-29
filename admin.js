@@ -107,114 +107,12 @@
     });
   }
 
-
-  // 管理者専用: 新しいパックを登録（api.admin_create_card_set）
-  function adminCreateCardSet(fields){
-    return client().schema("api").rpc("admin_create_card_set", {
-      p_code: fields.code || null,
-      p_name: fields.name,
-      p_release_date: fields.releaseDate || null
-    }).then(function(res){
-      if(res.error) throw res.error;
-      return res.data; // 作成されたcard_sets.id
-    });
-  }
-
-  // 管理者専用: シリーズ・画像URL対応の新規パック登録
-  function adminCreateCardSetV2(fields){
-    return client().schema("api").rpc("admin_create_card_set_v2", {
-      p_code: fields.code || null,
-      p_name: fields.name,
-      p_release_date: fields.releaseDate || null,
-      p_series_name: fields.seriesName || "その他",
-      p_image_url: fields.imageUrl || null
-    }).then(function(res){ if(res.error) throw res.error; return res.data; });
-  }
-
-  // 管理者専用: 既存パック情報更新
-  function adminUpdateCardSet(fields){
-    return client().schema("api").rpc("admin_update_card_set", {
-      p_id: fields.id,
-      p_code: fields.code || null,
-      p_name: fields.name,
-      p_release_date: fields.releaseDate || null,
-      p_series_name: fields.seriesName || "その他",
-      p_image_url: fields.imageUrl || null
-    }).then(function(res){ if(res.error) throw res.error; return res.data; });
-  }
-
-  // 公開: シリーズ一覧
-  function listCardSeries(){
-    return client().schema("api").rpc("list_card_series", {}).then(function(res){
-      if(res.error) throw res.error;
-      return res.data || [];
-    });
-  }
-
-  // 管理者専用: シリーズ追加
-  function adminCreateCardSeries(fields){
-    return client().schema("api").rpc("admin_create_card_series", {
-      p_name: fields.name,
-      p_reference_series_name: fields.referenceSeriesName || null,
-      p_position: fields.position || "after"
-    }).then(function(res){
-      if(res.error) throw res.error;
-      return res.data;
-    });
-  }
-
-  function extForImage(file){
-    var type = String(file && file.type || "").toLowerCase();
-    if(type === "image/jpeg") return "jpg";
-    if(type === "image/png") return "png";
-    if(type === "image/webp") return "webp";
-    if(type === "image/gif") return "gif";
-    return null;
-  }
-
-  // 管理者専用: パック画像をSupabase Storageへアップロード
-  function uploadPackImage(file, setId){
-    if(!file) return Promise.reject(new Error("画像ファイルを選択してください。"));
-    var ext = extForImage(file);
-    if(!ext) return Promise.reject(new Error("JPG / PNG / WebP / GIF の画像を選択してください。"));
-    if(Number(file.size || 0) > 5 * 1024 * 1024){
-      return Promise.reject(new Error("画像は5MB以下にしてください。"));
-    }
-
-    var safeSetId = String(setId || "new").replace(/[^a-zA-Z0-9_-]/g, "_");
-    var rand = (global.crypto && global.crypto.randomUUID)
-      ? global.crypto.randomUUID()
-      : String(Date.now()) + "_" + Math.random().toString(36).slice(2);
-    var path = safeSetId + "/" + rand + "." + ext;
-
-    return client().storage.from("pack-images").upload(path, file, {
-      cacheControl: "3600",
-      upsert: false,
-      contentType: file.type
-    }).then(function(res){
-      if(res.error) throw res.error;
-      var pub = client().storage.from("pack-images").getPublicUrl(path);
-      var url = pub && pub.data && pub.data.publicUrl;
-      if(!url) throw new Error("画像URLを取得できませんでした。");
-      return url;
-    });
-  }
-
-  // 管理画面用: 利用可能な価格元一覧
-  function listPriceSources(){
-    return client().schema("api").rpc("list_price_sources", {}).then(function(res){
-      if(res.error) throw res.error;
-      return res.data || [];
-    });
-  }
-
   // 管理者専用: 価格登録（api.admin_record_price）
   function adminRecordPrice(fields){
     return client().schema("api").rpc("admin_record_price", {
       p_card_id: fields.cardId,
       p_price: fields.price,
       p_observed_at: fields.observedAt || new Date().toISOString(),
-      p_source_id: fields.sourceId || null,
       p_price_type: fields.priceType || "sell",
       p_condition: fields.condition || "default"
     }).then(function(res){
@@ -223,23 +121,12 @@
     });
   }
 
-  // 管理者専用: ショート掲載情報取得
-  function adminGetShortFeature(cardId){
-    return client().schema("api").rpc("admin_get_short_feature", {
-      p_card_id: cardId
-    }).then(function(res){
-      if(res.error) throw res.error;
-      return (res.data && res.data[0]) || null;
-    });
-  }
 
-  // 管理者専用: ショート掲載ON/OFF
-  function adminSetShortFeature(fields){
-    return client().schema("api").rpc("admin_set_short_feature", {
-      p_card_id: fields.cardId,
-      p_is_active: !!fields.isActive,
-      p_youtube_url: fields.youtubeUrl || null,
-      p_published_at: fields.publishedAt || null
+  // 管理者専用: 複数カードのレアリティ一括変更
+  function adminBulkUpdateRarity(cardIds, rarity){
+    return client().schema("api").rpc("admin_bulk_update_card_rarity", {
+      p_card_ids: cardIds,
+      p_rarity: rarity
     }).then(function(res){
       if(res.error) throw res.error;
       return res.data;
@@ -254,16 +141,8 @@
     checkAdminAccess: checkAdminAccess,
     adminGetCard: adminGetCard,
     adminUpsertCard: adminUpsertCard,
-    adminCreateCardSet: adminCreateCardSet,
-    adminCreateCardSetV2: adminCreateCardSetV2,
-    adminUpdateCardSet: adminUpdateCardSet,
-    listCardSeries: listCardSeries,
-    adminCreateCardSeries: adminCreateCardSeries,
-    uploadPackImage: uploadPackImage,
-    listPriceSources: listPriceSources,
-    adminRecordPrice: adminRecordPrice,
-    adminGetShortFeature: adminGetShortFeature,
-    adminSetShortFeature: adminSetShortFeature
+    adminBulkUpdateRarity: adminBulkUpdateRarity,
+    adminRecordPrice: adminRecordPrice
   };
 
 })(window);

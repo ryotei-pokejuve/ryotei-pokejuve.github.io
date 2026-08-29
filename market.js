@@ -43,6 +43,7 @@
     return client().schema("api").rpc("search_cards_sorted", {
       p_query: opts.query || null,
       p_set_id: opts.setId || null,
+      p_series_name: opts.seriesName || null,
       p_rarity: opts.rarity || null,
       p_sort: opts.sort || "default",
       p_limit: opts.limit || 20,

@@ -65,12 +65,35 @@
     margin: 0 0 10px;
   }
 
-  #search-form{ display:flex; gap:6px; flex-wrap:wrap; }
+  #search-form{ display:flex; gap:6px; flex-wrap:wrap; align-items:flex-end; }
+  .search-control{ display:flex; flex-direction:column; gap:4px; min-width:150px; }
+  .search-control > span{ font-size:11px; color:var(--text-sub); }
+  #search-mode, #series-select, #pack-select{
+    padding:10px; font-family:inherit; font-size:13px;
+    border:3px solid var(--window-border-outer);
+    box-shadow:inset 0 0 0 2px var(--window-border-inner);
+    background:var(--window-bg); color:var(--text-color);
+  }
+  #series-select{ min-width:180px; }
+  #pack-select{ min-width:220px; }
+  #name-search-wrap{ flex:0 1 300px; }
+  #pack-search-wrap{ display:none; gap:6px; flex-wrap:wrap; flex:1 1 420px; }
+  #pack-search-wrap.open{ display:flex; }
+  #name-search-wrap.hidden{ display:none; }
+  @media(max-width:680px){
+    .search-control, #series-select, #pack-select{ width:100%; min-width:0; }
+    #pack-search-wrap{ width:100%; }
+  }
   #search-input{
-    flex: 1 1 200px;
+    width: 300px;
+    max-width: 100%;
+    height: 44px;
+    min-height: 44px;
+    max-height: 44px;
+    flex: 0 0 44px;
     min-width: 0;
-    padding: 10px;
-    font-size: 15px;
+    padding: 8px 10px;
+    font-size: 14px;
     font-family: inherit;
     border: 3px solid var(--window-border-outer);
     box-shadow: inset 0 0 0 2px var(--window-border-inner);
@@ -196,7 +219,29 @@
     <h1 id="brand">🎴 CARD SEARCH</h1>
 
     <form id="search-form">
-      <input id="search-input" type="search" placeholder="カード名・番号で検索（例: リーリエ）" autocomplete="off">
+      <label class="search-control">
+        <span>検索方法</span>
+        <select id="search-mode">
+          <option value="card">カード名で検索</option>
+          <option value="pack">パックから検索</option>
+        </select>
+      </label>
+
+      <label class="search-control" id="name-search-wrap">
+        <span>カード名</span>
+        <input id="search-input" type="search" placeholder="例: ピカチュウ" autocomplete="off">
+      </label>
+
+      <div id="pack-search-wrap">
+        <label class="search-control">
+          <span>シリーズ</span>
+          <select id="series-select"><option value="">シリーズを選択</option></select>
+        </label>
+        <label class="search-control">
+          <span>パック名</span>
+          <select id="pack-select" disabled><option value="">パック指定なし（シリーズ全体）</option></select>
+        </label>
+      </div>
       
       <label class="filter-block">
         <span>表示件数</span>
@@ -273,15 +318,23 @@
 (function(){
   "use strict";
 
-    var state = MARKET.loadSearchState() || { query: "", rarity: "", setId: "", offset: 0, limit: 20, sort: "default" };
+    var state = MARKET.loadSearchState() || { query: "", rarity: "", setId: "", offset: 0, limit: 20, sort: "default", mode: "card", seriesName: "" };
   state.limit = Number(state.limit) || 20;
   state.sort = state.sort || "default";
+  state.mode = state.mode === "pack" ? "pack" : "card";
+  state.seriesName = state.seriesName || "";
+  var allCardSets = [];
   var isInitialLoad = true;
   var searchSeq = 0; // 古いレスポンスが後から届いても画面を上書きしないための連番
 
   var els = {
     form: document.getElementById("search-form"),
     input: document.getElementById("search-input"),
+    mode: document.getElementById("search-mode"),
+    nameSearchWrap: document.getElementById("name-search-wrap"),
+    packSearchWrap: document.getElementById("pack-search-wrap"),
+    series: document.getElementById("series-select"),
+    pack: document.getElementById("pack-select"),
     filterToggle: document.getElementById("filter-toggle"),
     filterPanel: document.getElementById("filter-panel"),
     rarity: document.getElementById("filter-rarity"),
@@ -350,7 +403,52 @@
     });
   }
 
+  function rebuildSeriesOptions(){
+    var seen = {};
+    els.series.innerHTML = '<option value="">シリーズを選択</option>';
+    allCardSets.forEach(function(set){
+      var name = String(set.series_name || getSetGroup(set) || "その他").trim() || "その他";
+      if(seen[name]) return;
+      seen[name] = true;
+      var opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name;
+      els.series.appendChild(opt);
+    });
+  }
+
+  function rebuildPackOptions(seriesName, selectedId){
+    els.pack.innerHTML = "";
+    var first = document.createElement("option");
+    first.value = "";
+    first.textContent = seriesName ? "パックを選択" : "先にシリーズを選択";
+    els.pack.appendChild(first);
+    els.pack.disabled = !seriesName;
+    if(!seriesName) return;
+    allCardSets.filter(function(set){
+      return String(set.series_name || getSetGroup(set) || "その他").trim() === seriesName;
+    }).sort(function(a,b){
+      return setOptionLabel(a).localeCompare(setOptionLabel(b), "ja", {numeric:true});
+    }).forEach(function(set){
+      var opt = document.createElement("option");
+      opt.value = set.id;
+      opt.textContent = setOptionLabel(set);
+      els.pack.appendChild(opt);
+    });
+    if(selectedId) els.pack.value = selectedId;
+  }
+
+  function applySearchMode(){
+    var isPack = els.mode.value === "pack";
+    els.nameSearchWrap.classList.toggle("hidden", isPack);
+    els.packSearchWrap.classList.toggle("open", isPack);
+    if(isPack){
+      els.input.value = "";
+    }
+  }
+
   els.input.value = state.query || "";
+  els.mode.value = state.mode;
   els.rarity.value = state.rarity || "";
   els.pageSize.value = String(state.limit);
   els.sortOrder.value = state.sort;
@@ -362,18 +460,72 @@
 
   // パック一覧を読み込んで選択肢に追加（失敗しても検索自体は使えるようにする）
   MARKET.listCardSets().then(function(sets){
-    appendGroupedSetOptions(els.set, sets);
-    els.set.value = state.setId || "";
+    allCardSets = sets || [];
+    appendGroupedSetOptions(els.set, allCardSets);
+    els.set.value = state.mode === "card" ? (state.setId || "") : "";
+    rebuildSeriesOptions();
+    els.series.value = state.seriesName || "";
+    rebuildPackOptions(els.series.value, state.mode === "pack" ? state.setId : "");
+    applySearchMode();
   }).catch(function(err){
     console.error(err);
+    applySearchMode();
+  });
+
+  els.mode.addEventListener("change", function(){
+    state.mode = els.mode.value === "pack" ? "pack" : "card";
+    state.offset = 0;
+    if(state.mode === "card"){
+      state.setId = els.set.value || "";
+    }else{
+      state.query = "";
+      state.seriesName = els.series.value || "";
+      state.setId = els.pack.value || "";
+    }
+    applySearchMode();
+  });
+
+  els.series.addEventListener("change", function(){
+    state.seriesName = els.series.value || "";
+    state.setId = "";
+    rebuildPackOptions(state.seriesName, "");
+  });
+
+  els.pack.addEventListener("change", function(){
+    state.setId = els.pack.value || "";
   });
 
   els.form.addEventListener("submit", function(e){
     e.preventDefault();
-    state.query = els.input.value;
+    state.mode = els.mode.value === "pack" ? "pack" : "card";
+    state.query = state.mode === "card" ? els.input.value.trim() : "";
     state.rarity = els.rarity.value;
-    state.setId = els.set.value;
+    if(state.mode === "pack"){
+      state.seriesName = els.series.value || "";
+      state.setId = els.pack.value || "";
+      if(!state.seriesName){
+        els.status.textContent = "シリーズを選択してください。";
+        return;
+      }
+      // パック未選択ならシリーズ全体、パック選択時はそのパックだけ検索する。
+    }else{
+      state.setId = els.set.value;
+    }
     state.limit = Number(els.pageSize.value) || 20;
+    state.sort = els.sortOrder.value || "default";
+    state.offset = 0;
+    runSearch();
+  });
+
+  // 表示件数と並び順だけは、選択した瞬間に現在の検索条件へ反映する。
+  // 検索語・レアリティ・パックは従来どおり「けんさく」押下まで反映しない。
+  els.pageSize.addEventListener("change", function(){
+    state.limit = Number(els.pageSize.value) || 20;
+    state.offset = 0;
+    runSearch();
+  });
+
+  els.sortOrder.addEventListener("change", function(){
     state.sort = els.sortOrder.value || "default";
     state.offset = 0;
     runSearch();
@@ -464,6 +616,7 @@
       query: state.query,
       rarity: state.rarity || null,
       setId: state.setId || null,
+      seriesName: (state.mode === "pack" && !state.setId) ? (state.seriesName || null) : null,
       limit: state.limit,
       sort: state.sort,
       offset: state.offset
@@ -509,6 +662,7 @@
     });
   }
 
+  applySearchMode();
   runSearch();
 })();
 </script>
