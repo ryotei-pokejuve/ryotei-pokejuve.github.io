@@ -278,6 +278,73 @@ button, select { touch-action: manipulation; }
   .result-select{ transform:scale(1.25); margin:0 4px; flex:0 0 auto; }
   @media (max-width:720px){ .bulk-toolbar{display:grid;grid-template-columns:1fr}.bulk-check-label{min-height:44px} }
 
+  /* ===== ショート掲載カード 価格一括編集 ===== */
+  .short-price-toolbar{
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+    margin:8px 0 12px;
+  }
+  .short-price-toolbar input[type="search"]{ flex:1 1 220px; }
+  .short-price-summary{
+    font-size:12px; color:var(--text-sub); margin:6px 0 10px;
+  }
+  #short-price-list{
+    display:grid; gap:12px;
+  }
+  .short-price-card{
+    border:3px solid var(--window-border-outer);
+    box-shadow:2px 2px 0 var(--shadow-color);
+    background:#fff;
+    padding:10px;
+  }
+  .short-price-head{
+    display:flex; gap:10px; align-items:flex-start; margin-bottom:10px;
+  }
+  .short-price-meta{ flex:1; min-width:0; }
+  .short-price-name{ font-size:15px; font-weight:bold; overflow-wrap:anywhere; }
+  .short-price-sub{ font-size:11.5px; color:var(--text-sub); margin-top:3px; overflow-wrap:anywhere; }
+  .short-price-badge{
+    display:inline-block; margin-top:4px; padding:2px 6px;
+    border:2px solid var(--ok); color:var(--ok); font-size:10px;
+  }
+  .short-price-badge.off{ border-color:var(--text-sub); color:var(--text-sub); }
+  .short-price-grid{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(90px,1fr));
+    gap:8px;
+  }
+  .short-price-field label{ margin:0 0 3px; font-size:10.5px; }
+  .short-price-field input{
+    min-height:42px;
+    padding:7px;
+    font-size:14px;
+  }
+  .short-price-field.changed input{
+    border-color:var(--accent-2);
+    background:rgba(224,102,63,.08);
+  }
+  .short-price-actions{
+    display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:9px;
+  }
+  .short-price-actions .btn{ margin:0; min-height:38px; padding:6px 10px; font-size:11px; }
+  .short-price-links{ display:flex; gap:6px; flex-wrap:wrap; margin-left:auto; }
+  .short-price-link{
+    display:inline-block; padding:6px 8px; min-height:34px;
+    border:2px solid var(--window-border-outer);
+    background:#eee; color:var(--text-color); text-decoration:none; font-size:10px;
+  }
+  #short-price-empty{
+    display:none; padding:14px; text-align:center; color:var(--text-sub);
+    border:2px dashed var(--text-sub);
+  }
+  @media (max-width:720px){
+    .short-price-toolbar{ display:grid; grid-template-columns:1fr; }
+    .short-price-grid{ grid-template-columns:1fr 1fr; }
+    .short-price-field.market{ grid-column:1 / -1; }
+    .short-price-actions{ display:grid; grid-template-columns:1fr; }
+    .short-price-links{ margin-left:0; display:grid; grid-template-columns:1fr 1fr 1fr; }
+    .short-price-actions .btn,.short-price-link{ width:100%; text-align:center; min-height:44px; }
+  }
+
 </style>
 </head>
 <body>
@@ -350,19 +417,6 @@ button, select { touch-action: manipulation; }
           <option value="MUR">MUR</option>
           <option value="BWR">BWR</option>
           <option value="旧裏R">旧裏R</option>
-        </select>
-        <select id="admin-sort" aria-label="並び順">
-          <option value="default">標準</option>
-          <option value="number_asc">番号 小→大</option>
-          <option value="number_desc">番号 大→小</option>
-          <option value="name_asc">名前 あ→ん</option>
-          <option value="name_desc">名前 ん→あ</option>
-        </select>
-        <select id="admin-page-size" aria-label="表示件数">
-          <option value="20">20件表示</option>
-          <option value="50">50件表示</option>
-          <option value="100">100件表示</option>
-          <option value="all">すべて表示</option>
         </select>
         <button class="btn" id="admin-search-btn" type="button">検索</button>
       </div>
@@ -460,8 +514,6 @@ button, select { touch-action: manipulation; }
             <input id="short-feature-active" type="checkbox" style="width:auto;min-height:auto;">
             PRICEページに掲載する
           </label>
-          <label for="short-feature-url">YouTubeショートURL（任意）</label>
-          <input id="short-feature-url" type="text" placeholder="https://youtube.com/shorts/...">
           <label for="short-feature-published">動画投稿日（任意）</label>
           <input id="short-feature-published" type="datetime-local">
           <button class="btn secondary" type="button" id="short-feature-save" disabled>掲載設定を保存</button>
@@ -474,6 +526,30 @@ button, select { touch-action: manipulation; }
         </div>
         <div id="card-status" class="status-msg"></div>
       </form>
+    </div>
+
+
+    <div class="pixel-window">
+      <h2>ショート掲載カード 価格一括編集</h2>
+      <div style="font-size:12px;color:var(--text-sub);margin-bottom:8px;">
+        ショート動画に載せたカードだけを一覧表示します。複数カードの価格を直して、最後にまとめて保存できます。
+        空欄は「変更なし」です。
+      </div>
+
+      <div class="short-price-toolbar">
+        <input id="short-price-filter" type="search" placeholder="カード名・番号・パックで絞り込み">
+        <label class="bulk-check-label">
+          <input id="short-price-active-only" type="checkbox" checked>
+          PRICE掲載中のみ
+        </label>
+        <button class="btn secondary" id="short-price-reload" type="button">一覧を再読込</button>
+        <button class="btn" id="short-price-save-all" type="button" disabled>変更した価格を一括保存</button>
+      </div>
+
+      <div id="short-price-summary" class="short-price-summary">未読込</div>
+      <div id="short-price-status" class="status-msg"></div>
+      <div id="short-price-list"></div>
+      <div id="short-price-empty">該当するショート掲載カードがありません。</div>
     </div>
 
     <div class="pixel-window">
@@ -543,8 +619,6 @@ button, select { touch-action: manipulation; }
     filterSet: document.getElementById("admin-filter-set"),
     filterRarity: document.getElementById("admin-filter-rarity"),
     searchBtn: document.getElementById("admin-search-btn"),
-    sort: document.getElementById("admin-sort"),
-    pageSize: document.getElementById("admin-page-size"),
     results: document.getElementById("admin-results"),
     resultCount: document.getElementById("admin-result-count"),
     loadMoreWrap: document.getElementById("admin-load-more-wrap"),
@@ -582,10 +656,18 @@ button, select { touch-action: manipulation; }
     cardResetBtn: document.getElementById("card-reset-btn"),
     cardStatus: document.getElementById("card-status"),
     shortFeatureActive: document.getElementById("short-feature-active"),
-    shortFeatureUrl: document.getElementById("short-feature-url"),
     shortFeaturePublished: document.getElementById("short-feature-published"),
     shortFeatureSave: document.getElementById("short-feature-save"),
     shortFeatureStatus: document.getElementById("short-feature-status"),
+
+    shortPriceFilter: document.getElementById("short-price-filter"),
+    shortPriceActiveOnly: document.getElementById("short-price-active-only"),
+    shortPriceReload: document.getElementById("short-price-reload"),
+    shortPriceSaveAll: document.getElementById("short-price-save-all"),
+    shortPriceSummary: document.getElementById("short-price-summary"),
+    shortPriceStatus: document.getElementById("short-price-status"),
+    shortPriceList: document.getElementById("short-price-list"),
+    shortPriceEmpty: document.getElementById("short-price-empty"),
 
     priceCardSearch: document.getElementById("price-card-search"),
     priceCardSearchBtn: document.getElementById("price-card-search-btn"),
@@ -668,14 +750,7 @@ button, select { touch-action: manipulation; }
   var adminSearchTotal = 0;
   var adminSearchLoading = false;
   var ADMIN_PAGE_SIZE = 20;
-  var ADMIN_ALL_BATCH_SIZE = 500;
   var adminSelectedIds = new Set();
-
-  function getAdminPageSize(){
-    if(els.pageSize && els.pageSize.value === "all") return "all";
-    var n = Number(els.pageSize && els.pageSize.value);
-    return n > 0 ? n : ADMIN_PAGE_SIZE;
-  }
 
   function updateBulkUI(){
     var count = adminSelectedIds.size;
@@ -826,6 +901,7 @@ button, select { touch-action: manipulation; }
       setsLoaded = true;
       loadCardSets();
       loadPriceSources();
+        loadShortPriceCards();
     }
     loadSiteSettings();
     runAdminSearch();
@@ -971,7 +1047,6 @@ button, select { touch-action: manipulation; }
     var li = document.createElement("li");
     li.className = "result-row";
     li.dataset.cardId = card.id;
-    li._cardData = card;
 
     var select = document.createElement("input");
     select.type = "checkbox";
@@ -1032,41 +1107,6 @@ button, select { touch-action: manipulation; }
     els.loadMoreWrap.style.display = shown < adminSearchTotal ? "block" : "none";
   }
 
-  function compareAdminCards(a, b){
-    var mode = els.sort ? els.sort.value : "default";
-    if(mode === "default") return 0;
-
-    if(mode === "name_asc" || mode === "name_desc"){
-      var cmpName = String(a.name || "").localeCompare(String(b.name || ""), "ja", {
-        numeric: true, sensitivity: "base"
-      });
-      return mode === "name_desc" ? -cmpName : cmpName;
-    }
-
-    function numberParts(v){
-      var s = String(v || "").trim();
-      var m = s.match(/^(\d+)(.*)$/);
-      return m ? [Number(m[1]), m[2] || ""] : [Number.POSITIVE_INFINITY, s];
-    }
-    var ap = numberParts(a.card_number), bp = numberParts(b.card_number);
-    var cmp = ap[0] === bp[0]
-      ? String(ap[1]).localeCompare(String(bp[1]), "ja", {numeric:true})
-      : ap[0] - bp[0];
-    return mode === "number_desc" ? -cmp : cmp;
-  }
-
-  function sortRenderedAdminResults(){
-    var mode = els.sort ? els.sort.value : "default";
-    if(mode === "default") return;
-    var items = Array.prototype.slice.call(els.results.children);
-    items.sort(function(la, lb){
-      var a = la._cardData || {};
-      var b = lb._cardData || {};
-      return compareAdminCards(a,b);
-    });
-    items.forEach(function(li){ els.results.appendChild(li); });
-  }
-
   function runAdminSearch(append){
     if(adminSearchLoading) return;
     adminSearchLoading = true;
@@ -1085,66 +1125,31 @@ button, select { touch-action: manipulation; }
     els.loadMoreBtn.disabled = true;
     els.loadMoreBtn.textContent = "読み込み中...";
 
-    var requestedSize = getAdminPageSize();
-
-    function fetchBatch(limit, offset){
-      return MARKET.searchCards({
-        query: els.searchInput.value,
-        rarity: els.filterRarity.value || null,
-        setId: els.filterSet.value || null,
-        limit: limit,
-        offset: offset
-      });
-    }
-
-    function finishRows(rows){
+    MARKET.searchCards({
+      query: els.searchInput.value,
+      rarity: els.filterRarity.value || null,
+      setId: els.filterSet.value || null,
+      limit: ADMIN_PAGE_SIZE,
+      offset: adminSearchOffset
+    }).then(function(rows){
       rows = rows || [];
       if(rows.length && rows[0].total_count != null){
         adminSearchTotal = Number(rows[0].total_count) || 0;
       }
       rows.forEach(renderAdminResult);
       adminSearchOffset += rows.length;
-      sortRenderedAdminResults();
       updateAdminSearchFooter();
-      return rows;
-    }
-
-    var job;
-    if(requestedSize !== "all"){
-      job = fetchBatch(requestedSize, adminSearchOffset).then(finishRows);
-    } else {
-      // 「すべて表示」でも1リクエストを巨大化させず、500件ずつ最後まで取得する。
-      job = (function loadAll(){
-        return fetchBatch(ADMIN_ALL_BATCH_SIZE, adminSearchOffset).then(function(rows){
-          rows = finishRows(rows);
-          if(rows.length === 0) return;
-          if(adminSearchTotal > 0 && adminSearchOffset >= adminSearchTotal) return;
-          if(rows.length < ADMIN_ALL_BATCH_SIZE) return;
-          return loadAll();
-        });
-      })();
-    }
-
-    job.catch(function(err){
+    }).catch(function(err){
       console.error(err);
       if(!append) els.resultCount.textContent = "検索に失敗しました";
     }).finally(function(){
       adminSearchLoading = false;
       els.loadMoreBtn.disabled = false;
       els.loadMoreBtn.textContent = "もっと見る";
-      if(requestedSize === "all") els.loadMoreWrap.style.display = "none";
     });
   }
 
   els.searchBtn.addEventListener("click", function(){ runAdminSearch(false); });
-  els.sort.addEventListener("change", function(){
-    if(getAdminPageSize() === "all"){
-      sortRenderedAdminResults();
-    } else {
-      runAdminSearch(false);
-    }
-  });
-  els.pageSize.addEventListener("change", function(){ runAdminSearch(false); });
   els.filterSet.addEventListener("change", function(){ runAdminSearch(false); });
   els.filterRarity.addEventListener("change", function(){ runAdminSearch(false); });
   els.loadMoreBtn.addEventListener("click", function(){ runAdminSearch(true); });
@@ -1362,12 +1367,10 @@ button, select { touch-action: manipulation; }
     clearStatus(els.shortFeatureStatus);
     ADMIN.adminGetShortFeature(cardId).then(function(row){
       els.shortFeatureActive.checked = !!(row && row.is_active);
-      els.shortFeatureUrl.value = (row && row.youtube_url) || "";
       els.shortFeaturePublished.value = isoToDatetimeLocal(row && row.published_at);
       els.shortFeatureSave.disabled = false;
     }).catch(function(err){
       els.shortFeatureActive.checked = false;
-      els.shortFeatureUrl.value = "";
       els.shortFeaturePublished.value = "";
       els.shortFeatureSave.disabled = false;
       showStatus(els.shortFeatureStatus, "掲載情報の取得に失敗しました: " + friendlyError(err), true);
@@ -1388,7 +1391,7 @@ button, select { touch-action: manipulation; }
     ADMIN.adminSetShortFeature({
       cardId: selectedCardId,
       isActive: els.shortFeatureActive.checked,
-      youtubeUrl: els.shortFeatureUrl.value.trim(),
+      youtubeUrl: null,
       publishedAt: publishedIso
     }).then(function(){
       els.shortFeatureSave.disabled = false;
@@ -1402,6 +1405,328 @@ button, select { touch-action: manipulation; }
       showStatus(els.shortFeatureStatus, friendlyError(err), true);
     });
   });
+
+
+  // ---- ショート掲載カード 価格一括編集 ----
+  var shortPriceRows = [];
+  var shortPriceOriginal = {};
+  var shortPriceDirty = new Set();
+  var shortPriceLoading = false;
+
+  function moneyInputValue(v){
+    if(v == null || v === "") return "";
+    var n = Number(v);
+    return isFinite(n) && n > 0 ? String(Math.round(n)) : "";
+  }
+
+  function shortPriceKey(cardId, field){
+    return String(cardId) + "::" + field;
+  }
+
+  function setShortPriceDirty(cardId, field, input){
+    var key = shortPriceKey(cardId, field);
+    var oldValue = shortPriceOriginal[key] || "";
+    var newValue = String(input.value || "").trim();
+    if(newValue !== oldValue){
+      shortPriceDirty.add(key);
+      input.closest(".short-price-field").classList.add("changed");
+    }else{
+      shortPriceDirty.delete(key);
+      input.closest(".short-price-field").classList.remove("changed");
+    }
+    els.shortPriceSaveAll.disabled = shortPriceDirty.size === 0 || shortPriceLoading;
+    updateShortPriceSummary();
+  }
+
+  function updateShortPriceSummary(){
+    var shown = els.shortPriceList.querySelectorAll(".short-price-card:not([hidden])").length;
+    els.shortPriceSummary.textContent =
+      "表示 " + shown + " / 全 " + shortPriceRows.length + "件　変更 " + shortPriceDirty.size + "項目";
+  }
+
+  function priceSearchUrl(site, row){
+    var q = [row.card_name, row.card_number, row.set_code].filter(Boolean).join(" ");
+    if(site === "cardrush"){
+      return "https://www.cardrush-pokemon.jp/product-list?keyword=" + encodeURIComponent(q);
+    }
+    if(site === "hareruya"){
+      return "https://www.hareruya2.com/search?type=product&q=" + encodeURIComponent(q);
+    }
+    if(site === "mercari"){
+      return "https://jp.mercari.com/search?keyword=" + encodeURIComponent(q);
+    }
+    return "#";
+  }
+
+  function makeShortPriceField(cardId, field, label, value, extraClass){
+    var wrap = document.createElement("div");
+    wrap.className = "short-price-field" + (extraClass ? " " + extraClass : "");
+
+    var lab = document.createElement("label");
+    lab.textContent = label;
+    wrap.appendChild(lab);
+
+    var input = document.createElement("input");
+    input.type = "number";
+    input.min = "1";
+    input.inputMode = "numeric";
+    input.placeholder = "円";
+    input.value = moneyInputValue(value);
+    input.dataset.cardId = cardId;
+    input.dataset.priceField = field;
+
+    var key = shortPriceKey(cardId, field);
+    shortPriceOriginal[key] = input.value;
+
+    input.addEventListener("input", function(){
+      setShortPriceDirty(cardId, field, input);
+    });
+    wrap.appendChild(input);
+    return wrap;
+  }
+
+  function renderShortPriceRows(){
+    els.shortPriceList.innerHTML = "";
+    shortPriceOriginal = {};
+    shortPriceDirty.clear();
+
+    shortPriceRows.forEach(function(row){
+      var box = document.createElement("div");
+      box.className = "short-price-card";
+      box.dataset.cardId = row.card_id;
+      box.dataset.searchText = [
+        row.card_name, row.card_number, row.rarity, row.set_code, row.set_name
+      ].join(" ").toLocaleLowerCase("ja");
+      box.dataset.active = row.short_is_active ? "1" : "0";
+
+      var head = document.createElement("div");
+      head.className = "short-price-head";
+
+      var safeImage = MARKET.sanitizeImageUrl(row.image_url || "");
+      if(safeImage){
+        var img = document.createElement("img");
+        img.className = "result-thumb";
+        img.src = safeImage;
+        img.alt = "";
+        img.loading = "lazy";
+        head.appendChild(img);
+      }else{
+        var ph = document.createElement("div");
+        ph.className = "result-thumb-placeholder";
+        ph.textContent = "NO IMAGE";
+        head.appendChild(ph);
+      }
+
+      var meta = document.createElement("div");
+      meta.className = "short-price-meta";
+      var name = document.createElement("div");
+      name.className = "short-price-name";
+      name.textContent = row.card_name || "";
+      meta.appendChild(name);
+
+      var sub = document.createElement("div");
+      sub.className = "short-price-sub";
+      sub.textContent =
+        (row.set_code || "") + " " + (row.set_name || "") +
+        " / " + (row.card_number || "") +
+        (row.rarity ? " / " + row.rarity : "");
+      meta.appendChild(sub);
+
+      var badge = document.createElement("span");
+      badge.className = "short-price-badge" + (row.short_is_active ? "" : " off");
+      badge.textContent = row.short_is_active ? "PRICE掲載中" : "掲載OFF";
+      meta.appendChild(badge);
+      head.appendChild(meta);
+      box.appendChild(head);
+
+      var grid = document.createElement("div");
+      grid.className = "short-price-grid";
+      grid.appendChild(makeShortPriceField(row.card_id, "cardrush_sell", "カードラッシュ 販売", row.cardrush_sell));
+      grid.appendChild(makeShortPriceField(row.card_id, "cardrush_buy", "カードラッシュ 買取", row.cardrush_buy));
+      grid.appendChild(makeShortPriceField(row.card_id, "hareruya_sell", "晴れる屋2 販売", row.hareruya_sell));
+      grid.appendChild(makeShortPriceField(row.card_id, "hareruya_buy", "晴れる屋2 買取", row.hareruya_buy));
+      grid.appendChild(makeShortPriceField(row.card_id, "mercari_market", "メルカリ 相場", row.mercari_market, "market"));
+      box.appendChild(grid);
+
+      var actions = document.createElement("div");
+      actions.className = "short-price-actions";
+
+      var saveOne = document.createElement("button");
+      saveOne.type = "button";
+      saveOne.className = "btn secondary";
+      saveOne.textContent = "このカードだけ保存";
+      saveOne.addEventListener("click", function(){
+        saveShortPriceChanges(row.card_id);
+      });
+      actions.appendChild(saveOne);
+
+      var links = document.createElement("div");
+      links.className = "short-price-links";
+      [
+        ["Cardrush検索", "cardrush"],
+        ["晴れる屋2検索", "hareruya"],
+        ["メルカリ検索", "mercari"]
+      ].forEach(function(pair){
+        var a = document.createElement("a");
+        a.className = "short-price-link";
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.href = priceSearchUrl(pair[1], row);
+        a.textContent = pair[0];
+        links.appendChild(a);
+      });
+      actions.appendChild(links);
+      box.appendChild(actions);
+
+      els.shortPriceList.appendChild(box);
+    });
+
+    applyShortPriceFilter();
+  }
+
+  function applyShortPriceFilter(){
+    var q = String(els.shortPriceFilter.value || "").trim().toLocaleLowerCase("ja");
+    var activeOnly = els.shortPriceActiveOnly.checked;
+    var shown = 0;
+    Array.prototype.forEach.call(els.shortPriceList.querySelectorAll(".short-price-card"), function(box){
+      var visible = (!q || box.dataset.searchText.indexOf(q) !== -1) &&
+        (!activeOnly || box.dataset.active === "1");
+      box.hidden = !visible;
+      if(visible) shown++;
+    });
+    els.shortPriceEmpty.style.display = shown ? "none" : "block";
+    updateShortPriceSummary();
+  }
+
+  function loadShortPriceCards(){
+    if(shortPriceLoading) return;
+    shortPriceLoading = true;
+    clearStatus(els.shortPriceStatus);
+    els.shortPriceReload.disabled = true;
+    els.shortPriceSaveAll.disabled = true;
+    els.shortPriceSummary.textContent = "読み込み中…";
+
+    ADMIN.adminListShortFeatureCards().then(function(rows){
+      shortPriceRows = rows || [];
+      renderShortPriceRows();
+      shortPriceLoading = false;
+      els.shortPriceReload.disabled = false;
+      els.shortPriceSaveAll.disabled = shortPriceDirty.size === 0;
+    }).catch(function(err){
+      shortPriceLoading = false;
+      els.shortPriceReload.disabled = false;
+      showStatus(els.shortPriceStatus, "一覧の読み込みに失敗しました: " + friendlyError(err), true);
+      els.shortPriceSummary.textContent = "読み込み失敗";
+    });
+  }
+
+  var SHORT_PRICE_MAP = {
+    cardrush_sell: { sourceName:"カードラッシュ", priceType:"sell" },
+    cardrush_buy: { sourceName:"カードラッシュ", priceType:"buy" },
+    hareruya_sell: { sourceName:"晴れる屋2", priceType:"sell" },
+    hareruya_buy: { sourceName:"晴れる屋2", priceType:"buy" },
+    mercari_market: { sourceName:"メルカリ", priceType:"market" }
+  };
+
+  function sourceIdByName(name){
+    var found = null;
+    Object.keys(priceSourceById).some(function(id){
+      if(priceSourceById[id] && priceSourceById[id].name === name){
+        found = id;
+        return true;
+      }
+      return false;
+    });
+    return found;
+  }
+
+  function dirtyEntriesForCard(cardId){
+    var prefix = String(cardId) + "::";
+    return Array.from(shortPriceDirty).filter(function(key){
+      return !cardId || key.indexOf(prefix) === 0;
+    });
+  }
+
+  function runJobsSequentially(jobs, index){
+    index = index || 0;
+    if(index >= jobs.length) return Promise.resolve();
+    return jobs[index]().then(function(){
+      return runJobsSequentially(jobs, index + 1);
+    });
+  }
+
+  function saveShortPriceChanges(cardId){
+    var keys = dirtyEntriesForCard(cardId || null);
+    if(!keys.length){
+      showStatus(els.shortPriceStatus, "変更された価格はありません。", false);
+      return;
+    }
+
+    clearStatus(els.shortPriceStatus);
+    var jobs = [];
+    var nowIso = new Date().toISOString();
+
+    keys.forEach(function(key){
+      var parts = key.split("::");
+      var id = parts[0];
+      var field = parts[1];
+      var cfg = SHORT_PRICE_MAP[field];
+      var input = els.shortPriceList.querySelector(
+        'input[data-card-id="' + CSS.escape(id) + '"][data-price-field="' + CSS.escape(field) + '"]'
+      );
+      if(!cfg || !input) return;
+
+      var value = Number(input.value);
+      // 空欄は削除ではなく「変更しない」
+      if(!(value > 0)) return;
+
+      var sourceId = sourceIdByName(cfg.sourceName);
+      if(!sourceId){
+        jobs.push(function(){
+          return Promise.reject(new Error(cfg.sourceName + " の price_source が見つかりません。"));
+        });
+        return;
+      }
+
+      jobs.push(function(){
+        return ADMIN.adminRecordPrice({
+          cardId: id,
+          price: value,
+          observedAt: nowIso,
+          sourceId: sourceId,
+          priceType: cfg.priceType,
+          condition: "default"
+        });
+      });
+    });
+
+    if(!jobs.length){
+      showStatus(els.shortPriceStatus, "空欄だけの変更は保存しません。価格を1円以上で入力してください。", true);
+      return;
+    }
+
+    shortPriceLoading = true;
+    els.shortPriceSaveAll.disabled = true;
+    els.shortPriceReload.disabled = true;
+    showStatus(els.shortPriceStatus, jobs.length + "件の価格を保存中…", false);
+
+    runJobsSequentially(jobs).then(function(){
+      shortPriceLoading = false;
+      els.shortPriceReload.disabled = false;
+      showStatus(els.shortPriceStatus, jobs.length + "件の価格を保存しました。", false);
+      return loadShortPriceCards();
+    }).catch(function(err){
+      shortPriceLoading = false;
+      els.shortPriceReload.disabled = false;
+      els.shortPriceSaveAll.disabled = false;
+      showStatus(els.shortPriceStatus, "保存に失敗しました: " + friendlyError(err), true);
+    });
+  }
+
+  els.shortPriceReload.addEventListener("click", loadShortPriceCards);
+  els.shortPriceSaveAll.addEventListener("click", function(){ saveShortPriceChanges(null); });
+  els.shortPriceFilter.addEventListener("input", applyShortPriceFilter);
+  els.shortPriceActiveOnly.addEventListener("change", applyShortPriceFilter);
 
   // ---- 価格登録専用カード検索 ----
   function appendPriceCardResult(card){

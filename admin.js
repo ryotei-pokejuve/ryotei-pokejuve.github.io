@@ -223,6 +223,14 @@
     });
   }
 
+  // 管理者専用: ショート動画に載せたカード一覧＋現在価格
+  function adminListShortFeatureCards(){
+    return client().schema("api").rpc("admin_list_short_feature_cards", {}).then(function(res){
+      if(res.error) throw res.error;
+      return res.data || [];
+    });
+  }
+
   // 管理者専用: ショート掲載情報取得
   function adminGetShortFeature(cardId){
     return client().schema("api").rpc("admin_get_short_feature", {
@@ -295,6 +303,7 @@
     uploadPackImage: uploadPackImage,
     listPriceSources: listPriceSources,
     adminRecordPrice: adminRecordPrice,
+    adminListShortFeatureCards: adminListShortFeatureCards,
     adminGetShortFeature: adminGetShortFeature,
     adminSetShortFeature: adminSetShortFeature
   };
