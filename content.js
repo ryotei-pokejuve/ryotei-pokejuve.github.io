@@ -82,6 +82,74 @@
     return !isNaN(d) && (Date.now() - d) < 1000 * 60 * 60 * 24 * 7; // 7日以内
   }
 
+  // TOP用：アップロード一覧の先頭から、Shorts再生リストに含まれる動画を除外し、
+  // 最新の通常動画を1本返す。
+  function ytLatestNonShortVideo(){
+    return ytChannelInfo().then(function(info){
+      if(!info || !info.uploadsPlaylistId) return null;
+
+      return Promise.all([
+        ytPlaylistPage(info.uploadsPlaylistId, null, 20),
+        YOUTUBE_PLAYLIST_SHORTS
+          ? ytPlaylistPage(YOUTUBE_PLAYLIST_SHORTS, null, 50)
+          : Promise.resolve({ videos: [] })
+      ]).then(function(results){
+        var uploads = (results[0] && results[0].videos) || [];
+        var shorts = (results[1] && results[1].videos) || [];
+        var shortIds = Object.create(null);
+
+        shorts.forEach(function(v){
+          if(v && v.videoId) shortIds[v.videoId] = true;
+        });
+
+        for(var i = 0; i < uploads.length; i++){
+          var v = uploads[i];
+          if(v && v.videoId && !shortIds[v.videoId]) return v;
+        }
+        return null;
+      });
+    }).catch(function(){
+      return null;
+    });
+  }
+
+  function ytMountLatestVideo(){
+    var container = document.querySelector('#page-content .yt-latest-video');
+    if(!container) return;
+
+    ytLatestNonShortVideo().then(function(video){
+      if(!container.isConnected) return;
+
+      if(!video || !video.videoId){
+        container.textContent = "最新動画を取得できませんでした。";
+        return;
+      }
+
+      container.innerHTML = "";
+
+      var wrap = document.createElement("div");
+      wrap.className = "yt-embed-wrap";
+
+      var iframe = document.createElement("iframe");
+      iframe.src = "https://www.youtube.com/embed/" + encodeURIComponent(video.videoId);
+      iframe.title = video.title || "YouTube latest video";
+      iframe.referrerPolicy = "strict-origin-when-cross-origin";
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      iframe.allowFullscreen = true;
+      iframe.loading = "lazy";
+
+      wrap.appendChild(iframe);
+      container.appendChild(wrap);
+
+      if(video.title){
+        var title = document.createElement("p");
+        title.className = "flavor";
+        title.textContent = video.title;
+        container.appendChild(title);
+      }
+    });
+  }
+
   // XSS対策: YouTube APIから取得した動画タイトル・サムネイルURLは外部データ扱いとし、
   // HTML文字列への結合は行わずDOM APIで組み立てる（動画タイトルはtextContent、
   // サムネイルURLはhttps確認のうえimg.srcへプロパティ代入）。
@@ -201,12 +269,13 @@
             '<tr><td>ステータス</td><td>こうかい中</td></tr>' +
             '<tr><td>テーマ</td><td>ポケカ開封・引退品・趣味</td></tr>' +
           '</table>' +
-          '<p class="flavor">注目の動画</p>' +
-          (YOUTUBE_FEATURED_VIDEO_ID
-            ? '<div class="yt-embed-wrap"><iframe src="https://www.youtube.com/embed/' + YOUTUBE_FEATURED_VIDEO_ID + '" title="YouTube video" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>'
-            : '') +
+          '<p class="flavor">最新動画</p>' +
+          '<div class="yt-latest-video">よみこみちゅう……</div>' +
           '<a class="contact-btn yt-btn" href="' + YOUTUBE_CHANNEL_URL + '" target="_blank" rel="noopener noreferrer">▶ YouTubeチャンネルを見る</a>'
         );
+      },
+      onMount: function(){
+        ytMountLatestVideo();
       }
     },
     profile: {
