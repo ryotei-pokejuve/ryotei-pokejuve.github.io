@@ -20,6 +20,25 @@
       to { clip-path: circle(0 at 50% 50%); opacity: 0; }
     }
     @media (prefers-reduced-motion: reduce) { #warp-entry-overlay.is-active { animation: none; } }
+
+    .mode-link-coming-soon{
+      cursor:not-allowed;
+      opacity:.58;
+      pointer-events:none;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .coming-soon-label{
+      display:inline-block;
+      margin-left:6px;
+      font-size:.72em;
+      letter-spacing:.04em;
+    }
+    .history-list{
+      margin:12px 0 0;
+      padding-left:1.25rem;
+    }
+    .history-list li{ margin:7px 0; }
   </style>
   <script>(function(){try{var saved=localStorage.getItem('ryotei-2d-theme');if(saved==='light'||saved==='dark'){document.documentElement.dataset.theme=saved;return;}var legacy=localStorage.getItem('ryotei-theme');if(legacy==='dark'||legacy==='gba'){document.documentElement.dataset.theme=legacy==='gba'?'light':'dark';return;}}catch(error){}var light=typeof matchMedia==='function'&&matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.dataset.theme=light?'light':'dark';}());</script>
 </head>
@@ -41,7 +60,7 @@
         <div class="hud-readout"><dt>CURSOR</dt><dd id="status-position">01/00</dd></div>
         <div class="hud-readout hud-theme"><dt>THEME</dt><dd id="status-theme">DARK</dd></div>
       </dl>
-      <div class="status-actions"><span class="mode-chip" aria-label="現在の表示モード">2D</span><button id="sound-toggle" type="button" aria-label="サウンドを切り替える" aria-pressed="false">SOUND: <span>OFF</span></button><button id="theme-toggle" type="button" aria-label="配色テーマを切り替える" aria-pressed="false">THEME: <span>DARK</span></button><a class="mode-link" id="lain-toggle" href="lain.html">LAIN MODE</a></div>
+      <div class="status-actions"><span class="mode-chip" aria-label="現在の表示モード">2D</span><button id="sound-toggle" type="button" aria-label="サウンドを切り替える" aria-pressed="false">SOUND: <span>OFF</span></button><button id="theme-toggle" type="button" aria-label="配色テーマを切り替える" aria-pressed="false">THEME: <span>DARK</span></button><a class="mode-link mode-link-coming-soon" id="lain-toggle" aria-disabled="true" tabindex="-1">3D MODE <span class="coming-soon-label">COMING SOON</span></a></div>
     </header>
     <section id="main-content" class="main-window win2" aria-label="メニューとコンテンツ">
       <nav class="menu-pane" aria-labelledby="menu-heading"><div class="pane-heading"><h2 id="menu-heading">MENU</h2><span id="item-count" aria-hidden="true"></span></div><div id="menu-list" class="menu-list" role="listbox" aria-label="サイトメニュー" tabindex="0"></div></nav>
@@ -52,5 +71,125 @@
     <footer class="site-footer"><a href="about.html">このサイトについて</a><a href="privacy.html">プライバシー</a><a href="terms.html">免責事項</a><a href="contact.html">お問い合わせ</a><span>©2026 りょてい</span></footer>
   </main>
   <script src="content.js"></script><script src="assets/js/preview-2d-state.js"></script><script src="assets/js/preview-2d.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  function makeLink(href, text){
+    var a = document.createElement("a");
+    a.className = "open-link";
+    a.href = href;
+    a.textContent = text;
+    return a;
+  }
+
+  function renderHistory(){
+    var title = document.getElementById("detail-title");
+    var content = document.getElementById("detail-content");
+    var message = document.getElementById("message-text");
+    if(!title || !content || title.textContent.trim() !== "HISTORY") return;
+    if(content.dataset.historyTimeline === "1") return;
+
+    content.dataset.historyTimeline = "1";
+    content.innerHTML = "";
+
+    var intro = document.createElement("p");
+    intro.textContent = "これまでの活動や、このサイトで作ってきたものをざっくりまとめています。";
+    content.appendChild(intro);
+
+    var list = document.createElement("ul");
+    list.className = "history-list";
+
+    [
+      "ポケモンカードの開封・引退品を中心にYouTubeで動画投稿を開始。",
+      "サイトを作り、投稿動画・Shorts・ライブ配信などをまとめて見られるようにしました。",
+      "ポケモンカードのデータベースを整備し、カード名・シリーズ・パックから探せるカード図鑑を追加。",
+      "カード画像や収録情報、レアリティなどのデータを少しずつ補完・整理。",
+      "ショート動画で紹介したカードをまとめ、カードラッシュ・晴れる屋2・メルカリの参考価格を掲載するPRICEページを追加。",
+      "管理画面からショート掲載カードや価格を編集できる仕組みを追加。",
+      "サイト全体をゲーム端末風の2D MODEへリニューアル。",
+      "今後は3D MODEなど、新しい表示や機能も追加予定。"
+    ].forEach(function(text){
+      var li = document.createElement("li");
+      li.textContent = text;
+      list.appendChild(li);
+    });
+
+    content.appendChild(list);
+
+    if(message){
+      message.textContent = "HISTORY：これまでの活動とサイトの進化をまとめています。";
+    }
+  }
+
+  function renderCustomPanels(){
+    renderCardMarketLinks();
+    renderHistory();
+  }
+
+  function renderCardMarketLinks(){
+    var title = document.getElementById("detail-title");
+    var content = document.getElementById("detail-content");
+    var message = document.getElementById("message-text");
+    if(!title || !content || title.textContent.trim() !== "CARD MARKET") return;
+    if(content.dataset.cardMarketLinks === "1") return;
+
+    content.dataset.cardMarketLinks = "1";
+    content.innerHTML = "";
+
+    var box = document.createElement("div");
+    box.className = "external-card";
+
+    var cardText = document.createElement("p");
+    cardText.textContent = "ポケモンカードを一覧で見れます。";
+    box.appendChild(cardText);
+    box.appendChild(makeLink("search.html", "カード一覧を見る"));
+
+    var shortsText = document.createElement("p");
+    shortsText.style.marginTop = "18px";
+    shortsText.textContent = "ショート動画で載せたカードの価格を載せています。";
+    box.appendChild(shortsText);
+    box.appendChild(makeLink("price.html", "ショート価格を見る"));
+
+    content.appendChild(box);
+
+    if(message){
+      message.textContent = "CARD MARKET：ポケモンカードを一覧で見れます。ショート動画で載せたカードの価格を載せています。";
+    }
+  }
+
+  var title = document.getElementById("detail-title");
+  var content = document.getElementById("detail-content");
+  if(!title || !content) return;
+
+  var observer = new MutationObserver(function(){
+    setTimeout(renderCustomPanels, 0);
+  });
+  observer.observe(title, {childList:true, characterData:true, subtree:true});
+  observer.observe(content, {childList:true, subtree:true});
+
+  document.addEventListener("focusin", function(){
+    setTimeout(renderCustomPanels, 0);
+  });
+  document.addEventListener("click", function(){
+    setTimeout(renderCustomPanels, 0);
+  });
+
+  setTimeout(renderCustomPanels, 0);
+}());
+</script>
+
+
+<script>
+(function(){
+  var mode3d = document.getElementById("lain-toggle");
+  if(!mode3d) return;
+  mode3d.removeAttribute("href");
+  mode3d.setAttribute("aria-disabled","true");
+  mode3d.setAttribute("tabindex","-1");
+  mode3d.addEventListener("click", function(e){ e.preventDefault(); e.stopImmediatePropagation(); }, true);
+}());
+</script>
+
 </body>
 </html>

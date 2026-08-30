@@ -18,7 +18,7 @@ a{color:var(--blue)} .back{display:inline-block;margin-bottom:12px;text-decorati
 h1{font-family:'Press Start 2P','DotGothic16',sans-serif;font-size:20px;margin:4px 0 12px}
 .intro{margin:0 0 14px;color:var(--sub)}
 .filters{border:3px solid var(--line);background:#fffaf0;padding:12px;margin-bottom:16px}
-.filter-grid{display:grid;grid-template-columns:2fr 1.3fr 1fr 1.3fr;gap:8px}
+.filter-grid{display:grid;grid-template-columns:2fr 1.2fr 1.3fr 1fr 1.3fr;gap:8px}
 .filter-grid input,.filter-grid select{width:100%;min-height:42px;border:2px solid var(--line);background:#fff;padding:7px 9px;font:inherit;color:var(--ink)}
 .filter-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:9px}
 .btn{min-height:40px;border:2px solid #28305d;background:var(--blue);color:#fff;padding:7px 14px;font:inherit;cursor:pointer}
@@ -54,11 +54,12 @@ h1{font-family:'Press Start 2P','DotGothic16',sans-serif;font-size:20px;margin:4
 <main class="page">
 <a class="back" href="index.html">← トップへもどる</a>
 <h1>SHORTS PRICE</h1>
-<p class="intro">ショート動画で紹介したカードの参考価格まとめです。登録されている価格だけ表示します。</p>
+<p class="intro">ショート動画で載せたカードの価格を載せています。</p>
 
 <section class="filters" aria-label="検索と絞り込み">
   <div class="filter-grid">
     <input id="q" type="search" placeholder="カード名・番号・パック名">
+    <select id="series"><option value="">シリーズ：すべて</option></select>
     <select id="set"><option value="">パック：すべて</option></select>
     <select id="rarity">
       <option value="">レアリティ：すべて</option>
@@ -100,7 +101,7 @@ h1{font-family:'Press Start 2P','DotGothic16',sans-serif;font-size:20px;margin:4
 var PAGE=20,offset=0,total=0,loading=false;
 var grid=document.getElementById("grid"),status=document.getElementById("status"),summary=document.getElementById("summary");
 var count=document.getElementById("count"),moreWrap=document.getElementById("more-wrap"),more=document.getElementById("more");
-var q=document.getElementById("q"),setSel=document.getElementById("set"),rarity=document.getElementById("rarity"),sort=document.getElementById("sort");
+var q=document.getElementById("q"),seriesSel=document.getElementById("series"),setSel=document.getElementById("set"),rarity=document.getElementById("rarity"),sort=document.getElementById("sort");
 var apply=document.getElementById("apply"),clear=document.getElementById("clear");
 var DEFAULT_SORT="newest";
 var SORT_VALUES=["newest","name_asc","name_desc","price_desc","price_asc","release_desc","release_asc"];
@@ -154,7 +155,7 @@ function cardEl(card){
   return el;
 }
 function opts(){
-  return {query:q.value.trim(),setId:setSel.value||null,rarity:rarity.value||null,sort:sort.value||"newest",limit:PAGE,offset:offset};
+  return {query:q.value.trim(),seriesName:seriesSel.value||null,setId:setSel.value||null,rarity:rarity.value||null,sort:sort.value||"newest",limit:PAGE,offset:offset};
 }
 function load(append){
   if(loading)return;
@@ -187,6 +188,11 @@ MARKET.listCardSets().then(function(sets){
   Object.keys(groups).sort(function(a,b){
     return (order[a]-order[b]) || a.localeCompare(b,"ja");
   }).forEach(function(series){
+    var sopt=document.createElement("option");
+    sopt.value=series;
+    sopt.textContent=series;
+    seriesSel.appendChild(sopt);
+
     var rows=groups[series];
     rows.sort(function(a,b){
       return String(a.code||"").localeCompare(String(b.code||""),"ja",{numeric:true}) ||
@@ -204,9 +210,11 @@ MARKET.listCardSets().then(function(sets){
   });
 }).catch(function(err){console.error(err)});
 
+seriesSel.addEventListener("change",function(){if(seriesSel.value)setSel.value="";});
+setSel.addEventListener("change",function(){if(setSel.value)seriesSel.value="";});
 apply.addEventListener("click",reload);
 q.addEventListener("keydown",function(e){if(e.key==="Enter")reload()});
-clear.addEventListener("click",function(){q.value="";setSel.value="";rarity.value="";sort.value=DEFAULT_SORT;});
+clear.addEventListener("click",function(){q.value="";seriesSel.value="";setSel.value="";rarity.value="";sort.value=DEFAULT_SORT;});
 more.addEventListener("click",function(){load(true)});
 
 // 管理画面で保存した初期並び順を取得してから最初の一覧を表示する。

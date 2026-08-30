@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>カード図鑑 - りょていのサイト</title>
-<meta name="description" content="ポケモンカードの検索・相場チェック。">
+<meta name="description" content="ポケモンカードをカード名やパックから一覧で探せます。">
 <meta name="robots" content="noindex, follow">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https://idnhamxtwxfcxflenxko.supabase.co;">
 
@@ -53,26 +53,21 @@
     padding: 10px 0 8px;
     background: linear-gradient(160deg, var(--bg-outer-1), var(--bg-outer-2));
   }
-  #search-area-toggle{
-    display:block;
-    width:100%;
-    margin:0 0 8px;
-    padding:8px 10px;
-    font-family:inherit;
-    font-size:12px;
-    color:#fff;
-    background:rgba(255,255,255,.14);
-    border:2px solid rgba(255,255,255,.55);
-    text-align:left;
-  }
-  #search-area{ display:block; }
-  #top-bar.search-collapsed #search-area{ display:none; }
-  #top-bar.search-collapsed{ padding-bottom:4px; }
   #top-bar .back-link{
     display:inline-block; margin-bottom:8px;
     font-size: 12px; color:#fff; text-decoration:none;
     text-shadow: 2px 2px 0 var(--window-border-outer);
   }
+  .top-nav-links{
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    margin-bottom:8px;
+  }
+  .top-nav-links .back-link{ margin-bottom:0; }
+  .price-link{
+    display:inline-block; font-size:12px; color:#fff; text-decoration:none;
+    text-shadow:2px 2px 0 var(--window-border-outer);
+  }
+  .top-nav-links a:hover{ text-decoration:underline; }
   #brand{
     font-family: var(--font-pixel-en);
     font-size: 13px; color:#fff;
@@ -83,20 +78,19 @@
   #search-form{ display:flex; gap:6px; flex-wrap:wrap; align-items:flex-end; }
   .search-control{ display:flex; flex-direction:column; gap:4px; min-width:150px; }
   .search-control > span{ font-size:11px; color:var(--text-sub); }
-  #search-mode, #series-select, #pack-select{
+  #search-mode, #pack-select{
     padding:10px; font-family:inherit; font-size:13px;
     border:3px solid var(--window-border-outer);
     box-shadow:inset 0 0 0 2px var(--window-border-inner);
     background:var(--window-bg); color:var(--text-color);
   }
-  #series-select{ min-width:180px; }
   #pack-select{ min-width:220px; }
   #name-search-wrap{ flex:0 1 300px; }
   #pack-search-wrap{ display:none; gap:6px; flex-wrap:wrap; flex:1 1 420px; }
   #pack-search-wrap.open{ display:flex; }
   #name-search-wrap.hidden{ display:none; }
   @media(max-width:680px){
-    .search-control, #series-select, #pack-select{ width:100%; min-width:0; }
+    .search-control, #pack-select{ width:100%; min-width:0; }
     #pack-search-wrap{ width:100%; }
   }
   #search-input{
@@ -230,16 +224,18 @@
 
 <div id="page-wrap">
   <div id="top-bar">
-    <a class="back-link" href="index.html">← トップへもどる</a>
+    <div class="top-nav-links">
+      <a class="back-link" href="index.html">← トップへもどる</a>
+      <a class="price-link" href="price.html">PRICE →</a>
+    </div>
     <h1 id="brand">🎴 CARD SEARCH</h1>
-    <button id="search-area-toggle" type="button" aria-expanded="true">検索・絞り込みをしまう ▲</button>
 
-    <div id="search-area">
     <form id="search-form">
       <label class="search-control">
         <span>検索方法</span>
         <select id="search-mode">
           <option value="card">カード名で検索</option>
+          <option value="series">シリーズから検索</option>
           <option value="pack">パックから検索</option>
         </select>
       </label>
@@ -249,14 +245,17 @@
         <input id="search-input" type="search" placeholder="例: ピカチュウ" autocomplete="off">
       </label>
 
-      <div id="pack-search-wrap">
+      <div id="series-search-wrap">
         <label class="search-control">
           <span>シリーズ</span>
           <select id="series-select"><option value="">シリーズを選択</option></select>
         </label>
+      </div>
+
+      <div id="pack-search-wrap">
         <label class="search-control">
           <span>パック名</span>
-          <select id="pack-select" disabled><option value="">パック指定なし（シリーズ全体）</option></select>
+          <select id="pack-select"><option value="">パックを選択</option></select>
         </label>
       </div>
       
@@ -272,7 +271,6 @@
         <span>並び順</span>
         <select id="sort-order">
           <option value="default">標準</option>
-          <option value="release_desc">最新版（パック発売日が新しい順）</option>
           <option value="name_asc">五十音順 あ→ん</option>
           <option value="name_desc">五十音順 ん→あ</option>
           <option value="number_asc">カード番号 小→大</option>
@@ -313,7 +311,6 @@
       </select>
     </div>
     <div id="status-line"></div>
-    </div>
   </div>
 
   <div id="results" aria-live="polite"></div>
@@ -337,11 +334,10 @@
 (function(){
   "use strict";
 
-    var savedSearchState = MARKET.loadSearchState();
-  var state = savedSearchState || { query: "", rarity: "", setId: "", offset: 0, limit: 20, sort: "default", mode: "card", seriesName: "" };
+    var state = MARKET.loadSearchState() || { query: "", rarity: "", setId: "", offset: 0, limit: 20, sort: "default", mode: "card", seriesName: "" };
   state.limit = Number(state.limit) || 20;
   state.sort = state.sort || "default";
-  state.mode = state.mode === "pack" ? "pack" : "card";
+  state.mode = ["card","series","pack"].indexOf(state.mode) !== -1 ? state.mode : "card";
   state.seriesName = state.seriesName || "";
   var allCardSets = [];
   var isInitialLoad = true;
@@ -349,13 +345,12 @@
 
   var els = {
     form: document.getElementById("search-form"),
-    topBar: document.getElementById("top-bar"),
-    searchAreaToggle: document.getElementById("search-area-toggle"),
     input: document.getElementById("search-input"),
     mode: document.getElementById("search-mode"),
     nameSearchWrap: document.getElementById("name-search-wrap"),
-    packSearchWrap: document.getElementById("pack-search-wrap"),
+    seriesSearchWrap: document.getElementById("series-search-wrap"),
     series: document.getElementById("series-select"),
+    packSearchWrap: document.getElementById("pack-search-wrap"),
     pack: document.getElementById("pack-select"),
     filterToggle: document.getElementById("filter-toggle"),
     filterPanel: document.getElementById("filter-panel"),
@@ -425,48 +420,38 @@
     });
   }
 
-  function rebuildSeriesOptions(){
-    var seen = {};
-    els.series.innerHTML = '<option value="">シリーズを選択</option>';
-    allCardSets.forEach(function(set){
-      var name = String(set.series_name || getSetGroup(set) || "その他").trim() || "その他";
-      if(seen[name]) return;
-      seen[name] = true;
-      var opt = document.createElement("option");
-      opt.value = name;
-      opt.textContent = name;
-      els.series.appendChild(opt);
-    });
-  }
-
-  function rebuildPackOptions(seriesName, selectedId){
-    els.pack.innerHTML = "";
-    var first = document.createElement("option");
-    first.value = "";
-    first.textContent = seriesName ? "パックを選択" : "先にシリーズを選択";
-    els.pack.appendChild(first);
-    els.pack.disabled = !seriesName;
-    if(!seriesName) return;
-    allCardSets.filter(function(set){
-      return String(set.series_name || getSetGroup(set) || "その他").trim() === seriesName;
-    }).sort(function(a,b){
-      return setOptionLabel(a).localeCompare(setOptionLabel(b), "ja", {numeric:true});
-    }).forEach(function(set){
-      var opt = document.createElement("option");
-      opt.value = set.id;
-      opt.textContent = setOptionLabel(set);
-      els.pack.appendChild(opt);
-    });
+  function rebuildPackOptions(selectedId){
+    els.pack.innerHTML = '<option value="">パックを選択</option>';
+    appendGroupedSetOptions(els.pack, allCardSets);
+    els.pack.disabled = false;
     if(selectedId) els.pack.value = selectedId;
   }
 
+  function rebuildSeriesOptions(selectedName){
+    els.series.innerHTML = '<option value="">シリーズを選択</option>';
+    var map = {};
+    (allCardSets || []).forEach(function(s){
+      var name = String(s.series_name || getSetGroup(s) || "その他").trim() || "その他";
+      var order = Number(s.series_order == null ? 500 : s.series_order);
+      if(!map[name] || order < map[name].order) map[name] = {name:name, order:order};
+    });
+    Object.keys(map).map(function(k){ return map[k]; }).sort(function(a,b){
+      return (a.order-b.order) || a.name.localeCompare(b.name,"ja");
+    }).forEach(function(row){
+      var opt=document.createElement("option");
+      opt.value=row.name;
+      opt.textContent=row.name;
+      els.series.appendChild(opt);
+    });
+    if(selectedName) els.series.value = selectedName;
+  }
+
   function applySearchMode(){
-    var isPack = els.mode.value === "pack";
-    els.nameSearchWrap.classList.toggle("hidden", isPack);
-    els.packSearchWrap.classList.toggle("open", isPack);
-    if(isPack){
-      els.input.value = "";
-    }
+    var mode = els.mode.value || "card";
+    els.nameSearchWrap.classList.toggle("hidden", mode !== "card");
+    els.seriesSearchWrap.classList.toggle("open", mode === "series");
+    els.packSearchWrap.classList.toggle("open", mode === "pack");
+    if(mode !== "card") els.input.value = "";
   }
 
   els.input.value = state.query || "";
@@ -474,12 +459,6 @@
   els.rarity.value = state.rarity || "";
   els.pageSize.value = String(state.limit);
   els.sortOrder.value = state.sort;
-
-  els.searchAreaToggle.addEventListener("click", function(){
-    var collapsed = els.topBar.classList.toggle("search-collapsed");
-    els.searchAreaToggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
-    els.searchAreaToggle.textContent = collapsed ? "検索・絞り込みを表示 ▼" : "検索・絞り込みをしまう ▲";
-  });
 
   els.filterToggle.addEventListener("click", function(){
     var open = els.filterPanel.classList.toggle("open");
@@ -491,9 +470,8 @@
     allCardSets = sets || [];
     appendGroupedSetOptions(els.set, allCardSets);
     els.set.value = state.mode === "card" ? (state.setId || "") : "";
-    rebuildSeriesOptions();
-    els.series.value = state.seriesName || "";
-    rebuildPackOptions(els.series.value, state.mode === "pack" ? state.setId : "");
+    rebuildSeriesOptions(state.mode === "series" ? state.seriesName : "");
+    rebuildPackOptions(state.mode === "pack" ? state.setId : "");
     applySearchMode();
   }).catch(function(err){
     console.error(err);
@@ -501,22 +479,26 @@
   });
 
   els.mode.addEventListener("change", function(){
-    state.mode = els.mode.value === "pack" ? "pack" : "card";
+    state.mode = ["card","series","pack"].indexOf(els.mode.value) !== -1 ? els.mode.value : "card";
     state.offset = 0;
     if(state.mode === "card"){
       state.setId = els.set.value || "";
+      state.seriesName = "";
+    }else if(state.mode === "series"){
+      state.query = "";
+      state.setId = "";
+      state.seriesName = els.series.value || "";
     }else{
       state.query = "";
-      state.seriesName = els.series.value || "";
+      state.seriesName = "";
       state.setId = els.pack.value || "";
     }
     applySearchMode();
   });
 
+
   els.series.addEventListener("change", function(){
     state.seriesName = els.series.value || "";
-    state.setId = "";
-    rebuildPackOptions(state.seriesName, "");
   });
 
   els.pack.addEventListener("change", function(){
@@ -525,20 +507,25 @@
 
   els.form.addEventListener("submit", function(e){
     e.preventDefault();
-    state.mode = els.mode.value === "pack" ? "pack" : "card";
+    state.mode = ["card","series","pack"].indexOf(els.mode.value) !== -1 ? els.mode.value : "card";
     state.query = state.mode === "card" ? els.input.value.trim() : "";
     state.rarity = els.rarity.value;
+
     if(state.mode === "pack"){
-      state.seriesName = els.series.value || "";
       state.setId = els.pack.value || "";
+      state.seriesName = "";
+    }else if(state.mode === "series"){
+      state.setId = "";
+      state.seriesName = els.series.value || "";
       if(!state.seriesName){
         els.status.textContent = "シリーズを選択してください。";
         return;
       }
-      // パック未選択ならシリーズ全体、パック選択時はそのパックだけ検索する。
     }else{
       state.setId = els.set.value;
+      state.seriesName = "";
     }
+
     state.limit = Number(els.pageSize.value) || 20;
     state.sort = els.sortOrder.value || "default";
     state.offset = 0;
@@ -644,7 +631,7 @@
       query: state.query,
       rarity: state.rarity || null,
       setId: state.setId || null,
-      seriesName: (state.mode === "pack" && !state.setId) ? (state.seriesName || null) : null,
+      seriesName: state.mode === "series" ? (state.seriesName || null) : null,
       limit: state.limit,
       sort: state.sort,
       offset: state.offset
@@ -691,24 +678,7 @@
   }
 
   applySearchMode();
-
-  // 新しくSEARCHページを開いた時だけ、管理画面で設定したデフォルト並び順を適用する。
-  // カード詳細から戻った場合など、sessionStorageに検索状態がある時はユーザーの選択を優先する。
-  if(!savedSearchState){
-    MARKET.getSiteSetting("search_default_sort").then(function(value){
-      var allowed = ["default", "release_desc", "name_asc", "name_desc", "number_asc", "number_desc"];
-      if(allowed.indexOf(value) !== -1){
-        state.sort = value;
-        els.sortOrder.value = value;
-      }
-    }).catch(function(err){
-      console.error("SEARCHデフォルト並び順の取得に失敗しました", err);
-    }).finally(function(){
-      runSearch();
-    });
-  }else{
-    runSearch();
-  }
+  runSearch();
 })();
 </script>
 </body>
