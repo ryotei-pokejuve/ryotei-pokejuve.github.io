@@ -79,19 +79,19 @@
   #search-form{ display:flex; gap:6px; flex-wrap:wrap; align-items:flex-end; }
   .search-control{ display:flex; flex-direction:column; gap:4px; min-width:150px; }
   .search-control > span{ font-size:11px; color:var(--text-sub); }
-  #search-mode, #pack-select{
+  #search-mode, #series-select, #pack-select{
     padding:10px; font-family:inherit; font-size:13px;
     border:3px solid var(--window-border-outer);
     box-shadow:inset 0 0 0 2px var(--window-border-inner);
     background:var(--window-bg); color:var(--text-color);
   }
-  #pack-select{ min-width:220px; }
+  #series-select, #pack-select{ min-width:220px; }
   #name-search-wrap{ flex:0 1 300px; }
   #pack-search-wrap{ display:none; gap:6px; flex-wrap:wrap; flex:1 1 420px; }
   #pack-search-wrap.open{ display:flex; }
   #name-search-wrap.hidden{ display:none; }
   @media(max-width:680px){
-    .search-control, #pack-select{ width:100%; min-width:0; }
+    .search-control, #series-select, #pack-select{ width:100%; min-width:0; }
     #pack-search-wrap{ width:100%; }
   }
   #search-input{
@@ -272,7 +272,7 @@
       <div id="series-search-wrap">
         <label class="search-control">
           <span>シリーズ</span>
-          <select id="series-select"><option value="">シリーズを選択</option></select>
+          <select id="series-select"><option value="">全シリーズ</option></select>
         </label>
       </div>
 
@@ -470,7 +470,7 @@
   }
 
   function rebuildSeriesOptions(selectedName){
-    els.series.innerHTML = '<option value="">シリーズを選択</option>';
+    els.series.innerHTML = '<option value="">全シリーズ</option>';
     var map = {};
     (allCardSets || []).forEach(function(s){
       var name = String(s.series_name || getSetGroup(s) || "その他").trim() || "その他";
@@ -491,7 +491,7 @@
   function applySearchMode(){
     var mode = els.mode.value || "card";
     els.nameSearchWrap.classList.toggle("hidden", mode !== "card");
-    els.seriesSearchWrap.classList.toggle("open", mode === "series");
+    els.seriesSearchWrap.classList.toggle("open", mode === "card" || mode === "series");
     els.packSearchWrap.classList.toggle("open", mode === "pack");
     if(mode !== "card") els.input.value = "";
   }
@@ -540,7 +540,7 @@
     state.offset = 0;
     if(state.mode === "card"){
       state.setId = els.set.value || "";
-      state.seriesName = "";
+      state.seriesName = els.series.value || "";
     }else if(state.mode === "series"){
       state.query = "";
       state.setId = "";
@@ -574,13 +574,9 @@
     }else if(state.mode === "series"){
       state.setId = "";
       state.seriesName = els.series.value || "";
-      if(!state.seriesName){
-        els.status.textContent = "シリーズを選択してください。";
-        return;
-      }
     }else{
       state.setId = els.set.value;
-      state.seriesName = "";
+      state.seriesName = els.series.value || "";
     }
 
     state.limit = Number(els.pageSize.value) || 20;
@@ -688,7 +684,7 @@
       query: state.query,
       rarity: state.rarity || null,
       setId: state.setId || null,
-      seriesName: state.mode === "series" ? (state.seriesName || null) : null,
+      seriesName: state.mode === "pack" ? null : (state.seriesName || null),
       limit: state.limit,
       sort: state.sort,
       offset: state.offset
