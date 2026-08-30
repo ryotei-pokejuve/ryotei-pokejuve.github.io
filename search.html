@@ -224,6 +224,21 @@
   .publisher-guide h2{margin:0 0 8px;font-size:15px}
   .publisher-guide p{margin:5px 0;font-size:12px}
   .review-footer{margin:22px 0 4px;padding-top:12px;border-top:2px solid rgba(42,42,74,.45);display:flex;gap:12px;flex-wrap:wrap;font-size:11px}
+
+  #search-panel{display:block;}
+  #search-panel.closed{display:none;}
+  #search-panel-toggle{
+    margin:0 0 8px;
+    padding:7px 12px;
+    font-family:inherit;
+    font-size:11px;
+    color:#fff;
+    background:rgba(255,255,255,.10);
+    border:2px solid rgba(255,255,255,.65);
+    box-shadow:2px 2px 0 var(--shadow-color);
+    min-height:36px;
+  }
+  #search-panel-toggle:active{transform:translate(1px,1px);box-shadow:none;}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3405662051867998" crossorigin="anonymous"></script>
 </head>
@@ -236,6 +251,8 @@
       <a class="price-link" href="price.html">PRICE →</a>
     </div>
     <h1 id="brand">🎴 CARD SEARCH</h1>
+    <button id="search-panel-toggle" type="button" aria-expanded="true" aria-controls="search-panel">検索を閉じる ▲</button>
+    <div id="search-panel">
 
     <form id="search-form">
       <label class="search-control">
@@ -318,6 +335,7 @@
       </select>
     </div>
     <div id="status-line"></div>
+    </div>
   </div>
 
   
@@ -388,7 +406,9 @@
     next: document.getElementById("next-btn"),
     pageInfo: document.getElementById("page-info"),
     pageSize: document.getElementById("page-size"),
-    sortOrder: document.getElementById("sort-order")
+    sortOrder: document.getElementById("sort-order"),
+    searchPanel: document.getElementById("search-panel"),
+    searchPanelToggle: document.getElementById("search-panel-toggle")
   };
 
 
@@ -485,6 +505,21 @@
   els.filterToggle.addEventListener("click", function(){
     var open = els.filterPanel.classList.toggle("open");
     els.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+
+  function setSearchPanelOpen(open){
+    els.searchPanel.classList.toggle("closed", !open);
+    els.searchPanelToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    els.searchPanelToggle.textContent = open ? "検索を閉じる ▲" : "検索を開く ▼";
+    try{ sessionStorage.setItem("cardSearchPanelOpen", open ? "1" : "0"); }catch(_e){}
+  }
+
+  var savedPanelOpen = null;
+  try{ savedPanelOpen = sessionStorage.getItem("cardSearchPanelOpen"); }catch(_e){}
+  setSearchPanelOpen(savedPanelOpen !== "0");
+
+  els.searchPanelToggle.addEventListener("click", function(){
+    setSearchPanelOpen(els.searchPanel.classList.contains("closed"));
   });
 
   // パック一覧を読み込んで選択肢に追加（失敗しても検索自体は使えるようにする）
