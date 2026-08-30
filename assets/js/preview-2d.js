@@ -469,7 +469,7 @@
     var warpEntryRequested = getSessionValue(WARP_ENTRY_KEY) === '1';
     var pushStartConsumed = getSessionValue(PUSH_START_KEY) === '1';
     var shouldPlayWarpEntry = isProductionTop && warpEntryRequested;
-    var shouldShowPushStart = isProductionTop && !shouldPlayWarpEntry && !pushStartConsumed;
+    var shouldShowPushStart = false; // PUSH START gate retired
     activeInstance = { document: doc };
 
     if (!pages || !Array.isArray(order)) {

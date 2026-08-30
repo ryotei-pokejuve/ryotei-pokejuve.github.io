@@ -106,6 +106,16 @@
     });
   }
 
+  // 公開設定の取得（PRICE/SEARCHのデフォルト設定に使用）
+  function getSiteSetting(key){
+    return client().schema("api").rpc("get_site_setting", {
+      p_key: key
+    }).then(function(res){
+      if(res.error) throw res.error;
+      return res.data == null ? null : String(res.data);
+    });
+  }
+
   // パック（card_sets）一覧（api.list_card_sets）。絞り込みUIの選択肢に使う
   function listCardSets(){
     return client().schema("api").rpc("list_card_sets_v3", {}).then(function(res){
@@ -171,6 +181,7 @@
     getPriceHistory: getPriceHistory,
     getCardMarketPrices: getCardMarketPrices,
     listShortPriceCards: listShortPriceCards,
+    getSiteSetting: getSiteSetting,
     listCardSets: listCardSets,
     listCardSeries: listCardSeries,
     sanitizeImageUrl: sanitizeImageUrl,
