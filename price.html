@@ -50,6 +50,11 @@ h1{font-family:'Press Start 2P','DotGothic16',sans-serif;font-size:20px;margin:4
   .page{width:100%;border-width:0;padding:12px}.short-grid{grid-template-columns:1fr}
   .filter-grid{grid-template-columns:1fr}.filter-actions{justify-content:stretch}.filter-actions .btn{flex:1}
 }
+
+.publisher-guide{margin:0 0 16px;padding:12px 14px;border:3px solid var(--line);background:#fffaf0;line-height:1.75}
+.publisher-guide h2{margin:0 0 8px;font-size:15px}
+.publisher-guide p{margin:5px 0;color:var(--sub);font-size:12px}
+.review-footer{margin:24px 0 4px;padding-top:12px;border-top:2px solid rgba(52,69,122,.45);display:flex;gap:12px;flex-wrap:wrap;font-size:11px}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3405662051867998" crossorigin="anonymous"></script>
 </head>
@@ -57,7 +62,12 @@ h1{font-family:'Press Start 2P','DotGothic16',sans-serif;font-size:20px;margin:4
 <main class="page">
 <a class="back" href="index.html">← トップへもどる</a>
 <h1>SHORTS PRICE</h1>
-<p class="intro">ショート動画で載せたカードの価格を載せています。</p>
+<p class="intro">ショート動画で紹介したカードを中心に、管理者が確認して登録した参考価格をまとめています。</p>
+<section class="publisher-guide" aria-labelledby="price-guide-title">
+  <h2 id="price-guide-title">価格情報について</h2>
+  <p>カードラッシュ・晴れる屋2・メルカリなどで確認した情報を参考に、カードごとの価格を手動で登録しています。リアルタイム価格ではなく、カードの状態・店舗・時期によって実際の販売価格や買取価格は変わります。</p>
+  <p>シリーズ・収録パック・レアリティから絞り込めます。同名カードでも収録先やカード番号が異なる場合は、それぞれ別カードとして扱っています。</p>
+</section>
 
 <section class="filters" aria-label="検索と絞り込み">
   <div class="filter-grid">
@@ -94,6 +104,13 @@ h1{font-family:'Press Start 2P','DotGothic16',sans-serif;font-size:20px;margin:4
 <div id="grid" class="short-grid"></div>
 <div id="count" class="count"></div>
 <div id="more-wrap" class="more-wrap" style="display:none"><button id="more" class="more" type="button">もっと見る</button></div>
+
+<footer class="review-footer">
+  <a href="about.html">このサイトについて</a>
+  <a href="privacy.html">プライバシー</a>
+  <a href="terms.html">免責事項</a>
+  <a href="contact.html">お問い合わせ</a>
+</footer>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3/dist/umd/supabase.js" integrity="sha256-7ABBdtEBrsd67vJmqhyUQRKH/iA5xl6l9scvXhSzhH0=" crossorigin="anonymous"></script>

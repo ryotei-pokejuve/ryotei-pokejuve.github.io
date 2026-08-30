@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>カード図鑑 - りょていのサイト</title>
 <meta name="description" content="ポケモンカードをカード名やパックから一覧で探せます。">
-<meta name="robots" content="noindex, follow">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://*.googlesyndication.com https://tpc.googlesyndication.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https://*.google.com https://*.adtrafficquality.google https://idnhamxtwxfcxflenxko.supabase.co https://pagead2.googlesyndication.com https://*.googlesyndication.com https://googleads.g.doubleclick.net https://*.doubleclick.net; frame-src https://googleads.g.doubleclick.net https://*.doubleclick.net https://tpc.googlesyndication.com https://www.google.com;">
 
 <link rel="icon" type="image/jpg" href="ryotei.jpg">
@@ -220,6 +219,11 @@
   @media (prefers-reduced-motion: reduce){
     *{ animation: none !important; transition: none !important; }
   }
+
+  .publisher-guide{margin:14px 0;padding:12px 14px;border:3px solid var(--window-border-outer);box-shadow:inset 0 0 0 2px var(--window-border-inner);background:var(--window-bg);line-height:1.75}
+  .publisher-guide h2{margin:0 0 8px;font-size:15px}
+  .publisher-guide p{margin:5px 0;font-size:12px}
+  .review-footer{margin:22px 0 4px;padding-top:12px;border-top:2px solid rgba(42,42,74,.45);display:flex;gap:12px;flex-wrap:wrap;font-size:11px}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3405662051867998" crossorigin="anonymous"></script>
 </head>
@@ -316,7 +320,14 @@
     <div id="status-line"></div>
   </div>
 
-  <div id="results" aria-live="polite"></div>
+  
+<section id="publisher-guide" class="publisher-guide" aria-labelledby="publisher-guide-title">
+  <h2 id="publisher-guide-title">カード図鑑について</h2>
+  <p>当サイトで整理・確認したポケモンカードのデータを、カード名・シリーズ・収録パック・レアリティから探せるカード図鑑です。ページを開いた時点ではカード一覧を表示し、条件を指定すると該当カードへ絞り込めます。</p>
+  <p>同じカード名でも、収録パックやカード番号が異なる再録カードは別カードとして掲載しています。画像・カード番号・レアリティ・収録情報は、確認しながらデータベースを更新しています。</p>
+</section>
+
+<div id="results" aria-live="polite"></div>
 
   <div id="empty-state">該当するカードが見つかりませんでした。検索語を変えてお試しください。</div>
   <div id="error-state">
@@ -330,6 +341,14 @@
     <button id="next-btn" type="button">つぎ ▶</button>
   </div>
 </div>
+
+
+<footer class="review-footer">
+  <a href="about.html">このサイトについて</a>
+  <a href="privacy.html">プライバシー</a>
+  <a href="terms.html">免責事項</a>
+  <a href="contact.html">お問い合わせ</a>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3/dist/umd/supabase.js" integrity="sha256-7ABBdtEBrsd67vJmqhyUQRKH/iA5xl6l9scvXhSzhH0=" crossorigin="anonymous"></script>
 <script src="market.js"></script>
