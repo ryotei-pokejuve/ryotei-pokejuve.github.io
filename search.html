@@ -462,9 +462,15 @@
     });
   }
 
-  function rebuildPackOptions(selectedId){
+  function rebuildPackOptions(seriesName, selectedId){
     els.pack.innerHTML = '<option value="">パックを選択</option>';
-    appendGroupedSetOptions(els.pack, allCardSets);
+    var targetSeries = String(seriesName || "").trim();
+    var rows = (allCardSets || []).filter(function(s){
+      if(!targetSeries) return true; // 全シリーズなら全パック
+      var group = String(s.series_name || getSetGroup(s) || "その他").trim() || "その他";
+      return group === targetSeries;
+    });
+    appendGroupedSetOptions(els.pack, rows);
     els.pack.disabled = false;
     if(selectedId) els.pack.value = selectedId;
   }
@@ -527,8 +533,8 @@
     allCardSets = sets || [];
     appendGroupedSetOptions(els.set, allCardSets);
     els.set.value = state.mode === "card" ? (state.setId || "") : "";
-    rebuildSeriesOptions(state.mode === "series" ? state.seriesName : "");
-    rebuildPackOptions(state.mode === "pack" ? state.setId : "");
+    rebuildSeriesOptions(state.seriesName || "");
+    rebuildPackOptions(state.seriesName || "", state.mode === "pack" ? state.setId : "");
     applySearchMode();
   }).catch(function(err){
     console.error(err);
@@ -547,8 +553,9 @@
       state.seriesName = els.series.value || "";
     }else{
       state.query = "";
-      state.seriesName = "";
-      state.setId = els.pack.value || "";
+      state.seriesName = els.series.value || "";
+      state.setId = "";
+      rebuildPackOptions(state.seriesName, "");
     }
     applySearchMode();
   });
@@ -556,6 +563,10 @@
 
   els.series.addEventListener("change", function(){
     state.seriesName = els.series.value || "";
+    if((els.mode.value || "card") === "pack"){
+      state.setId = "";
+      rebuildPackOptions(state.seriesName, "");
+    }
   });
 
   els.pack.addEventListener("change", function(){
@@ -569,8 +580,12 @@
     state.rarity = els.rarity.value;
 
     if(state.mode === "pack"){
+      state.seriesName = els.series.value || "";
       state.setId = els.pack.value || "";
-      state.seriesName = "";
+      if(!state.setId){
+        els.status.textContent = "パックを選択してください。";
+        return;
+      }
     }else if(state.mode === "series"){
       state.setId = "";
       state.seriesName = els.series.value || "";
