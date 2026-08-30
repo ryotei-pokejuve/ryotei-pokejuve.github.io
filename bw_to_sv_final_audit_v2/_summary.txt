@@ -1,0 +1,37 @@
+BW-SV FINAL AUDIT V2
+
+rule_mapped_sets: 131
+target_db_cards: 12412
+scrydex_sets_fetched: 131
+scrydex_set_errors: 0
+missing_cards_in_db: 351
+db_cards_not_found_in_scrydex: 236
+explicit_rarity_rows_checked: 10334
+rarity_mismatches: 0
+suspicious_names: 0
+non_numeric_card_numbers: 1
+duplicate_numeric_number_rows: 0
+
+[image sources]
+POKEMON_CARD_COM: 1
+SCRYDEX: 12411
+
+[missing cards by series]
+SMシリーズ: 3
+SVシリーズ: 42
+XYシリーズ: 303
+ソード・シールド: 3
+
+[DB cards not found in Scrydex by series]
+SMシリーズ: 7
+SVシリーズ: 110
+ソード・シールド: 119
+
+[rarity mismatches by series]
+
+IMPORTANT:
+- Python does not update Supabase.
+- Uses scrydex_url from RULE mapping; no expansion URL guessing.
+- Scrydex API is not used.
+- If scrydex_set_errors is not 0, do not interpret zero counts as clean.
+- Review CSVs before any DB correction.

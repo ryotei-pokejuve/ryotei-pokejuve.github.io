@@ -1,0 +1,21 @@
+XY6 / XY7 JAPANESE NAME RESTORE AUDIT
+
+target_rows: 159
+resolved: 0
+unresolved: 159
+learned_existing_pairs: 0
+scrydex_set_fetch_errors: 0
+
+[resolution methods]
+NO_LEARNED_NAME: 159
+
+[by set]
+XY6: total=78, resolved=0, unresolved=78
+XY7: total=81, resolved=0, unresolved=81
+
+IMPORTANT:
+- READ ONLY. No Supabase writes.
+- Scrydex API is NOT used.
+- Only RULE mappings are scanned.
+- Conflicting or unknown names are NOT guessed.
+- Review unresolved.csv before creating INSERT SQL.

@@ -1,0 +1,16 @@
+XY6 / XY7 JAPANESE NAME RESCUE V3
+
+target_rows: 75
+resolved_v3: 75
+still_unresolved_v3: 0
+fetch_errors: 0
+
+[methods]
+HEADING_AFTER_H1: 75
+
+[by set]
+XY6: total=34, resolved=34, unresolved=0
+XY7: total=41, resolved=41, unresolved=0
+
+READ ONLY / no Supabase writes / no Scrydex API
+Japanese names are taken from Scrydex public card detail pages.

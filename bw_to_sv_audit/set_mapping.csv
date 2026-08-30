@@ -1,0 +1,243 @@
+﻿set_id,series_name,db_code,db_name,scrydex_id,scrydex_url,candidate_ids,status
+ee238a8d-c6b6-447c-a8dd-8a77eb478576,ソード・シールド,SLL,スターターデッキセット ルカリオVSTAR,,,,UNRESOLVED_SET
+5a12a468-c360-42f8-af2f-db5052c26a48,ソード・シールド,SLD,スターターデッキセット ダークライVSTAR,,,,UNRESOLVED_SET
+68a3a158-761d-4ef2-8e9c-27b04693d68c,ソード・シールド,SN,スタートデッキ コロコロコミックver,,,,UNRESOLVED_SET
+da7d6402-877d-45f6-a928-af39c2fb9ecc,ソード・シールド,SP6,VSTARスペシャルセット,,,,UNRESOLVED_SET
+9d85b87f-9b69-40c1-8bb5-f19894c8bca6,ソード・シールド,SPD,VSTAR&VMAX ハイクラスデッキ デオキシス,,,,UNRESOLVED_SET
+f50726a7-f438-4c7a-b857-f2675d2604a7,ソード・シールド,SPZ,VSTAR&VMAX ハイクラスデッキ ゼラオラ,,,,UNRESOLVED_SET
+54450e62-c2ee-4136-b175-6191e3a2acfc,ソード・シールド,S10a,ダークファンタズマ,swsh10a_ja,https://scrydex.com/pokemon/expansions/dark-phantasma/swsh10a_ja,swsh10a_ja,MAPPED
+6e0a46c7-e469-4972-ba98-131cf67c7c94,ソード・シールド,S10P,スペースジャグラー,swsh10p_ja,https://scrydex.com/pokemon/expansions/space-juggler/swsh10p_ja,swsh10p_ja,MAPPED
+ca93c4b2-7d37-4881-9306-c30f64a19b88,ソード・シールド,S11,ロストアビス,swsh11_ja,https://scrydex.com/pokemon/expansions/lost-abyss/swsh11_ja,swsh11_ja,MAPPED
+012908fb-007c-486d-85ba-d2fcf10d833d,ソード・シールド,S11a,白熱のアルカナ,swsh11a_ja,https://scrydex.com/pokemon/expansions/incandescent-arcana/swsh11a_ja,swsh11a_ja,MAPPED
+248d92ee-d69e-493d-9d4b-0960134db32f,ソード・シールド,S12,パラダイムトリガー,swsh12_ja,https://scrydex.com/pokemon/expansions/paradigm-trigger/swsh12_ja,swsh12_ja,MAPPED
+8c1bc8f3-39e4-4b18-a239-4b6b22df60a8,ソード・シールド,S12a,VSTARユニバース,swsh12a_ja,https://scrydex.com/pokemon/expansions/vstar-universe/swsh12a_ja,swsh12a_ja,MAPPED
+8cce95a2-f537-4156-907d-f331ce13b5d6,ソード・シールド,S5I,一撃マスター,swsh5i_ja,https://scrydex.com/pokemon/expansions/single-strike-master/swsh5i_ja,swsh5i_ja,MAPPED
+ec2d763e-ea05-4f77-ade2-b439f60a2adb,ソード・シールド,S6H,白銀のランス,swsh6h_ja,https://scrydex.com/pokemon/expansions/silver-lance/swsh6h_ja,swsh6h_ja,MAPPED
+c56a482d-7434-4e00-bc54-16c38f187c4e,ソード・シールド,S6K,漆黒のガイスト,swsh6k_ja,https://scrydex.com/pokemon/expansions/jet-black-spirit/swsh6k_ja,swsh6k_ja,MAPPED
+b86a7ec9-e8f7-4f8c-b4e4-757e2f1d54f6,ソード・シールド,S7D,摩天パーフェクト,swsh7d_ja,https://scrydex.com/pokemon/expansions/skyscraping-perfection/swsh7d_ja,swsh7d_ja,MAPPED
+a945665e-c81a-4c03-924d-624a07458341,ソード・シールド,S8,フュージョンアーツ,swsh8_ja,https://scrydex.com/pokemon/expansions/fusion-arts/swsh8_ja,swsh8_ja,MAPPED
+80bdd6cc-3aa6-4299-b5b1-43a5f80af030,ソード・シールド,S8b,VMAXクライマックス,swsh8b_ja,https://scrydex.com/pokemon/expansions/vmax-climax/swsh8b_ja,swsh8b_ja,MAPPED
+012f4320-fb6b-4541-b502-a185ca139451,ソード・シールド,S9,スターバース,swsh9_ja,https://scrydex.com/pokemon/expansions/star-birth/swsh9_ja,swsh9_ja,MAPPED
+0380eb72-bbcd-401c-ba09-fec23007efa7,ソード・シールド,S9a,バトルリージョン,swsh9a_ja,https://scrydex.com/pokemon/expansions/battle-region/swsh9a_ja,swsh9a_ja,MAPPED
+94db240f-1949-4c1e-9b92-12425aa31573,SMシリーズ,SM10,ダブルブレイズ,sm10_ja,https://scrydex.com/pokemon/expansions/double-blaze/sm10_ja,sm10_ja,MAPPED
+4fc047cb-d0d5-4086-b6dd-8f0b1d5dad42,SMシリーズ,SM10a,ジージーエンド,sm10a_ja,https://scrydex.com/pokemon/expansions/gg-end/sm10a_ja,sm10a_ja,MAPPED
+03ce403b-f7de-460e-931e-27de38cd44ca,SMシリーズ,SM10b,スカイレジェンド,sm10b_ja,https://scrydex.com/pokemon/expansions/sky-legend/sm10b_ja,sm10b_ja,MAPPED
+14496d8f-d11f-4779-bc03-b5a0e25a8a4b,SMシリーズ,SM11,ミラクルツイン,sm11_ja,https://scrydex.com/pokemon/expansions/miracle-twin/sm11_ja,sm11_ja,MAPPED
+67f367c1-a48d-4f82-8b03-0cea6da851bb,SMシリーズ,SM11a,リミックスバウト,sm11a_ja,https://scrydex.com/pokemon/expansions/remix-bout/sm11a_ja,sm11a_ja,MAPPED
+bf3433b6-5f29-4156-a1b7-c67eb119b52f,SMシリーズ,SM11b,ドリームリーグ,sm11b_ja,https://scrydex.com/pokemon/expansions/dream-league/sm11b_ja,sm11b_ja,MAPPED
+4a261245-088f-4357-a2ff-6c7890e11543,SMシリーズ,SM12,オルタージェネシス,sm12_ja,https://scrydex.com/pokemon/expansions/alter-genesis/sm12_ja,sm12_ja,MAPPED
+30503cd2-8ced-45f5-9b2f-acd3ee55c09a,SMシリーズ,SM12a,TAG TEAM GX タッグオールスターズ,sm12a_ja,https://scrydex.com/pokemon/expansions/tag-team-gx-tag-all-stars/sm12a_ja,sm12a_ja,MAPPED
+af81f07b-2345-4f9e-baf5-adfa2bcdb807,SMシリーズ,SM1M,コレクションムーン,sm1m_ja,https://scrydex.com/pokemon/expansions/collection-moon/sm1m_ja,sm1m_ja,MAPPED
+575b3ae4-5c0c-4abc-93f8-f1f4cc71974a,SMシリーズ,SM1p,サン＆ムーン,sm1p_ja,https://scrydex.com/pokemon/expansions/strength-expansion-pack-sun-moon/sm1p_ja,sm1p_ja,MAPPED
+c9f7833f-defe-4d99-b45a-33fcb5a1fb14,SMシリーズ,SM1S,コレクションサン,sm1s_ja,https://scrydex.com/pokemon/expansions/collection-sun/sm1s_ja,sm1s_ja,MAPPED
+234779b1-7c9a-442f-8f8e-de41d5de658c,SMシリーズ,SM2K,キミを待つ島々,sm2k_ja,https://scrydex.com/pokemon/expansions/islands-await-you/sm2k_ja,sm2k_ja,MAPPED
+a46aa9cd-922a-487f-a7f2-940f9a23ef57,SMシリーズ,SM2L,アローラの月光,sm2l_ja,https://scrydex.com/pokemon/expansions/alolan-moonlight/sm2l_ja,sm2l_ja,MAPPED
+25678826-2811-4bff-9b3a-26e10c5db48c,SMシリーズ,SM2p,新たなる試練の向こう,sm2p_ja,https://scrydex.com/pokemon/expansions/facing-a-new-trial/sm2p_ja,sm2p_ja,MAPPED
+a8568729-9fae-4f33-bea1-c887bbc3f41a,SMシリーズ,SM3H,闘う虹を見たか,sm3h_ja,https://scrydex.com/pokemon/expansions/to-have-seen-the-battle-rainbow/sm3h_ja,sm3h_ja,MAPPED
+ea641579-b748-4519-80bf-909f23f821ca,SMシリーズ,SM3N,光を喰らう闇,sm3n_ja,https://scrydex.com/pokemon/expansions/darkness-that-consumes-light/sm3n_ja,sm3n_ja,MAPPED
+cc2feeb0-7efb-4265-9655-142f55afe232,SMシリーズ,SM3p,ひかる伝説,sm3p_ja,https://scrydex.com/pokemon/expansions/shining-legends/sm3p_ja,sm3p_ja,MAPPED
+9f635209-aec1-4acf-84b7-8e77e6be7bc0,SMシリーズ,SM4A,超次元の暴獣,sm4a_ja,https://scrydex.com/pokemon/expansions/ultradimensional-beasts/sm4a_ja,sm4a_ja,MAPPED
+02774e64-31dd-4b6c-a9b3-65c24144066e,SMシリーズ,SM4p,GXバトルブースト,sm4p_ja,https://scrydex.com/pokemon/expansions/gx-battle-boost/sm4p_ja,sm4p_ja,MAPPED
+133c791b-7cad-484f-843a-1fdb007af685,SMシリーズ,SM4S,覚醒の勇者,sm4s_ja,https://scrydex.com/pokemon/expansions/awakened-heroes/sm4s_ja,sm4s_ja,MAPPED
+4faa5ea4-2af5-4aea-8154-3d8eac93ff68,SMシリーズ,SM5M,ウルトラムーン,sm5m_ja,https://scrydex.com/pokemon/expansions/ultra-moon/sm5m_ja,sm5m_ja,MAPPED
+7b4aebdd-ad4e-4fd2-a4a1-50ed98bc4e51,SMシリーズ,SM5p,ウルトラフォース,sm5p_ja,https://scrydex.com/pokemon/expansions/ultra-force/sm5p_ja,sm5p_ja,MAPPED
+85624ae1-7bf6-4f09-a3c7-d3af5f65893a,SMシリーズ,SM5S,ウルトラサン,sm5s_ja,https://scrydex.com/pokemon/expansions/ultra-sun/sm5s_ja,sm5s_ja,MAPPED
+adc82cca-bad7-4c21-88f1-14482564992e,SMシリーズ,SM6,禁断の光,sm6_ja,https://scrydex.com/pokemon/expansions/forbidden-light/sm6_ja,sm6_ja,MAPPED
+80f62c95-9f01-4569-b25d-11f781e01a82,SMシリーズ,SM6a,ドラゴンストーム,sm6a_ja,https://scrydex.com/pokemon/expansions/dragon-storm/sm6a_ja,sm6a_ja,MAPPED
+1778f144-2fa0-4cf0-b7ed-b8a42a4f4526,SMシリーズ,SM6b,チャンピオンロード,sm6b_ja,https://scrydex.com/pokemon/expansions/champion-road/sm6b_ja,sm6b_ja,MAPPED
+c747cf6e-7ba4-4ec5-8288-d40293a4565f,SVシリーズ,SV10,ロケット団の栄光,sv10_ja,https://scrydex.com/pokemon/expansions/glory-of-team-rocket/sv10_ja,sv10_ja,MAPPED
+1b0c8034-f89e-45bd-9339-da3e9963ce3f,SVシリーズ,SV11B,ブラックボルト,sv11b_ja,https://scrydex.com/pokemon/expansions/black-bolt/sv11b_ja,sv11b_ja,MAPPED
+02eba1f1-ab17-434f-b54f-3213cbb54ca3,SVシリーズ,SV11W,ホワイトフレア,sv11w_ja,https://scrydex.com/pokemon/expansions/white-flare/sv11w_ja,sv11w_ja,MAPPED
+af1234fc-0c84-4c51-ba4c-cc74829e2d03,SVシリーズ,SV1a,トリプレットビート,sv1a_ja,https://scrydex.com/pokemon/expansions/triplet-beat/sv1a_ja,sv1a_ja,MAPPED
+02909cf1-28d7-484f-bede-01b7da714ab6,SMシリーズ,SM7,裂空のカリスマ,sm7_ja,https://scrydex.com/pokemon/expansions/sky-splitting-charisma/sm7_ja,sm7_ja,MAPPED
+8251be2f-446e-47c1-ae16-155441fda939,SMシリーズ,SM7a,迅雷スパーク,sm7a_ja,https://scrydex.com/pokemon/expansions/thunderclap-spark/sm7a_ja,sm7a_ja,MAPPED
+dbb0d0e7-efba-41c2-9f8a-daf68582ed52,SMシリーズ,SM7b,フェアリーライズ,sm7b_ja,https://scrydex.com/pokemon/expansions/fairy-rise/sm7b_ja,sm7b_ja,MAPPED
+ac71e58e-df22-4e89-89a6-7e939bd6632a,SMシリーズ,SM8,超爆インパクト,sm8_ja,https://scrydex.com/pokemon/expansions/super-burst-impact/sm8_ja,sm8_ja,MAPPED
+424e31c9-b164-41cc-bc8b-67667edfab53,SMシリーズ,SM8a,ダークオーダー,sm8a_ja,https://scrydex.com/pokemon/expansions/dark-order/sm8a_ja,sm8a_ja,MAPPED
+312d4099-d563-4221-b523-a8ab2cf9c24e,SMシリーズ,SM8b,GXウルトラシャイニー,sm8b_ja,https://scrydex.com/pokemon/expansions/gx-ultra-shiny/sm8b_ja,sm8b_ja,MAPPED
+8c3e90a2-295a-49ec-a166-fec75fe3fd8e,SMシリーズ,SM9,タッグボルト,sm9_ja,https://scrydex.com/pokemon/expansions/tag-bolt/sm9_ja,sm9_ja,MAPPED
+0bf8b1be-1ffe-4105-957e-f4d47b905e05,SMシリーズ,SM9a,ナイトユニゾン,sm9a_ja,https://scrydex.com/pokemon/expansions/night-unison/sm9a_ja,sm9a_ja,MAPPED
+a7880f19-342f-4727-8b28-2ad012936a2f,SMシリーズ,SM9b,フルメタルウォール,sm9b_ja,https://scrydex.com/pokemon/expansions/full-metal-wall/sm9b_ja,sm9b_ja,MAPPED
+0e5e9c85-befb-4767-b2e3-748891d46454,SVシリーズ,SV1S,スカーレットex,sv1s_ja,https://scrydex.com/pokemon/expansions/scarlet-ex/sv1s_ja,sv1s_ja,MAPPED
+15f71d52-9415-472d-a5cb-2397e385979c,SVシリーズ,SV1V,バイオレットex,sv1v_ja,https://scrydex.com/pokemon/expansions/violet-ex/sv1v_ja,sv1v_ja,MAPPED
+bb411b0c-7378-4681-8d40-30958187c747,SVシリーズ,SV2a,ポケモンカード151,sv2a_ja,https://scrydex.com/pokemon/expansions/pokmon-card-151/sv2a_ja,sv2a_ja,MAPPED
+34dac2ab-c4e1-429a-a8f7-a057ae021a67,SVシリーズ,SV2D,クレイバースト,sv2d_ja,https://scrydex.com/pokemon/expansions/clay-burst/sv2d_ja,sv2d_ja,MAPPED
+e86bad58-b459-4ac3-a82c-a122cf1755d6,SVシリーズ,SV2P,スノーハザード,sv2p_ja,https://scrydex.com/pokemon/expansions/snow-hazard/sv2p_ja,sv2p_ja,MAPPED
+eb9a2ae1-f752-48e2-bd6e-4a3103023949,SVシリーズ,SV3,黒炎の支配者,sv3_ja,https://scrydex.com/pokemon/expansions/ruler-of-the-black-flame/sv3_ja,sv3_ja,MAPPED
+c5804d11-9c59-4cad-9061-0801b0ba0d9b,SVシリーズ,SV3a,レイジングサーフ,sv3a_ja,https://scrydex.com/pokemon/expansions/raging-surf/sv3a_ja,sv3a_ja,MAPPED
+2e3e2cf1-be86-4808-87f7-fe01973f0325,SVシリーズ,SV4a,レイジングサーフ,sv4a_ja,https://scrydex.com/pokemon/expansions/shiny-treasure-ex/sv4a_ja,sv4a_ja,MAPPED
+41226239-da09-4293-b6a3-d53c92094bf5,SVシリーズ,SV4K,古代の咆哮,sv4k_ja,https://scrydex.com/pokemon/expansions/ancient-roar/sv4k_ja,sv4k_ja,MAPPED
+1d6a22e1-15be-46ec-bfa4-71adffe1213e,SVシリーズ,SV4M,未来の一閃,sv4m_ja,https://scrydex.com/pokemon/expansions/future-flash/sv4m_ja,sv4m_ja,MAPPED
+97d0e77f-4340-44e3-9fb3-6e227b079a7d,SVシリーズ,SV5a,クリムゾンヘイズ,sv5a_ja,https://scrydex.com/pokemon/expansions/crimson-haze/sv5a_ja,sv5a_ja,MAPPED
+1fea9ad9-1344-4423-b075-978401221f70,SVシリーズ,SV5M,サイバージャッジ,sv5m_ja,https://scrydex.com/pokemon/expansions/cyber-judge/sv5m_ja,sv5m_ja,MAPPED
+aaae146c-17af-45fb-b9fb-165ca527fc03,SVシリーズ,SV6,変幻の仮面,sv6_ja,https://scrydex.com/pokemon/expansions/mask-of-change/sv6_ja,sv6_ja,MAPPED
+0683c46d-715d-4978-bcac-223c867795ea,SVシリーズ,SV6a,ナイトワンダラー,sv6a_ja,https://scrydex.com/pokemon/expansions/night-wanderer/sv6a_ja,sv6a_ja,MAPPED
+db8504f1-e9f0-4e60-954a-4818040cfe98,SVシリーズ,SV7,ステラミラクル,sv7_ja,https://scrydex.com/pokemon/expansions/stellar-miracle/sv7_ja,sv7_ja,MAPPED
+154b30d7-3fc1-4322-af22-f39b9c881d45,SVシリーズ,SV7a,楽園ドラゴーナ,sv7a_ja,https://scrydex.com/pokemon/expansions/paradise-dragona/sv7a_ja,sv7a_ja,MAPPED
+6d9ff692-c95f-40d8-aef9-58089eb14260,SVシリーズ,SV8,超電ブレイカー,sv8_ja,https://scrydex.com/pokemon/expansions/super-electric-breaker/sv8_ja,sv8_ja,MAPPED
+d89dc0ae-ec18-4b7e-a147-29ceffa71c2f,SVシリーズ,SV8a,テラスタルフェスex,sv8a_ja,https://scrydex.com/pokemon/expansions/terastal-festival-ex/sv8a_ja,sv8a_ja,MAPPED
+89da1d8e-b1db-45f2-8674-eed2ab01058b,SVシリーズ,SV9,バトルパートナーズ,sv9_ja,https://scrydex.com/pokemon/expansions/battle-partners/sv9_ja,sv9_ja,MAPPED
+562e3ff7-4148-430b-8ea4-e1308f56d05e,SVシリーズ,SV9a,熱風のアリーナ,sv9a_ja,https://scrydex.com/pokemon/expansions/hot-air-arena/sv9a_ja,sv9a_ja,MAPPED
+6714f749-4785-40ba-b69d-2d9da53fcad6,SVシリーズ,SVK,デッキビルドBOX ステラミラクル,,,svk_ja,UNRESOLVED_SET
+f2d994ec-e52f-4ab8-b315-285543e1f698,SVシリーズ,SVLN,スターターセット テラスタイプ：ステラ ニンフィアex,,,svln_ja,UNRESOLVED_SET
+d6ec8a81-24f9-40f2-b312-51e98ef405f8,SVシリーズ,SVLS,スターターセット テラスタイプ：ステラ ソウブレイズex,,,svls_ja,UNRESOLVED_SET
+43366684-3ba6-4b69-a815-9c96da64469d,ソード・シールド,S4a,シャイニースターV,swsh4a_ja,https://scrydex.com/pokemon/expansions/shiny-star-v/swsh4a_ja,swsh4a_ja,MAPPED
+e8d20478-31c4-44df-a71d-e0e80eb4ecfa,BWシリーズ,BW,「エクストラレギュレーションBOX」,,,,UNRESOLVED_SET
+7816388b-32e3-4c5e-9815-b552741bee9c,BWシリーズ,BW1-Bb,ポケモンカードゲームBW 拡張パック「ブラックコレクション」,bw1b_ja,https://scrydex.com/pokemon/expansions/black-collection/bw1b_ja,bw1b_ja|bw1_ja,MAPPED
+b40da42f-59cd-4cf5-b07d-0a4e0b111b12,BWシリーズ,BW1-Bw,ポケモンカードゲームBW 拡張パック「ホワイトコレクション」,bw1w_ja,https://scrydex.com/pokemon/expansions/white-collection/bw1w_ja,bw1w_ja|bw1b_ja|bw1_ja,MAPPED
+eb0a6865-84ff-4f85-b031-54c9d4e4c14d,BWシリーズ,BW10-B,ポケモンカードゲームBW コンセプトパック「EXバトルブースト」,ebb1_ja,https://scrydex.com/pokemon/expansions/ex-battle-boost/ebb1_ja,ebb1_ja|bw10b_ja|bw10_ja,MAPPED
+57924c09-76eb-4558-9b20-3158526e6c65,BWシリーズ,BW2-B,ポケモンカードゲームBW 拡張パック「レッドコレクション」,bw2_ja,https://scrydex.com/pokemon/expansions/red-collection/bw2_ja,bw2_ja|bw2b_ja,MAPPED
+eeb4f01f-3792-421f-9dc9-6a8799cd6a06,BWシリーズ,BW3-Bh,ポケモンカードゲームBW 拡張パック「ヘイルブリザード」,bw3h_ja,https://scrydex.com/pokemon/expansions/hail-blizzard/bw3h_ja,bw3h_ja|bw3b_ja|bw3_ja,MAPPED
+b7b434e5-3fee-4321-a856-7cb6afbe5941,BWシリーズ,BW3-Bp,ポケモンカードゲームBW 拡張パック「サイコドライブ」,bw3p_ja,https://scrydex.com/pokemon/expansions/psycho-drive/bw3p_ja,bw3p_ja|bw3b_ja|bw3_ja,MAPPED
+6b8faf93-bc0b-4539-aca0-5b0cdcba2d41,BWシリーズ,BW5-Brn,ポケモンカードゲームBW 拡張パック「リューノブレード」,bw5d_ja,https://scrydex.com/pokemon/expansions/dragon-blade/bw5d_ja,bw5d_ja|bw5b_ja|bw5_ja,MAPPED
+55fb9c24-1735-4a8c-b090-eebabf950f94,BWシリーズ,BW6-Bc,ポケモンカードゲームBW 拡張パック「コールドフレア」,bw6c_ja,https://scrydex.com/pokemon/expansions/cold-flare/bw6c_ja,bw6c_ja|bw6b_ja|bw6_ja,MAPPED
+d80a5f18-cad8-457f-90e6-3fbfd527f8c2,BWシリーズ,BW7-B,ポケモンカードゲームBW 拡張パック「プラズマゲイル」,bw7_ja,https://scrydex.com/pokemon/expansions/plasma-gale/bw7_ja,bw7_ja|bw7b_ja,MAPPED
+71a210ff-9d68-4eed-900a-43b5f14a70c6,BWシリーズ,BW8-Brn,ポケモンカードゲームBW 拡張パック「ライデンナックル」,bw8t_ja,https://scrydex.com/pokemon/expansions/thunder-knuckle/bw8t_ja,bw8t_ja|bw8b_ja|bw8_ja,MAPPED
+519974df-352f-47fe-a03f-04e3e551a5da,ソード・シールド,S10b,強化拡張パック「Pokémon GO」,swsh10b_ja,https://scrydex.com/pokemon/expansions/pokmon-go/swsh10b_ja,swsh10b_ja,MAPPED
+e7364633-fbf1-400c-8da2-63b129f42c38,ソード・シールド,S1W,拡張パック「ソード」,swsh1w_ja,https://scrydex.com/pokemon/expansions/sword/swsh1w_ja,swsh1w_ja,MAPPED
+7d28ee74-f539-44c6-9aa1-1af5bf6c65aa,ソード・シールド,S2,拡張パック「反逆クラッシュ」,swsh2_ja,https://scrydex.com/pokemon/expansions/rebellion-crash/swsh2_ja,swsh2_ja,MAPPED
+c82f1d3a-3f74-454a-9a22-8ee9ac53e4e8,ソード・シールド,S3,拡張パック「ムゲンゾーン」,swsh3_ja,https://scrydex.com/pokemon/expansions/infinity-zone/swsh3_ja,swsh3_ja,MAPPED
+55532dfc-3744-4734-b6b3-db9157b43812,ソード・シールド,S4,拡張パック「仰天のボルテッカー」,swsh4_ja,https://scrydex.com/pokemon/expansions/amazing-volt-tackle/swsh4_ja,swsh4_ja,MAPPED
+b8da2cc6-5a50-4b94-898d-bbb675e70c0a,ソード・シールド,S5a,強化拡張パック「双璧のファイター」,swsh5a_ja,https://scrydex.com/pokemon/expansions/peerless-fighters/swsh5a_ja,swsh5a_ja,MAPPED
+d67a90e5-6bf3-4a5b-8181-26f09eca8a1b,ソード・シールド,S7R,拡張パック「蒼空ストリーム」,swsh7r_ja,https://scrydex.com/pokemon/expansions/blue-sky-stream/swsh7r_ja,swsh7r_ja,MAPPED
+f4152523-4bcf-4a36-ac50-28647c304731,ソード・シールド,S8a-G,25th ANNIVERSARY GOLDEN BOX,,,swsh8ag_ja,UNRESOLVED_SET
+757962fc-3d22-47ce-80b8-26115f4e3f9c,ソード・シールド,SC,ポケモンカードゲームBW コンセプトパック「シャイニーコレクション」,,,,UNRESOLVED_SET
+d555a91e-ace5-4076-ad1a-c1f5c7b951b3,ソード・シールド,SCS,スターターセットVMAX　リザードン,,,,UNRESOLVED_SET
+61b9e207-b5e9-4ad5-ae49-c129ef07460d,ソード・シールド,SEF,スターターセットVMAX フシギバナ,,,,UNRESOLVED_SET
+9b1f8e00-7abd-4b6c-9567-1f0e83b03fa5,ソード・シールド,SF,プレミアムトレーナーボックス ICHIGEKI、RENGEKI,,,,UNRESOLVED_SET
+d6f5837c-82f7-46b2-926b-54a487ad18a9,ソード・シールド,SGI,ハイクラスデッキ「インテレオンVMAX」,,,,UNRESOLVED_SET
+f6f0ec70-b0da-469c-ba60-0917f8ff2b29,ソード・シールド,SI,スタートデッキ100,,,,UNRESOLVED_SET
+733c4d4c-63c9-4e42-a9be-b4c3a53b711b,SMシリーズ,SM-XY,「プレミアムトレーナーボックス」,,,smxy_ja,UNRESOLVED_SET
+20672802-91f9-40b4-909f-312ffba0dd5b,BWシリーズ,BW4-B,ポケモンカードゲームBW 拡張パック「ダークラッシュ」,bw4_ja,https://scrydex.com/pokemon/expansions/dark-rush/bw4_ja,bw4_ja|bw4b_ja,MAPPED
+790d2460-b945-4a62-ac80-f5a10254b191,BWシリーズ,BW5-Brz,ポケモンカードゲームBW　拡張パック「リューズブラスト」,bw5s_ja,https://scrydex.com/pokemon/expansions/dragon-blast/bw5s_ja,bw5s_ja|bw5b_ja|bw5_ja,MAPPED
+b0253502-abfb-4157-a4fc-41821a8bd9f6,BWシリーズ,BW6-Bf,ポケモンカードゲームBW 拡張パック「フリーズボルト」,bw6f_ja,https://scrydex.com/pokemon/expansions/freeze-bolt/bw6f_ja,bw6f_ja|bw6b_ja|bw6_ja,MAPPED
+3b23961b-060c-4eec-b215-11dcd659f7a9,BWシリーズ,BW8-Brf,ポケモンカードゲームBW 拡張パック「ラセンフォース」,bw8s_ja,https://scrydex.com/pokemon/expansions/spiral-force/bw8s_ja,bw8s_ja|bw8b_ja|bw8_ja,MAPPED
+2f7aa653-531c-4744-b532-e3fead1dfa1f,BWシリーズ,BW9-B,ポケモンカードゲームBW 拡張パック「メガロキャノン」,bw9_ja,https://scrydex.com/pokemon/expansions/megalo-cannon/bw9_ja,bw9_ja|bw9b_ja,MAPPED
+b98bdccc-6122-463a-b28c-5d521e2c1410,SMシリーズ,SMC,ポケモンカードゲーム サン&ムーン「スターターセット改造「カプ・ブルルGX」」,,,smc_ja,UNRESOLVED_SET
+2d50e5bd-52eb-459d-b77e-7fea75585405,SMシリーズ,SME,ポケモンカードゲーム サン＆ムーン スターターセット伝説「ソルガレオGX ルナアーラGX」,,,sme_ja,UNRESOLVED_SET
+fd9a54c8-786f-4ca7-8759-df936d1e3b47,SMシリーズ,SMG,ポケモンカードゲーム サン&ムーン デッキビルドBOX「ウルトラムーン」,,,smg_ja,UNRESOLVED_SET
+2201afc3-a1ac-4a55-bac9-f9c89f1e396d,SMシリーズ,SMI,スターターセット「炎のブースターGX」,,,smi_ja,UNRESOLVED_SET
+c6522ec9-d5e5-4d79-b9e6-68f4e2fa2ac7,SMシリーズ,SMP2,ムービースペシャルパック「名探偵ピカチュウ」,,,smp2_ja,UNRESOLVED_SET
+ec92a963-3bd6-466b-8100-fd62088805ad,ソード・シールド,SNPr,ポケモンカードゲームXY BREAK 進化パック「ライチュウBREAK」,,,,UNRESOLVED_SET
+22f4adbe-de74-45a3-aca0-8280835d2063,ソード・シールド,SP1,「ザシアン＋ザマゼンタBOX」,,,,UNRESOLVED_SET
+1962db4f-a262-488a-8430-7dc2df687e0c,ソード・シールド,SP5,スペシャルカードセット ミュウツーV-UNION、ゲッコウガV-UNION、ザシアンV-UNION,,,,UNRESOLVED_SET
+33b94e3c-7107-4986-aefb-25b7d168b2bf,SVシリーズ,SVAM,スターターセットex ニャオハ＆ルカリオex,,,svam_ja,UNRESOLVED_SET
+3f9da1bc-73f7-4a5b-a48a-76b66b155e10,SVシリーズ,SVB,プレミアムトレーナーボックスex,,,svb_ja,UNRESOLVED_SET
+fa4fdd05-681a-47a0-be0a-20b019ebb52c,SVシリーズ,SVD,exスタートデッキ,,,svd_ja,UNRESOLVED_SET
+40e8b9b0-dd80-4134-a824-665f698114f8,SVシリーズ,SVEM,スターターセット テラスタル「ミュウツーex」「ラウドボーンex」,,,svem_ja,UNRESOLVED_SET
+487d846d-b055-4f79-86e8-64730f225c6c,SVシリーズ,SVG,スペシャルデッキセットex フシギバナ・リザードン・カメックス,,,svg_ja,UNRESOLVED_SET
+598cb6cf-d8c6-4f1e-b257-d3fac4134bf3,SVシリーズ,SVHM,スターターデッキ＆ビルドセット「未来のミライドンex」,,,svhm_ja,UNRESOLVED_SET
+bdf939d9-7a1d-4109-8a6f-59660dc67d0d,SVシリーズ,SVJL,バトルマスターデッキテラスタルリザードンex,,,svjl_ja,UNRESOLVED_SET
+4234424b-a5fb-4a85-872e-07cc9a8845de,SVシリーズ,SVM,スタートデッキ Generations,,,svm_ja,UNRESOLVED_SET
+542b66c8-7c21-4bdb-affe-8f231b7ce8a6,SVシリーズ,SVOD,スターターセットex ダイゴのダンバル＆メタグロスex,svod_ja,https://scrydex.com/pokemon/expansions/stevens-beldum-metagross-ex-starter-set-ex/svod_ja,svod_ja,MAPPED
+9decbd91-1215-4254-8795-0835a9c601a7,SVシリーズ,SVP1,exスペシャルセット,,,svp1_ja,UNRESOLVED_SET
+a0688785-c0ff-43fa-84fa-48d14432b701,XYシリーズ,XY,ハイクラスパック「THE BEST OF XY」,xy_ja,https://scrydex.com/pokemon/expansions/the-best-of-xy/xy_ja,xy_ja,MAPPED
+7232c008-006b-4250-8b7a-d6e96202a657,ソード・シールド,S10D,拡張パック「タイムゲイザー」,swsh10d_ja,https://scrydex.com/pokemon/expansions/time-gazer/swsh10d_ja,swsh10d_ja,MAPPED
+92b1b2b5-1413-4667-96da-f6302db14a80,ソード・シールド,S1H,拡張パック「シールド」,swsh1h_ja,https://scrydex.com/pokemon/expansions/shield/swsh1h_ja,swsh1h_ja,MAPPED
+692e5d4f-0da6-4011-a12c-ffdb1309cba4,ソード・シールド,S1a,強化拡張パック「VMAXライジング」,swsh1a_ja,https://scrydex.com/pokemon/expansions/vmax-rising/swsh1a_ja,swsh1a_ja,MAPPED
+34f34ce8-d9b4-4c63-9460-a26290607bc5,ソード・シールド,S2a,強化拡張パック「爆炎ウォーカー」,swsh2a_ja,https://scrydex.com/pokemon/expansions/explosive-walker/swsh2a_ja,swsh2a_ja,MAPPED
+5ef17897-aa4b-47b6-ba3f-437267d27a85,ソード・シールド,S3a,強化拡張パック「伝説の鼓動」,swsh3a_ja,https://scrydex.com/pokemon/expansions/legendary-heartbeat/swsh3a_ja,swsh3a_ja,MAPPED
+db89ab0e-03c2-433a-bbc0-771d17066a54,ソード・シールド,S5R,拡張パック「連撃マスター」,swsh5r_ja,https://scrydex.com/pokemon/expansions/rapid-strike-master/swsh5r_ja,swsh5r_ja,MAPPED
+a29ec842-6bdb-4f63-9b66-6d63ca4e67cf,ソード・シールド,S6a,強化拡張パック「イーブイヒーローズ」,swsh6a_ja,https://scrydex.com/pokemon/expansions/eevee-heroes/swsh6a_ja,swsh6a_ja,MAPPED
+798983eb-5b45-49ab-b90a-339a8fd22b4a,ソード・シールド,S8a,拡張パック「25th ANNIVERSARY COLLECTION」,swsh8a_ja,https://scrydex.com/pokemon/expansions/25th-anniversary-collection/swsh8a_ja,swsh8a_ja,MAPPED
+79161f5d-a8a7-4eed-ae2c-2313a071f9be,ソード・シールド,SB,プレミアムトレーナーボックス ソード＆シールド,,,,UNRESOLVED_SET
+5a852d95-0fe0-43c0-b84b-860fb52ec41d,ソード・シールド,SC2,スターターセットVMAX リザードン,,,,UNRESOLVED_SET
+37cd007a-3c49-46f8-a7d7-5e65194bf84e,ソード・シールド,SD,Vスタートデッキ無色　イーブイ,,,,UNRESOLVED_SET
+b19defcd-5894-43b1-8d5c-243f1a02aefe,ソード・シールド,SEK,スターターセットVMAX カメックス,,,,UNRESOLVED_SET
+259f0e66-c9f7-4fa0-909c-b6c3006b37b8,ソード・シールド,SGG,ハイクラスデッキ「ゲンガーVMAX」,,,,UNRESOLVED_SET
+7225534a-6b50-418a-8daa-7b743bf1217a,ソード・シールド,SH,ファミリーポケモンカードゲーム,,,,UNRESOLVED_SET
+3bf48092-68bf-4b4f-9e2f-7aab8ea7e83e,ソード・シールド,SJ,スペシャルデッキセット ザシアン・ザマゼンタ vs ムゲンダイナ,,,,UNRESOLVED_SET
+cad53c76-f4d3-43d3-b9ca-b1ab9ab6b74c,SMシリーズ,SMA,ポケモンカードゲーム サン&ムーン 「スターターセット草 ジュナイパーGX」,,,sma_ja,UNRESOLVED_SET
+0f0b8f32-db0e-4bf1-9a12-e6692554debb,XYシリーズ,XY1-By,ポケモンカードゲームXY 拡張パック「コレクションY」,xy1y_ja,https://scrydex.com/pokemon/expansions/collection-y/xy1y_ja,xy1y_ja|xy1by_ja,MAPPED
+54b86786-a897-44ce-9b70-68714bd0f345,XYシリーズ,XY11-Bb,ポケモンカードゲームXY BREAK 拡張パック「爆熱の闘士」,,,xy11b_ja|xy11bb_ja,UNRESOLVED_SET
+6ba347c2-db70-4a00-bd67-01f48ceff2f5,XYシリーズ,XY2,ポケモンカードゲームXY 拡張パック「ワイルドブレイズ」,xy2_ja,https://scrydex.com/pokemon/expansions/wild-blaze/xy2_ja,xy2_ja,MAPPED
+c5895636-5372-42da-a880-777a0a52416a,XYシリーズ,XY4,ポケモンカードゲームXY 拡張パック「ファントムゲート」,xy4_ja,https://scrydex.com/pokemon/expansions/phantom-gate/xy4_ja,xy4_ja,MAPPED
+a03039bf-3a15-4b15-9d4f-634488fa9e48,XYシリーズ,XY5-Bt,ポケモンカードゲームXY 拡張パック「タイダルストーム」,xy5t_ja,https://scrydex.com/pokemon/expansions/tidal-storm/xy5t_ja,xy5t_ja|xy5bt_ja,MAPPED
+705e526d-2388-4abf-987e-3f6d015e536a,XYシリーズ,XY6-B,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,,,xy6b_ja,UNRESOLVED_SET
+523bcbf0-8655-4701-9a72-c82b0b0ca55e,XYシリーズ,XY7-B,ポケモンカードゲームXY 拡張パック「バンデットリング」,,,xy7b_ja,UNRESOLVED_SET
+ef6bc45c-08a8-4349-8017-1717b108d3c8,XYシリーズ,XY8-Br,ポケモンカードゲームXY BREAK　拡張パック「赤い閃光」,xy8r_ja,https://scrydex.com/pokemon/expansions/red-flash/xy8r_ja,xy8r_ja|xy8br_ja,MAPPED
+28315e22-5885-4440-aa0d-81a8d9716dc6,XYシリーズ,XYA,ポケモンカードゲームXY メガバトルデッキ60「リザードンEX」,,,xya_ja,UNRESOLVED_SET
+ecaea609-ab89-4eb0-aa2e-d0d7fab738d4,XYシリーズ,XYC,ポケモンカードゲームXY スーパーレジェンドセット60「ゼルネアスEX・イベルタルEX」,,,xyc_ja,UNRESOLVED_SET
+c0245308-aae6-4388-b35e-7689b1474012,XYシリーズ,XYE,ポケモンカードゲームXY 対戦スタートセット30「エンブオーEX VS トゲキッスEX」,,,xye_ja,UNRESOLVED_SET
+87789899-88a8-4a22-81d5-44cb932626af,SVシリーズ,SV5K,ワイルドフォース,sv5k_ja,https://scrydex.com/pokemon/expansions/wild-force/sv5k_ja,sv5k_ja,MAPPED
+c89cc58d-42ed-4213-9651-cb9ba0b4b513,XYシリーズ,XYG,ポケモンカードゲームXY BREAK パーフェクトバトルデッキ60「ジガルデEX」,,,xyg_ja,UNRESOLVED_SET
+0dbeeeb1-7c7d-4568-a13e-5d7b7014996c,SMシリーズ,SMD,ポケモンカードゲーム サン＆ムーン 30枚デッキ対戦セット「サトシVSロケット団」,,,smd_ja,UNRESOLVED_SET
+41235d5a-7736-459d-975c-99796cbc344f,SMシリーズ,SMF,ポケモンカードゲーム サン&ムーン  プレミアムトレーナーボックス ウルトラサン・ウルトラムーン,,,smf_ja,UNRESOLVED_SET
+0556ed71-9979-4e4e-9dd4-b7e804d178be,ソード・シールド,SK,プレミアムトレーナーボックス VSTAR,,,,UNRESOLVED_SET
+37d12ef0-6a6c-4af8-a2a2-e12155105598,SMシリーズ,SMJ,プレミアムトレーナーボックス TAG TEAM GX,,,smj_ja,UNRESOLVED_SET
+1e73b75d-2759-41ee-b2da-2fc72d3f2e66,SMシリーズ,SML,「ファミリーポケモンカードゲーム」,,,sml_ja,UNRESOLVED_SET
+d517f358-1f62-44aa-aeb2-ade2a7cea604,SMシリーズ,SMN,デッキビルドBOX「TAG TEAM GX」,,,smn_ja,UNRESOLVED_SET
+c57c55fa-900b-4f7f-8556-1e9f76af659f,SMシリーズ,SMP1,月刊コロコロコミック　2017年1月号付録「イワンコ全力デッキ」,,,smp1_ja,UNRESOLVED_SET
+60cfcd99-9818-4d22-9aee-ad11d01e1521,ソード・シールド,SNPo,ポケモンカードゲームXY BREAK 進化パック「オンバーンBREAK」,,,,UNRESOLVED_SET
+1f1159d9-179c-4492-ba61-8766edef7086,ソード・シールド,SO,スペシャルデッキセット リザードンVSTAR vs レックウザVMAX,,,,UNRESOLVED_SET
+79d7b6eb-40f1-4ceb-bc9d-3c6a95d28549,ソード・シールド,SP3,ジャンボパックセット 白銀のランス＆漆黒のガイスト,,,,UNRESOLVED_SET
+e97372c9-3f91-4a4d-825a-7a05c5e8551e,SVシリーズ,SVAL,スターターセットex ホゲータ＆デンリュウex,,,sval_ja,UNRESOLVED_SET
+10672e42-ee26-494b-806f-6ed997960b66,SVシリーズ,SVAW,スターターセットex クワッス＆ミミッキュex,,,svaw_ja,UNRESOLVED_SET
+bcac3e9a-64ca-4230-831d-76dc59ae9c89,SVシリーズ,SVC,スターターセットex ピカチュウex&パーモット,,,svc_ja,UNRESOLVED_SET
+a113ccfa-1c92-450e-9492-fa23e0114247,SVシリーズ,SVEL,スターターセット テラスタル「ミュウツーex」「ラウドボーンex」,,,svel_ja,UNRESOLVED_SET
+2fe01ffc-66f9-494b-968c-8c5547e265c0,SVシリーズ,SVF,デッキビルドBOX 黒炎の支配者,,,svf_ja,UNRESOLVED_SET
+15e2acb1-274a-4bd5-9675-91614d9a063b,SVシリーズ,SVHK,スターターデッキ＆ビルドセット「古代のコライドンex」,,,svhk_ja,UNRESOLVED_SET
+54ed94c5-7583-4652-9d8d-e07e6a609e43,SVシリーズ,SVI,バトルアカデミー,,,svi_ja,UNRESOLVED_SET
+8ffd7472-04dd-4240-ae1d-ccb91666b2c3,SVシリーズ,SVJP,バトルマスターデッキパオジアンex,,,svjp_ja,UNRESOLVED_SET
+e37676ce-c650-4693-b8ac-ad52eea418a2,SVシリーズ,SVN,デッキビルドBOX「バトルパートナーズ」,,,svn_ja,UNRESOLVED_SET
+b42030c0-3702-41e1-b649-a790ce1e1ad1,SVシリーズ,SVOM,スターターセットex マリィのモルペコ＆オーロンゲex,svom_ja,https://scrydex.com/pokemon/expansions/marnies-morpeko-grimmsnarl-ex-starter-set-ex/svom_ja,svom_ja,MAPPED
+d01a8961-c09d-4f07-9b7b-8b72852e763e,ソード・シールド,SZD,ポケモンカードゲームBW 「サザンドラデッキ30」,,,,UNRESOLVED_SET
+1e661884-d040-47cb-bdf0-f160771af6e1,XYシリーズ,XY1-Bx,ポケモンカードゲームXY 拡張パック「コレクションX」,xy1x_ja,https://scrydex.com/pokemon/expansions/collection-x/xy1x_ja,xy1x_ja|xy1bx_ja,MAPPED
+738567d0-701f-448b-bba6-70a6b90dbcc4,XYシリーズ,XY10-B,ポケモンカードゲームXY BREAK 拡張パック「めざめる超王」,xy10_ja,https://scrydex.com/pokemon/expansions/awakening-psychic-king/xy10_ja,xy10_ja|xy10b_ja,MAPPED
+ab56c33c-dbd8-43eb-aa6d-d6c230e5ccd2,XYシリーズ,XY11-Br,ポケモンカードゲームXY BREAK 拡張パック「冷酷の反逆者」,,,xy11r_ja|xy11br_ja,UNRESOLVED_SET
+18513f31-8b41-4783-9b7b-43ea49365192,XYシリーズ,XY3,ポケモンカードゲームXY 拡張パック「ライジングフィスト」,xy3_ja,https://scrydex.com/pokemon/expansions/rising-fist/xy3_ja,xy3_ja,MAPPED
+e249c6c7-6f19-4de0-b421-1d7bce8e588d,XYシリーズ,XY5-Bg,ポケモンカードゲームXY 拡張パック「ガイアボルケーノ」,xy5g_ja,https://scrydex.com/pokemon/expansions/gaia-volcano/xy5g_ja,xy5g_ja|xy5bg_ja,MAPPED
+75574306-ef8d-4e8e-b8a5-5d485286a968,XYシリーズ,XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,xy6_ja,https://scrydex.com/pokemon/expansions/emerald-break/xy6_ja,xy6_ja,MAPPED
+e19dcfd0-93f5-498e-bc42-b724ceb38c83,XYシリーズ,XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,xy7_ja,https://scrydex.com/pokemon/expansions/bandit-ring/xy7_ja,xy7_ja,MAPPED
+e2a21580-e660-4e87-921d-56dea35352aa,XYシリーズ,XY8-Bb,ポケモンカードゲームXY BREAK　拡張パック「青い衝撃」,xy8b_ja,https://scrydex.com/pokemon/expansions/blue-shock/xy8b_ja,xy8b_ja|xy8bb_ja,MAPPED
+76c58458-b473-4806-9bb6-903a2d2a9b45,XYシリーズ,XY9-B,ポケモンカードゲームXY BREAK　拡張パック「破天の怒り」,xy9_ja,https://scrydex.com/pokemon/expansions/rage-of-the-broken-heavens/xy9_ja,xy9_ja|xy9b_ja,MAPPED
+daf88047-59ed-4973-be27-77b18f6412fa,XYシリーズ,XYB,ポケモンカードゲームXY ハイパーメタルチェーンデッキ60「ディアルガEX+ギルガルドEX」,,,xyb_ja,UNRESOLVED_SET
+eb361b26-23e5-4079-aa0f-e070d62a7fbe,XYシリーズ,XYD,ポケモンカードゲームXY メガバトルデッキ60「レックウザEX」,,,xyd_ja,UNRESOLVED_SET
+64bb61c5-f822-4642-b873-e986c7551bf7,XYシリーズ,XYF,ポケモンカードゲームXY BREAK コンボデッキ60「ゴルダックBREAK+パルキアEX」,,,xyf_ja,UNRESOLVED_SET
+3cee07f9-f0d3-4c69-b371-d3ad02b80ba7,XYシリーズ,XYH,ポケモンカードゲームXY BREAK メガバトルデッキ60「メガタブンネEX」,,,xyh_ja,UNRESOLVED_SET
+8c4fd439-6cf1-4019-bc0d-cb884bd15126,SMシリーズ,SMK,トレーナーバトルデッキ「ニビシティジムのタケシ」「ハナダシティジムのカスミ」,,,smk_ja,UNRESOLVED_SET
+490eef10-bea0-434e-ae28-b67ca13d9002,SMシリーズ,SMH,GXスタートデッキ,,,smh_ja,UNRESOLVED_SET
+f1e926cc-29d1-4214-b949-836beb3a827c,SMシリーズ,SMM,スターターセット TAG TEAM GX 「エーフィ&デオキシスGX」「ブラッキー&ダークライGX」,smm_ja,https://scrydex.com/pokemon/expansions/tag-team-gx-starter-sets/smm_ja,smm_ja,MAPPED
+80bafe30-b936-4474-87c8-2bea79d320a4,SVシリーズ,WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,wcs23_ja,https://scrydex.com/pokemon/expansions/world-championships-2023-yokohama-deck-pikachu/wcs23_ja,wcs23_ja,MAPPED
+822453a9-361a-478e-a7fa-b953876a50b3,XYシリーズ,20th,ポケモンカードゲームXY BREAK 「ポケットモンスターカードゲーム スターターパック」,,,,UNRESOLVED_SET
+a4b22717-7318-403a-8743-77bfda0624d7,XYシリーズ,CP4,ポケモンカードゲームXY BREAK プレミアムチャンピオンパック「EX×M×BREAK」,cp4_ja,https://scrydex.com/pokemon/expansions/premium-champion-pack/cp4_ja,cp4_ja,MAPPED
+13ac4f0e-0e0f-4ab3-9fa0-933a49903236,XYシリーズ,CP6,ポケモンカードゲームXY BREAK コンセプトパック「ポケットモンスターカードゲーム 拡張パック 20th Anniversary」,cp6_ja,https://scrydex.com/pokemon/expansions/expansion-pack-20th-anniversary/cp6_ja,cp6_ja,MAPPED
+f9b57fb2-3ede-44a3-b2b7-f9b2bd5a9e0b,XYシリーズ,MMB-P,ポケモンカードゲームXY 「メガマスターデッキビルドBOX パワースタイル」,,,,UNRESOLVED_SET
+5f734794-2cd7-4671-b390-7a1f33222268,XYシリーズ,CP3,ポケモンカードゲームXY BREAK コンセプトパック「ポケキュンコレクション」,cp3_ja,https://scrydex.com/pokemon/expansions/pokkyun-collection/cp3_ja,cp3_ja,MAPPED
+905e9463-b7ea-4ce1-9b8d-6ecd68b302ce,XYシリーズ,CP5,ポケモンカードゲームXY BREAK コンセプトパック「幻・伝説ドリームキラコレクション」,cp5_ja,https://scrydex.com/pokemon/expansions/mythical-legendary-dream-shine-collection/cp5_ja,cp5_ja,MAPPED
+afc4e240-4a24-4037-b1fa-e7af9c14bba4,XYシリーズ,HXY,ポケモンカードゲームXY はじめてセット,,,,UNRESOLVED_SET
+3bcc32d1-0cc8-4fea-af1e-8fa739e8c95d,XYシリーズ,MMB-S,ポケモンカードゲームXY 「メガマスターデッキビルドBOX スピードスタイル」,,,,UNRESOLVED_SET
+cbbbd49a-cc8b-4bbe-83f2-29ebc09f25e3,XYシリーズ,CP1,マグマ団VSアクア団 ダブルクライシス,cp1_ja,https://scrydex.com/pokemon/expansions/magma-gang-vs-aqua-gang-double-crisis/cp1_ja,cp1_ja,MAPPED
+da8834cb-2787-4c61-83c5-8ec8bc913a8a,XYシリーズ,CP2,伝説キラコレクション,cp2_ja,https://scrydex.com/pokemon/expansions/legendary-shine-collection/cp2_ja,cp2_ja,MAPPED
+fa67111e-9be0-46cd-a88e-caea786d172e,XYシリーズ,X30,ポケモンカードゲームXY 「ゼルネアスデッキ30」,,,,UNRESOLVED_SET
+3080bd54-93bd-4dad-9eef-7d6873e21fa1,XYシリーズ,Y30,ポケモンカードゲームXY 「イベルタルデッキ30」,,,,UNRESOLVED_SET
+aa1650a8-2853-4ae0-b793-f6410516e06b,XYシリーズ,,ポケモンカードゲーム 20th アニバーサリーフェスタ,,,,UNRESOLVED_SET
+40ec578a-ec0b-451c-a35f-b04235a93a32,BWシリーズ,BGSt,ポケモンカードゲームBW バトルギフトセット「ボルトロスVSトルネロス」 （トルネロスデッキ）,,,,UNRESOLVED_SET
+dae17923-0c7c-4284-879c-826b529e970c,BWシリーズ,BGSv,ポケモンカードゲームBW バトルギフトセット「ボルトロスVSトルネロス」 （ボルトロスデッキ）,,,,UNRESOLVED_SET
+53842470-3bf2-47c2-95fb-38fd74a60300,BWシリーズ,BKB,ポケモンカードゲームBW バトル強化デッキ60「ブラックキュレムEX」,,,,UNRESOLVED_SET
+14e769cf-b7ff-4c5d-899c-223df4a09cb9,BWシリーズ,BKR,ポケモンカードゲームBW バトル強化デッキ60「レシラムEX」,,,,UNRESOLVED_SET
+58f6dcfe-1da3-470b-8d10-a4dfe9a235ee,BWシリーズ,BKW,ポケモンカードゲームBW バトル強化デッキ60「ホワイトキュレムEX」,,,,UNRESOLVED_SET
+f8cd910c-8e78-4a4a-80d5-0467adfc8ce9,BWシリーズ,BKZ,ポケモンカードゲームBW バトル強化デッキ60「ゼクロムEX」,,,,UNRESOLVED_SET
+06d75e9b-c3c2-4c20-8f62-1800b6c6ed1b,BWシリーズ,BKc,ポケモンカードゲームBW バトル強化デッキ コバルオン,,,,UNRESOLVED_SET
+c36fd29c-51d7-4fad-ac7b-f238870e4307,BWシリーズ,BKt,ポケモンカードゲームBW バトル強化デッキ テラキオン,,,,UNRESOLVED_SET
+01f9f42d-01d4-4f9d-81c7-1387791c71aa,BWシリーズ,BKv,ポケモンカードゲームBW バトル強化デッキ ビリジオン,,,,UNRESOLVED_SET
+6d1ae7c3-64c4-4912-8211-d7b16e114f98,BWシリーズ,BTV,ポケモンカードゲームBW バトルテーマデッキ「ビクティニ」,,,,UNRESOLVED_SET
+22b27a8f-adcc-4806-afd4-f6cdf8afba1f,BWシリーズ,CS1m,ポケモンカードゲームBW コレクションシート 旅立ちの仲間 ミジュマル,,,,UNRESOLVED_SET
+853adb35-1890-4fd2-9969-7ab871a0570a,BWシリーズ,DS,ポケモンカードゲームBW 拡張パック「ドラゴンセレクション」,ds1_ja,https://scrydex.com/pokemon/expansions/dragon-selection/ds1_ja,ds1_ja,MAPPED
+ee41c22d-f9ce-4255-8594-5f6f32940f1a,BWシリーズ,HSPm,ポケモンカードゲームBW はじめてセット ピカチュウver. （ミジュマルデッキ）,,,,UNRESOLVED_SET
+5324894c-b35f-4b10-8075-0696be8905d7,BWシリーズ,HSPt,ポケモンカードゲームBW はじめてセット ピカチュウver. （ツタージャデッキ）,,,,UNRESOLVED_SET
+b9af8be1-6c92-484f-a9c8-cd676894021c,BWシリーズ,HSZp,ポケモンカードゲームBW はじめてセット 全国図鑑版 （ポカブデッキ）,,,,UNRESOLVED_SET
+cb17bd4f-d22a-49d6-9f46-f9fd39c72dc2,BWシリーズ,HSm,ポケモンカードゲームBW はじめてセット forガール （ミジュマルデッキ）,,,,UNRESOLVED_SET
+2e1756b9-e1c7-40a4-979f-bd135ed7bf79,BWシリーズ,HSt,ポケモンカードゲームBW はじめてセット forガール （ツタージャデッキ）,,,,UNRESOLVED_SET
+89fd1846-523d-4aa2-a81b-e0ad34e46209,BWシリーズ,KK,ポケモンカードゲームBW 「最強爆流コンボデッキ60 カメックス＋キュレムEX」,,,,UNRESOLVED_SET
+91a0d41f-0365-4580-99e7-4858dbebf177,BWシリーズ,PPD,ポケモンカードゲームBW 「プラズマ団パワードデッキ30」,,,,UNRESOLVED_SET
+2d7facfd-10a8-4160-92a3-474cea068e8c,BWシリーズ,CS1p,ポケモンカードゲームBW コレクションシート 旅立ちの仲間 ポカブ,,,,UNRESOLVED_SET
+725b7761-718b-4806-98ae-576b98d93cde,BWシリーズ,GBR,ポケモンカードゲームBW 「ガブリアスデッキ30」,,,,UNRESOLVED_SET
+896b5d36-d477-4f4d-882f-3ecff689b238,BWシリーズ,HSPp,ポケモンカードゲームBW はじめてセット ピカチュウver. （ポカブデッキ）,,,,UNRESOLVED_SET
+4afa86c3-a37a-49f2-9d91-c9b96cf26ea8,BWシリーズ,HSZm,ポケモンカードゲームBW はじめてセット 全国図鑑版 （ミジュマルデッキ）,,,,UNRESOLVED_SET
+59ffbab0-eb3a-4da2-b9ac-9e92ac5bb550,BWシリーズ,HSZt,ポケモンカードゲームBW はじめてセット 全国図鑑版 （ツタージャデッキ）,,,,UNRESOLVED_SET
+4f776912-1b8d-4215-aac4-bfcce732c8c7,BWシリーズ,HSp,ポケモンカードゲームBW はじめてセット forガール （ポカブデッキ）,,,,UNRESOLVED_SET
+f0396155-d154-4946-8208-11a05a41d923,BWシリーズ,KLD,ポケモンカードゲームBW バトル強化デッキ30「ケルディオ」,,,,UNRESOLVED_SET
+55e6d6fd-52c1-438e-9b05-d8e60f9c4893,BWシリーズ,MDB,ポケモンカードゲームBW 「トッププレイヤーが選ぶ100＋40枚 マスターデッキビルドBOX EX」,,,,UNRESOLVED_SET
+32500309-1cc7-4c5a-a11e-a3151a6c1637,BWシリーズ,PBG,ポケモンカードゲームBW プラズマ団バトルギフトセット,,,,UNRESOLVED_SET
+07c7c398-510a-431d-8cfc-0b6d234fbbe8,BWシリーズ,WAK,ポケモンカードゲームBW みんなのWAKUWAKUバトル,,,,UNRESOLVED_SET

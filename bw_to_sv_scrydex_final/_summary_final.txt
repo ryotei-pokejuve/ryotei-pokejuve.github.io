@@ -1,0 +1,15 @@
+db_target_sets: 242
+db_target_cards: 15612
+scrydex_expansions_discovered: 229
+mapped_sets: 139
+mapped_by_rule: 131
+mapped_by_name: 8
+unresolved_sets: 103
+rarity_updates: 3990
+unresolved_cards: 5382
+scrydex_blank: 1956
+card_not_found: 240
+cards_in_unresolved_sets: 3186
+ambiguous: 0
+missing_images: 529
+NOTE: SQLは生成しましたが、まだ実行しないでください。

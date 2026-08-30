@@ -1,0 +1,23 @@
+XY6 / XY7 JAPANESE NAME RESTORE V2
+
+xy_rule_sets_scanned: 20
+learned_existing_pairs: 1330
+target_rows: 159
+resolved: 84
+unresolved: 75
+fetch_errors: 2
+
+[resolution methods]
+GLOBAL_UNANIMOUS: 62
+NO_LEARNED_NAME: 75
+SAME_SET_UNANIMOUS: 22
+
+[by set]
+XY6: total=78, resolved=44, unresolved=34
+XY7: total=81, resolved=40, unresolved=41
+
+IMPORTANT:
+- READ ONLY / no Supabase writes
+- Scrydex API is NOT used
+- Only XY-series RULE mappings are used for learning
+- Conflicts and unknown names are not guessed

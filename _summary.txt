@@ -1,0 +1,33 @@
+rule_mapped_sets: 131
+target_db_cards: 12148
+scrydex_image_matches: 11911
+image_updates_needed: 11911
+already_same_scrydex_url: 0
+unresolved_cards: 237
+sql_chunks: 40
+
+[updates by previous source]
+EMPTY: 535
+OTHER: 1
+POKEMON_CARD_COM: 7695
+TCGDEX: 3680
+
+[updates by series]
+BWシリーズ: 924
+SMシリーズ: 3163
+SVシリーズ: 3260
+XYシリーズ: 1299
+ソード・シールド: 3265
+
+[unresolved reasons]
+CARD_NOT_FOUND: 237
+
+IMPORTANT:
+- Python does not update Supabase.
+- Only RULE mappings are used.
+- NAME mappings are excluded.
+- No guessed Scrydex CDN URL is generated.
+- Only an image URL actually found in Scrydex public Web HTML is used.
+- Review _summary.txt and image_unresolved.csv before executing SQL.
+- APPLY SQL is split into 300-row chunks for Supabase SQL Editor.
+- Backup table: public.bw_sv_image_backup_scrydex_20260829

@@ -1,0 +1,10 @@
+XY / XY6 / XY7 MISSING CARD AUDIT
+
+XY: DB=44, Scrydex=188, MISSING=144, DB_NOT_FOUND=0
+XY6: DB=13, Scrydex=91, MISSING=78, DB_NOT_FOUND=0
+XY7: DB=16, Scrydex=97, MISSING=81, DB_NOT_FOUND=0
+
+total_missing: 303
+fetch_errors: 0
+
+READ ONLY / no Supabase writes / no Scrydex API

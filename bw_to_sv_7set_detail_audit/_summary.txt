@@ -1,0 +1,14 @@
+BW-SV 7-SET DETAIL AUDIT
+
+SM1p: DB=70, Scrydex=73, MISSING=3 (inside=1, beyond=2), DB_NOT_FOUND=0
+SV4a: DB=320, Scrydex=250, MISSING=40 (inside=40, beyond=0), DB_NOT_FOUND=110
+XY: DB=44, Scrydex=188, MISSING=144 (inside=144, beyond=0), DB_NOT_FOUND=0
+S8a: DB=35, Scrydex=38, MISSING=3 (inside=3, beyond=0), DB_NOT_FOUND=0
+XY6: DB=13, Scrydex=91, MISSING=78 (inside=78, beyond=0), DB_NOT_FOUND=0
+XY7: DB=16, Scrydex=97, MISSING=81 (inside=81, beyond=0), DB_NOT_FOUND=0
+WCS23: DB=30, Scrydex=32, MISSING=2 (inside=0, beyond=2), DB_NOT_FOUND=0
+
+total_missing: 351
+fetch_errors: 0
+
+READ ONLY / no Supabase writes / no Scrydex API

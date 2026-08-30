@@ -1,0 +1,26 @@
+BW-SV FINAL AUDIT
+
+rule_mapped_sets: 131
+target_db_cards: 12412
+scrydex_set_errors: 131
+missing_cards_in_db: 0
+db_cards_not_found_in_scrydex: 0
+rarity_mismatches_with_explicit_scrydex_rarity: 0
+suspicious_names: 0
+non_numeric_card_numbers: 1
+duplicate_numeric_number_rows: 0
+
+[image sources]
+POKEMON_CARD_COM: 1
+SCRYDEX: 12411
+
+[missing cards by series]
+
+[DB cards not found in Scrydex by series]
+
+IMPORTANT:
+- This script does NOT update Supabase.
+- Only RULE mappings are used.
+- Scrydex API is NOT used.
+- Review CSVs before making any corrections.
+- Use a fresh DB export before running this final audit.

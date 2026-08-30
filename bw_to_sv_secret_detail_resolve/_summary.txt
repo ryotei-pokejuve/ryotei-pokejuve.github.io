@@ -1,0 +1,9 @@
+previously_resolved: 250
+detail_target: 14
+detail_resolved: 14
+still_unresolved: 0
+total_resolved: 264
+
+NOTE: DB更新なし。
+NOTE: Scrydex公開カード詳細ページに掲載された日本語名のみ採用。
+NOTE: total_resolved=264 なら次にINSERT SQL生成へ進める。

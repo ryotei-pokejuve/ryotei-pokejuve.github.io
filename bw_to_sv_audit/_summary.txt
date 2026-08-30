@@ -1,0 +1,15 @@
+target_series: BWシリーズ, SMシリーズ, SVシリーズ, XYシリーズ, ソード・シールド
+db_target_sets: 242
+db_target_cards: 15612
+scrydex_expansions_discovered: 229
+mapped_sets: 130
+unresolved_sets: 112
+rarity_ok: 6175
+rarity_changes: 3876
+scrydex_blank: 1840
+card_not_found: 236
+ambiguous_scrydex_number: 0
+cards_in_unresolved_sets: 3485
+missing_images: 535
+
+NOTE: この監査はDBを更新していません。差分SQLはまだ作っていません。

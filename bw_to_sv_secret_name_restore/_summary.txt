@@ -1,0 +1,19 @@
+target_missing_secret_rows: 264
+resolved_japanese_names: 250
+unresolved_japanese_names: 14
+same_set_resolved: 164
+global_unanimous_resolved: 86
+
+[resolved by series]
+BWシリーズ: 84
+SMシリーズ: 8
+XYシリーズ: 30
+ソード・シールド: 128
+
+[unresolved reasons]
+GLOBAL_CONFLICT: 7
+NO_LEARNED_NAME: 7
+
+NOTE: DB更新なし。
+NOTE: HIGHのみ自動復元。英語名→日本語名が一意でないものは未解決。
+NOTE: 次段階で resolved CSV を確認してから INSERT SQL を生成する。

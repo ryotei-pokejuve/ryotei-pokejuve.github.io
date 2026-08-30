@@ -1,0 +1,7 @@
+db_mega_rows: 2011
+scrydex_cards_parsed: 980
+matches: 919
+changes: 58
+no_rarity_parsed: 504
+not_found_on_scrydex: 530
+request_or_parse_errors: 531

@@ -1,0 +1,23 @@
+rule_mapped_sets: 131
+sets_with_missing_cards: 48
+missing_scrydex_rows: 610
+missing_beyond_db_max_rows: 264
+parse_warnings: 0
+
+[missing by series]
+BWシリーズ: 90
+SMシリーズ: 9
+SVシリーズ: 40
+XYシリーズ: 336
+ソード・シールド: 135
+
+[beyond DB max by series]
+BWシリーズ: 90
+SMシリーズ: 9
+XYシリーズ: 33
+ソード・シールド: 132
+
+NOTE: DB更新はしていません。
+NOTE: missing_cards.csv はScrydexに存在し、DBに同じカード番号が無い行です。
+NOTE: missing_beyond_db_max.csv は特にシークレット枠欠損の可能性が高い行です。
+NOTE: INSERT SQLはまだ生成していません。結果確認後に作成します。

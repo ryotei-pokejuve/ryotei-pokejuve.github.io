@@ -1,0 +1,13 @@
+SV4a MISSING 40 OFFICIAL DIRECT VERIFY V2
+
+input_rows: 40
+verified: 0
+unresolved: 40
+
+Method:
+- pokemon-card.com public card-search directly
+- Japanese candidate name from Scrydex
+- official detail page must explicitly match SV4a <number>/190
+
+READ ONLY / no Supabase writes / no Scrydex API
+No INSERT SQL generated yet.

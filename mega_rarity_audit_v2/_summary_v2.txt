@@ -1,0 +1,7 @@
+db_mega_rows: 2011
+scrydex_table_rows_found: 1511
+matches: 923
+changes: 49
+scrydex_blank: 513
+not_found: 526
+set_fetch_errors: 0

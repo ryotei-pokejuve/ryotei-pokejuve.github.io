@@ -1,0 +1,16 @@
+XY (THE BEST OF XY) JAPANESE NAME RESCUE AUDIT
+
+target_rows: 144
+resolved: 142
+unresolved: 2
+fetch_errors: 0
+resolved_rows_blank_rarity: 142
+resolved_rows_blank_image: 0
+
+[methods]
+NO_JAPANESE_NAME: 2
+SCRYDEX_DETAIL_HEADING_AFTER_H1: 142
+
+READ ONLY / no Supabase writes / no Scrydex API
+Japanese names are taken only from Scrydex public card detail pages.
+No unresolved row is guessed or auto-filled.

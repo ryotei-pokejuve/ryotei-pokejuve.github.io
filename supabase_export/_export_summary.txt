@@ -1,0 +1,7 @@
+REST_URL: https://idnhamxtwxfcxflenxko.supabase.co/rest/v1
+card_sets: ERROR HTTP 401: {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT SELECT ON public.card_sets TO anon;","message":"permission denied for table card_sets"}
+cards: ERROR HTTP 401: {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT SELECT ON public.cards TO anon;","message":"permission denied for table cards"}
+current_prices: ERROR HTTP 401: {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT SELECT ON public.current_prices TO anon;","message":"permission denied for table current_prices"}
+price_sources: ERROR HTTP 401: {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT SELECT ON public.price_sources TO anon;","message":"permission denied for table price_sources"}
+short_features: ERROR HTTP 401: {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT SELECT ON public.short_features TO anon;","message":"permission denied for table short_features"}
+site_settings: ERROR HTTP 401: {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT SELECT ON public.site_settings TO anon;","message":"permission denied for table site_settings"}

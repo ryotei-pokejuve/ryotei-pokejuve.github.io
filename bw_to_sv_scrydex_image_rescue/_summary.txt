@@ -1,0 +1,16 @@
+input_unresolved: 237
+rescue_confirmed: 236
+still_unresolved: 1
+sql_chunks: 1
+
+[confirmed by set]
+S12a: 8
+S4a: 76
+S8b: 35
+SM2L: 7
+SV4a: 110
+
+[unresolved reasons]
+NO_MAPPING_OR_NUMBER: 1
+
+IMPORTANT: Python does not update Supabase. Review CSVs before SQL.

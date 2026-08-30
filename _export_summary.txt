@@ -1,0 +1,6 @@
+card_sets: 342
+cards: 24186
+current_prices: 6
+price_sources: 4
+short_features: 1
+site_settings: 2

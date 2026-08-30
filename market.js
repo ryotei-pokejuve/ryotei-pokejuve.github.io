@@ -40,15 +40,18 @@
   // 検索ページ用: 表示件数・並び順対応
   function searchCardsSorted(opts){
     opts = opts || {};
-    return client().schema("api").rpc("search_cards_sorted", {
+    var sort = opts.sort || "default";
+    var rpcName = sort === "release_desc" ? "search_cards_release_sorted" : "search_cards_sorted";
+    var params = {
       p_query: opts.query || null,
       p_set_id: opts.setId || null,
       p_series_name: opts.seriesName || null,
       p_rarity: opts.rarity || null,
-      p_sort: opts.sort || "default",
       p_limit: opts.limit || 20,
       p_offset: opts.offset || 0
-    }).then(function(res){
+    };
+    if(rpcName === "search_cards_sorted") params.p_sort = sort;
+    return client().schema("api").rpc(rpcName, params).then(function(res){
       if(res.error) throw res.error;
       return res.data || [];
     });
@@ -87,6 +90,14 @@
     }).then(function(res){
       if(res.error) throw res.error;
       return res.data || [];
+    });
+  }
+
+  // 公開サイト設定を1件取得。未設定時はnull。
+  function getSiteSetting(key){
+    return client().schema("api").rpc("get_site_setting", { p_key: key }).then(function(res){
+      if(res.error) throw res.error;
+      return res.data == null ? null : String(res.data);
     });
   }
 
@@ -170,6 +181,7 @@
     getCard: getCard,
     getPriceHistory: getPriceHistory,
     getCardMarketPrices: getCardMarketPrices,
+    getSiteSetting: getSiteSetting,
     listShortPriceCards: listShortPriceCards,
     listCardSets: listCardSets,
     listCardSeries: listCardSeries,

@@ -1,0 +1,8 @@
+﻿set_code,set_name,scrydex_id,db_rows,db_numeric_numbers,db_max_number,scrydex_numbers,missing_total,missing_inside_db_range,missing_beyond_db_max,db_not_found_in_scrydex
+SM1p,サン&ムーン,sm1p_ja,70,70,71,73,3,1,2,0
+SV4a,シャイニートレジャーex,sv4a_ja,320,320,360,250,40,40,0,110
+XY,ハイクラスパック「THE BEST OF XY」,xy_ja,44,44,188,188,144,144,0,0
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,swsh8a_ja,35,35,38,38,3,3,0,0
+XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,xy6_ja,13,13,91,91,78,78,0,0
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,xy7_ja,16,16,97,97,81,81,0,0
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,wcs23_ja,30,30,30,32,2,0,2,0

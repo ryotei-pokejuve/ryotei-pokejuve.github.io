@@ -1,0 +1,8 @@
+SV4a MISSING 40 OFFICIAL VERIFY
+
+input_rows: 40
+verified_official_number_match: 0
+unresolved: 40
+
+READ ONLY / no Supabase writes / no Scrydex API
+No INSERT SQL generated yet.

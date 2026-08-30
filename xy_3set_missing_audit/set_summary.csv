@@ -1,0 +1,4 @@
+﻿set_code,set_name,scrydex_id,db_rows,db_numeric_numbers,scrydex_numbers,missing_count,db_not_found_count,missing_with_name,missing_with_rarity,missing_with_image
+XY,ハイクラスパック「THE BEST OF XY」,xy_ja,44,44,188,144,0,0,0,144
+XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,xy6_ja,13,13,91,78,0,0,78,78
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,xy7_ja,16,16,97,81,0,0,81,81

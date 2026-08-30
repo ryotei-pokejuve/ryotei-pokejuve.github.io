@@ -102,6 +102,8 @@ var grid=document.getElementById("grid"),status=document.getElementById("status"
 var count=document.getElementById("count"),moreWrap=document.getElementById("more-wrap"),more=document.getElementById("more");
 var q=document.getElementById("q"),setSel=document.getElementById("set"),rarity=document.getElementById("rarity"),sort=document.getElementById("sort");
 var apply=document.getElementById("apply"),clear=document.getElementById("clear");
+var DEFAULT_SORT="newest";
+var SORT_VALUES=["newest","name_asc","name_desc","price_desc","price_asc","release_desc","release_asc"];
 
 function fmtDate(v){
   if(!v)return "ー";
@@ -204,9 +206,19 @@ MARKET.listCardSets().then(function(sets){
 
 apply.addEventListener("click",reload);
 q.addEventListener("keydown",function(e){if(e.key==="Enter")reload()});
-clear.addEventListener("click",function(){q.value="";setSel.value="";rarity.value="";sort.value="newest";});
+clear.addEventListener("click",function(){q.value="";setSel.value="";rarity.value="";sort.value=DEFAULT_SORT;});
 more.addEventListener("click",function(){load(true)});
-load(false);
+
+// 管理画面で保存した初期並び順を取得してから最初の一覧を表示する。
+// 設定取得に失敗した場合もページ自体は従来どおり新着順で表示する。
+MARKET.getSiteSetting("price_default_sort").then(function(value){
+  if(SORT_VALUES.indexOf(value) !== -1) DEFAULT_SORT=value;
+}).catch(function(err){
+  console.error("site setting load failed", err);
+}).then(function(){
+  sort.value=DEFAULT_SORT;
+  load(false);
+});
 })();
 </script>
 </body>

@@ -1,0 +1,529 @@
+﻿set_code,set_name,number,db_card_number,db_name,db_rarity,db_image_url,found_in_scrydex
+SM1p,サン&ムーン,1,001,モクロー,ー,https://images.scrydex.com/pokemon/sm1p_ja-1/medium,YES
+SM1p,サン&ムーン,2,002,フクスロー,ー,https://images.scrydex.com/pokemon/sm1p_ja-2/medium,YES
+SM1p,サン&ムーン,3,003,ジュナイパーGX,RR,https://images.scrydex.com/pokemon/sm1p_ja-3/medium,YES
+SM1p,サン&ムーン,4,004,アゴジムシ,ー,https://images.scrydex.com/pokemon/sm1p_ja-4/medium,YES
+SM1p,サン&ムーン,5,005,カリキリ,ー,https://images.scrydex.com/pokemon/sm1p_ja-5/medium,YES
+SM1p,サン&ムーン,6,006,ラランテス,ー,https://images.scrydex.com/pokemon/sm1p_ja-6/medium,YES
+SM1p,サン&ムーン,7,007,ニャビー,ー,https://images.scrydex.com/pokemon/sm1p_ja-7/medium,YES
+SM1p,サン&ムーン,8,008,ニャヒート,ー,https://images.scrydex.com/pokemon/sm1p_ja-8/medium,YES
+SM1p,サン&ムーン,9,009,ガオガエンGX,RR,https://images.scrydex.com/pokemon/sm1p_ja-9/medium,YES
+SM1p,サン&ムーン,10,010,オドリドリ,ー,https://images.scrydex.com/pokemon/sm1p_ja-10/medium,YES
+SM1p,サン&ムーン,11,011,ニョロモ,ー,https://images.scrydex.com/pokemon/sm1p_ja-11/medium,YES
+SM1p,サン&ムーン,12,012,ニョロゾ,ー,https://images.scrydex.com/pokemon/sm1p_ja-12/medium,YES
+SM1p,サン&ムーン,13,013,ニョロトノ,ー,https://images.scrydex.com/pokemon/sm1p_ja-13/medium,YES
+SM1p,サン&ムーン,14,014,アシマリ,ー,https://images.scrydex.com/pokemon/sm1p_ja-14/medium,YES
+SM1p,サン&ムーン,15,015,オシャマリ,ー,https://images.scrydex.com/pokemon/sm1p_ja-15/medium,YES
+SM1p,サン&ムーン,16,016,アシレーヌGX,RR,https://images.scrydex.com/pokemon/sm1p_ja-16/medium,YES
+SM1p,サン&ムーン,17,017,シズクモ,ー,https://images.scrydex.com/pokemon/sm1p_ja-17/medium,YES
+SM1p,サン&ムーン,18,018,オニシズクモ,ー,https://images.scrydex.com/pokemon/sm1p_ja-18/medium,YES
+SM1p,サン&ムーン,19,019,ナマコブシ,ー,https://images.scrydex.com/pokemon/sm1p_ja-19/medium,YES
+SM1p,サン&ムーン,20,020,デンヂムシ,ー,https://images.scrydex.com/pokemon/sm1p_ja-20/medium,YES
+SM1p,サン&ムーン,21,021,クワガノンGX,RR,https://images.scrydex.com/pokemon/sm1p_ja-21/medium,YES
+SM1p,サン&ムーン,22,022,オドリドリ,ー,https://images.scrydex.com/pokemon/sm1p_ja-22/medium,YES
+SM1p,サン&ムーン,23,023,オドリドリ,ー,https://images.scrydex.com/pokemon/sm1p_ja-23/medium,YES
+SM1p,サン&ムーン,24,024,オドリドリ,ー,https://images.scrydex.com/pokemon/sm1p_ja-24/medium,YES
+SM1p,サン&ムーン,25,025,ヒドイデ,ー,https://images.scrydex.com/pokemon/sm1p_ja-25/medium,YES
+SM1p,サン&ムーン,26,026,ドヒドイデGX,RR,https://images.scrydex.com/pokemon/sm1p_ja-26/medium,YES
+SM1p,サン&ムーン,27,027,コスモッグ,ー,https://images.scrydex.com/pokemon/sm1p_ja-27/medium,YES
+SM1p,サン&ムーン,28,028,コスモウム,ー,https://images.scrydex.com/pokemon/sm1p_ja-28/medium,YES
+SM1p,サン&ムーン,29,029,ルナアーラ,ー,https://images.scrydex.com/pokemon/sm1p_ja-29/medium,YES
+SM1p,サン&ムーン,30,030,ウソッキー,ー,https://images.scrydex.com/pokemon/sm1p_ja-30/medium,YES
+SM1p,サン&ムーン,31,031,ドロバンコ,ー,https://images.scrydex.com/pokemon/sm1p_ja-31/medium,YES
+SM1p,サン&ムーン,32,032,バンバドロ,ー,https://images.scrydex.com/pokemon/sm1p_ja-32/medium,YES
+SM1p,サン&ムーン,33,033,ナゲツケサル,ー,https://images.scrydex.com/pokemon/sm1p_ja-33/medium,YES
+SM1p,サン&ムーン,34,034,スナバァ,ー,https://images.scrydex.com/pokemon/sm1p_ja-34/medium,YES
+SM1p,サン&ムーン,35,035,シロデスナ,ー,https://images.scrydex.com/pokemon/sm1p_ja-35/medium,YES
+SM1p,サン&ムーン,36,036,アローラコラッタ,ー,https://images.scrydex.com/pokemon/sm1p_ja-36/medium,YES
+SM1p,サン&ムーン,37,037,アローララッタ,ー,https://images.scrydex.com/pokemon/sm1p_ja-37/medium,YES
+SM1p,サン&ムーン,38,038,アブソル,ー,https://images.scrydex.com/pokemon/sm1p_ja-38/medium,YES
+SM1p,サン&ムーン,39,039,ソルガレオ,ー,https://images.scrydex.com/pokemon/sm1p_ja-39/medium,YES
+SM1p,サン&ムーン,40,040,ニンフィアGX,RR,https://images.scrydex.com/pokemon/sm1p_ja-40/medium,YES
+SM1p,サン&ムーン,41,041,イーブイ,ー,https://images.scrydex.com/pokemon/sm1p_ja-41/medium,YES
+SM1p,サン&ムーン,42,042,ジジーロンGX,RR,https://images.scrydex.com/pokemon/sm1p_ja-42/medium,YES
+SM1p,サン&ムーン,43,043,エネルギーリサイクル,ー,https://images.scrydex.com/pokemon/sm1p_ja-43/medium,YES
+SM1p,サン&ムーン,44,044,改造ハンマー,ー,https://images.scrydex.com/pokemon/sm1p_ja-44/medium,YES
+SM1p,サン&ムーン,45,045,ハイパーボール,ー,https://images.scrydex.com/pokemon/sm1p_ja-45/medium,YES
+SM1p,サン&ムーン,46,046,ふしぎなアメ,ー,https://images.scrydex.com/pokemon/sm1p_ja-46/medium,YES
+SM1p,サン&ムーン,47,047,マルチつけかえ,ー,https://images.scrydex.com/pokemon/sm1p_ja-47/medium,YES
+SM1p,サン&ムーン,48,048,まんたんのくすり,ー,https://images.scrydex.com/pokemon/sm1p_ja-48/medium,YES
+SM1p,サン&ムーン,49,049,こだわりハチマキ,ー,https://images.scrydex.com/pokemon/sm1p_ja-49/medium,YES
+SM1p,サン&ムーン,50,050,月輪の祭壇,ー,https://images.scrydex.com/pokemon/sm1p_ja-50/medium,YES
+SM1p,サン&ムーン,51,051,日輪の祭壇,ー,https://images.scrydex.com/pokemon/sm1p_ja-51/medium,YES
+SM1p,サン&ムーン,52,052,ジュナイパーGX,SR,https://images.scrydex.com/pokemon/sm1p_ja-52/medium,YES
+SM1p,サン&ムーン,53,053,ガオガエンGX,SR,https://images.scrydex.com/pokemon/sm1p_ja-53/medium,YES
+SM1p,サン&ムーン,54,054,アシレーヌGX,SR,https://images.scrydex.com/pokemon/sm1p_ja-54/medium,YES
+SM1p,サン&ムーン,55,055,クワガノンGX,SR,https://images.scrydex.com/pokemon/sm1p_ja-55/medium,YES
+SM1p,サン&ムーン,56,056,ドヒドイデGX,SR,https://images.scrydex.com/pokemon/sm1p_ja-56/medium,YES
+SM1p,サン&ムーン,57,057,ニンフィアGX,SR,https://images.scrydex.com/pokemon/sm1p_ja-57/medium,YES
+SM1p,サン&ムーン,58,058,ジジーロンGX,SR,https://images.scrydex.com/pokemon/sm1p_ja-58/medium,YES
+SM1p,サン&ムーン,59,059,ジュナイパーGX,HR,https://images.scrydex.com/pokemon/sm1p_ja-59/medium,YES
+SM1p,サン&ムーン,60,060,ガオガエンGX,HR,https://images.scrydex.com/pokemon/sm1p_ja-60/medium,YES
+SM1p,サン&ムーン,61,061,アシレーヌGX,HR,https://images.scrydex.com/pokemon/sm1p_ja-61/medium,YES
+SM1p,サン&ムーン,62,062,クワガノンGX,HR,https://images.scrydex.com/pokemon/sm1p_ja-62/medium,YES
+SM1p,サン&ムーン,63,063,ドヒドイデGX,HR,https://images.scrydex.com/pokemon/sm1p_ja-63/medium,YES
+SM1p,サン&ムーン,64,064,ニンフィアGX,HR,https://images.scrydex.com/pokemon/sm1p_ja-64/medium,YES
+SM1p,サン&ムーン,65,065,ジジーロンGX,HR,https://images.scrydex.com/pokemon/sm1p_ja-65/medium,YES
+SM1p,サン&ムーン,66,066,ふしぎなアメ,UR,https://images.scrydex.com/pokemon/sm1p_ja-66/medium,YES
+SM1p,サン&ムーン,67,067,ダブル無色エネルギー,UR,https://images.scrydex.com/pokemon/sm1p_ja-67/medium,YES
+SM1p,サン&ムーン,68,068,基本草エネルギー,UR,https://images.scrydex.com/pokemon/sm1p_ja-68/medium,YES
+SM1p,サン&ムーン,70,070,基本炎エネルギー,,https://images.scrydex.com/pokemon/sm1p_ja-70/large,YES
+SM1p,サン&ムーン,71,071,基本超エネルギー,,https://images.scrydex.com/pokemon/sm1p_ja-71/large,YES
+SV4a,シャイニートレジャーex,1,001,ナゾノクサ,,https://images.scrydex.com/pokemon/sv4a_ja-1/medium,YES
+SV4a,シャイニートレジャーex,2,002,クサイハナ,,https://images.scrydex.com/pokemon/sv4a_ja-2/medium,YES
+SV4a,シャイニートレジャーex,3,003,ラフレシア,,https://images.scrydex.com/pokemon/sv4a_ja-3/medium,YES
+SV4a,シャイニートレジャーex,4,004,ストライク,,https://images.scrydex.com/pokemon/sv4a_ja-4/medium,YES
+SV4a,シャイニートレジャーex,5,005,ハネッコ,,https://images.scrydex.com/pokemon/sv4a_ja-5/medium,YES
+SV4a,シャイニートレジャーex,6,006,ポポッコ,,https://images.scrydex.com/pokemon/sv4a_ja-6/medium,YES
+SV4a,シャイニートレジャーex,7,007,ワタッコ,,https://images.scrydex.com/pokemon/sv4a_ja-7/medium,YES
+SV4a,シャイニートレジャーex,8,008,クヌギダマ,,https://images.scrydex.com/pokemon/sv4a_ja-8/medium,YES
+SV4a,シャイニートレジャーex,9,009,フォレトスex,RR,https://images.scrydex.com/pokemon/sv4a_ja-9/medium,YES
+SV4a,シャイニートレジャーex,10,010,ユキカブリ,,https://images.scrydex.com/pokemon/sv4a_ja-10/medium,YES
+SV4a,シャイニートレジャーex,11,011,ユキノオー,,https://images.scrydex.com/pokemon/sv4a_ja-11/medium,YES
+SV4a,シャイニートレジャーex,12,012,ニャオハ,,https://images.scrydex.com/pokemon/sv4a_ja-12/medium,YES
+SV4a,シャイニートレジャーex,13,013,ニャローテ,,https://images.scrydex.com/pokemon/sv4a_ja-13/medium,YES
+SV4a,シャイニートレジャーex,14,014,マスカーニャex,RR,https://images.scrydex.com/pokemon/sv4a_ja-14/medium,YES
+SV4a,シャイニートレジャーex,15,015,ミニーブ,,https://images.scrydex.com/pokemon/sv4a_ja-15/medium,YES
+SV4a,シャイニートレジャーex,16,016,オリーニョ,,https://images.scrydex.com/pokemon/sv4a_ja-16/medium,YES
+SV4a,シャイニートレジャーex,17,017,オリーヴァ,,https://images.scrydex.com/pokemon/sv4a_ja-17/medium,YES
+SV4a,シャイニートレジャーex,18,018,ノノクラゲ,,https://images.scrydex.com/pokemon/sv4a_ja-18/medium,YES
+SV4a,シャイニートレジャーex,19,019,リククラゲex,RR,https://images.scrydex.com/pokemon/sv4a_ja-19/medium,YES
+SV4a,シャイニートレジャーex,20,020,カプサイジ,,https://images.scrydex.com/pokemon/sv4a_ja-20/medium,YES
+SV4a,シャイニートレジャーex,21,021,スコヴィラン,,https://images.scrydex.com/pokemon/sv4a_ja-21/medium,YES
+SV4a,シャイニートレジャーex,22,022,シガロコ,,https://images.scrydex.com/pokemon/sv4a_ja-22/medium,YES
+SV4a,シャイニートレジャーex,23,023,クエスパトラex,RR,https://images.scrydex.com/pokemon/sv4a_ja-23/medium,YES
+SV4a,シャイニートレジャーex,24,024,チオンジェンex,RR,https://images.scrydex.com/pokemon/sv4a_ja-24/medium,YES
+SV4a,シャイニートレジャーex,25,025,ヒトカゲ,,https://images.scrydex.com/pokemon/sv4a_ja-25/medium,YES
+SV4a,シャイニートレジャーex,26,026,リザード,,https://images.scrydex.com/pokemon/sv4a_ja-26/medium,YES
+SV4a,シャイニートレジャーex,27,027,パルデア ケンタロス,,https://images.scrydex.com/pokemon/sv4a_ja-27/medium,YES
+SV4a,シャイニートレジャーex,28,028,エンテイ,,https://images.scrydex.com/pokemon/sv4a_ja-28/medium,YES
+SV4a,シャイニートレジャーex,29,029,オドリドリ,,https://images.scrydex.com/pokemon/sv4a_ja-29/medium,YES
+SV4a,シャイニートレジャーex,30,030,ホゲータ,,https://images.scrydex.com/pokemon/sv4a_ja-30/medium,YES
+SV4a,シャイニートレジャーex,31,031,アチゲータ,,https://images.scrydex.com/pokemon/sv4a_ja-31/medium,YES
+SV4a,シャイニートレジャーex,32,032,ラウドボーンex,RR,https://images.scrydex.com/pokemon/sv4a_ja-32/medium,YES
+SV4a,シャイニートレジャーex,33,033,カルボウ,,https://images.scrydex.com/pokemon/sv4a_ja-33/medium,YES
+SV4a,シャイニートレジャーex,34,034,グレンアルマ,,https://images.scrydex.com/pokemon/sv4a_ja-34/medium,YES
+SV4a,シャイニートレジャーex,35,035,イーユイex,RR,https://images.scrydex.com/pokemon/sv4a_ja-35/medium,YES
+SV4a,シャイニートレジャーex,36,036,ヤドン,,https://images.scrydex.com/pokemon/sv4a_ja-36/medium,YES
+SV4a,シャイニートレジャーex,37,037,ヤドラン,,https://images.scrydex.com/pokemon/sv4a_ja-37/medium,YES
+SV4a,シャイニートレジャーex,38,038,ヒトデマン,,https://images.scrydex.com/pokemon/sv4a_ja-38/medium,YES
+SV4a,シャイニートレジャーex,39,039,スターミー,,https://images.scrydex.com/pokemon/sv4a_ja-39/medium,YES
+SV4a,シャイニートレジャーex,40,040,パルデア ケンタロス,,https://images.scrydex.com/pokemon/sv4a_ja-40/medium,YES
+SV4a,シャイニートレジャーex,41,041,クワッス,,https://images.scrydex.com/pokemon/sv4a_ja-41/medium,YES
+SV4a,シャイニートレジャーex,42,042,ウェルカモ,,https://images.scrydex.com/pokemon/sv4a_ja-42/medium,YES
+SV4a,シャイニートレジャーex,43,043,ウェーニバルex,RR,https://images.scrydex.com/pokemon/sv4a_ja-43/medium,YES
+SV4a,シャイニートレジャーex,44,044,ウミディグダ,,https://images.scrydex.com/pokemon/sv4a_ja-44/medium,YES
+SV4a,シャイニートレジャーex,45,045,ウミトリオ,,https://images.scrydex.com/pokemon/sv4a_ja-45/medium,YES
+SV4a,シャイニートレジャーex,46,046,ナミイルカ,,https://images.scrydex.com/pokemon/sv4a_ja-46/medium,YES
+SV4a,シャイニートレジャーex,47,047,イルカマン,,https://images.scrydex.com/pokemon/sv4a_ja-47/medium,YES
+SV4a,シャイニートレジャーex,48,048,ミガルーサ,,https://images.scrydex.com/pokemon/sv4a_ja-48/medium,YES
+SV4a,シャイニートレジャーex,49,049,ヘイラッシャ,,https://images.scrydex.com/pokemon/sv4a_ja-49/medium,YES
+SV4a,シャイニートレジャーex,50,050,シャリタツ,,https://images.scrydex.com/pokemon/sv4a_ja-50/medium,YES
+SV4a,シャイニートレジャーex,51,051,セビエ,,https://images.scrydex.com/pokemon/sv4a_ja-51/medium,YES
+SV4a,シャイニートレジャーex,52,052,セゴール,,https://images.scrydex.com/pokemon/sv4a_ja-52/medium,YES
+SV4a,シャイニートレジャーex,53,053,セグレイブ,,https://images.scrydex.com/pokemon/sv4a_ja-53/medium,YES
+SV4a,シャイニートレジャーex,54,054,パオジアンex,RR,https://images.scrydex.com/pokemon/sv4a_ja-54/medium,YES
+SV4a,シャイニートレジャーex,55,055,ピカチュウ,,https://images.scrydex.com/pokemon/sv4a_ja-55/medium,YES
+SV4a,シャイニートレジャーex,56,056,ライチュウ,,https://images.scrydex.com/pokemon/sv4a_ja-56/medium,YES
+SV4a,シャイニートレジャーex,57,057,ビリリダマ,,https://images.scrydex.com/pokemon/sv4a_ja-57/medium,YES
+SV4a,シャイニートレジャーex,58,058,マルマイン,,https://images.scrydex.com/pokemon/sv4a_ja-58/medium,YES
+SV4a,シャイニートレジャーex,59,059,コリンク,,https://images.scrydex.com/pokemon/sv4a_ja-59/medium,YES
+SV4a,シャイニートレジャーex,60,060,ルクシオ,,https://images.scrydex.com/pokemon/sv4a_ja-60/medium,YES
+SV4a,シャイニートレジャーex,61,061,レントラー,,https://images.scrydex.com/pokemon/sv4a_ja-61/medium,YES
+SV4a,シャイニートレジャーex,62,062,パチリス,,https://images.scrydex.com/pokemon/sv4a_ja-62/medium,YES
+SV4a,シャイニートレジャーex,63,063,ボルトロス,,https://images.scrydex.com/pokemon/sv4a_ja-63/medium,YES
+SV4a,シャイニートレジャーex,64,064,エレズン,,https://images.scrydex.com/pokemon/sv4a_ja-64/medium,YES
+SV4a,シャイニートレジャーex,65,065,ストリンダー,,https://images.scrydex.com/pokemon/sv4a_ja-65/medium,YES
+SV4a,シャイニートレジャーex,66,066,パモ,,https://images.scrydex.com/pokemon/sv4a_ja-66/medium,YES
+SV4a,シャイニートレジャーex,67,067,パモット,,https://images.scrydex.com/pokemon/sv4a_ja-67/medium,YES
+SV4a,シャイニートレジャーex,68,068,パーモット,,https://images.scrydex.com/pokemon/sv4a_ja-68/medium,YES
+SV4a,シャイニートレジャーex,69,069,カイデン,,https://images.scrydex.com/pokemon/sv4a_ja-69/medium,YES
+SV4a,シャイニートレジャーex,70,070,タイカイデン,,https://images.scrydex.com/pokemon/sv4a_ja-70/medium,YES
+SV4a,シャイニートレジャーex,71,071,ミライドンex,RR,https://images.scrydex.com/pokemon/sv4a_ja-71/medium,YES
+SV4a,シャイニートレジャーex,72,072,プクリン,,https://images.scrydex.com/pokemon/sv4a_ja-72/medium,YES
+SV4a,シャイニートレジャーex,73,073,ケーシィ,,https://images.scrydex.com/pokemon/sv4a_ja-73/medium,YES
+SV4a,シャイニートレジャーex,74,074,ユンゲラー,,https://images.scrydex.com/pokemon/sv4a_ja-74/medium,YES
+SV4a,シャイニートレジャーex,75,075,フーディンex,RR,https://images.scrydex.com/pokemon/sv4a_ja-75/medium,YES
+SV4a,シャイニートレジャーex,76,076,ミュウex,RR,https://images.scrydex.com/pokemon/sv4a_ja-76/medium,YES
+SV4a,シャイニートレジャーex,77,077,ピィ,,https://images.scrydex.com/pokemon/sv4a_ja-77/medium,YES
+SV4a,シャイニートレジャーex,78,078,ネイティ,,https://images.scrydex.com/pokemon/sv4a_ja-78/medium,YES
+SV4a,シャイニートレジャーex,79,079,ネイティオ,,https://images.scrydex.com/pokemon/sv4a_ja-79/medium,YES
+SV4a,シャイニートレジャーex,80,080,ラルトス,,https://images.scrydex.com/pokemon/sv4a_ja-80/medium,YES
+SV4a,シャイニートレジャーex,81,081,キルリア,,https://images.scrydex.com/pokemon/sv4a_ja-81/medium,YES
+SV4a,シャイニートレジャーex,82,082,サーナイトex,RR,https://images.scrydex.com/pokemon/sv4a_ja-82/medium,YES
+SV4a,シャイニートレジャーex,83,083,フワンテ,,https://images.scrydex.com/pokemon/sv4a_ja-83/medium,YES
+SV4a,シャイニートレジャーex,84,084,フワライド,,https://images.scrydex.com/pokemon/sv4a_ja-84/medium,YES
+SV4a,シャイニートレジャーex,85,085,マネネ,,https://images.scrydex.com/pokemon/sv4a_ja-85/medium,YES
+SV4a,シャイニートレジャーex,86,086,ミカルゲ,,https://images.scrydex.com/pokemon/sv4a_ja-86/medium,YES
+SV4a,シャイニートレジャーex,87,087,クレッフィ,,https://images.scrydex.com/pokemon/sv4a_ja-87/medium,YES
+SV4a,シャイニートレジャーex,88,088,ミミッキュ,,https://images.scrydex.com/pokemon/sv4a_ja-88/medium,YES
+SV4a,シャイニートレジャーex,89,089,パピモッチ,,https://images.scrydex.com/pokemon/sv4a_ja-89/medium,YES
+SV4a,シャイニートレジャーex,90,090,バウッツェル,,https://images.scrydex.com/pokemon/sv4a_ja-90/medium,YES
+SV4a,シャイニートレジャーex,91,091,ソウブレイズ,,https://images.scrydex.com/pokemon/sv4a_ja-91/medium,YES
+SV4a,シャイニートレジャーex,92,092,ベラカス,,https://images.scrydex.com/pokemon/sv4a_ja-92/medium,YES
+SV4a,シャイニートレジャーex,93,093,ヒラヒナ,,https://images.scrydex.com/pokemon/sv4a_ja-93/medium,YES
+SV4a,シャイニートレジャーex,94,094,カヌチャン,,https://images.scrydex.com/pokemon/sv4a_ja-94/medium,YES
+SV4a,シャイニートレジャーex,95,095,ナカヌチャン,,https://images.scrydex.com/pokemon/sv4a_ja-95/medium,YES
+SV4a,シャイニートレジャーex,96,096,デカヌチャン,,https://images.scrydex.com/pokemon/sv4a_ja-96/medium,YES
+SV4a,シャイニートレジャーex,97,097,ボチ,,https://images.scrydex.com/pokemon/sv4a_ja-97/medium,YES
+SV4a,シャイニートレジャーex,98,098,ハカドッグ,,https://images.scrydex.com/pokemon/sv4a_ja-98/medium,YES
+SV4a,シャイニートレジャーex,99,099,コレクレー,,https://images.scrydex.com/pokemon/sv4a_ja-99/medium,YES
+SV4a,シャイニートレジャーex,100,100,マンキー,,https://images.scrydex.com/pokemon/sv4a_ja-100/medium,YES
+SV4a,シャイニートレジャーex,101,101,オコリザル,,https://images.scrydex.com/pokemon/sv4a_ja-101/medium,YES
+SV4a,シャイニートレジャーex,102,102,コノヨザル,,https://images.scrydex.com/pokemon/sv4a_ja-102/medium,YES
+SV4a,シャイニートレジャーex,103,103,パルデア ケンタロス,,https://images.scrydex.com/pokemon/sv4a_ja-103/medium,YES
+SV4a,シャイニートレジャーex,104,104,リオル,,https://images.scrydex.com/pokemon/sv4a_ja-104/medium,YES
+SV4a,シャイニートレジャーex,105,105,ルカリオ,,https://images.scrydex.com/pokemon/sv4a_ja-105/medium,YES
+SV4a,シャイニートレジャーex,106,106,ルチャブル,,https://images.scrydex.com/pokemon/sv4a_ja-106/medium,YES
+SV4a,シャイニートレジャーex,107,107,コジオ,,https://images.scrydex.com/pokemon/sv4a_ja-107/medium,YES
+SV4a,シャイニートレジャーex,108,108,ジオヅム,,https://images.scrydex.com/pokemon/sv4a_ja-108/medium,YES
+SV4a,シャイニートレジャーex,109,109,キョジオーン,,https://images.scrydex.com/pokemon/sv4a_ja-109/medium,YES
+SV4a,シャイニートレジャーex,110,110,キラーメ,,https://images.scrydex.com/pokemon/sv4a_ja-110/medium,YES
+SV4a,シャイニートレジャーex,111,111,キラフロルex,RR,https://images.scrydex.com/pokemon/sv4a_ja-111/medium,YES
+SV4a,シャイニートレジャーex,112,112,イダイナキバex,RR,https://images.scrydex.com/pokemon/sv4a_ja-112/medium,YES
+SV4a,シャイニートレジャーex,113,113,ディンルーex,RR,https://images.scrydex.com/pokemon/sv4a_ja-113/medium,YES
+SV4a,シャイニートレジャーex,114,114,コライドンex,RR,https://images.scrydex.com/pokemon/sv4a_ja-114/medium,YES
+SV4a,シャイニートレジャーex,115,115,リザードンex,RR,https://images.scrydex.com/pokemon/sv4a_ja-115/medium,YES
+SV4a,シャイニートレジャーex,116,116,パルデア ウパー,,https://images.scrydex.com/pokemon/sv4a_ja-116/medium,YES
+SV4a,シャイニートレジャーex,117,117,パルデア ドオーex,RR,https://images.scrydex.com/pokemon/sv4a_ja-117/medium,YES
+SV4a,シャイニートレジャーex,118,118,ヤミカラス,,https://images.scrydex.com/pokemon/sv4a_ja-118/medium,YES
+SV4a,シャイニートレジャーex,119,119,ニューラ,,https://images.scrydex.com/pokemon/sv4a_ja-119/medium,YES
+SV4a,シャイニートレジャーex,120,120,マニューラ,,https://images.scrydex.com/pokemon/sv4a_ja-120/medium,YES
+SV4a,シャイニートレジャーex,121,121,ヤミラミ,,https://images.scrydex.com/pokemon/sv4a_ja-121/medium,YES
+SV4a,シャイニートレジャーex,122,122,コマタナ,,https://images.scrydex.com/pokemon/sv4a_ja-122/medium,YES
+SV4a,シャイニートレジャーex,123,123,キリキザン,,https://images.scrydex.com/pokemon/sv4a_ja-123/medium,YES
+SV4a,シャイニートレジャーex,124,124,ドドゲザン,,https://images.scrydex.com/pokemon/sv4a_ja-124/medium,YES
+SV4a,シャイニートレジャーex,125,125,オラチフ,,https://images.scrydex.com/pokemon/sv4a_ja-125/medium,YES
+SV4a,シャイニートレジャーex,126,126,マフィティフ,,https://images.scrydex.com/pokemon/sv4a_ja-126/medium,YES
+SV4a,シャイニートレジャーex,147,147,ペリッパー,,https://images.scrydex.com/pokemon/sv4a_ja-147/medium,YES
+SV4a,シャイニートレジャーex,168,168,まけんきハチマキ,,https://images.scrydex.com/pokemon/sv4a_ja-168/medium,YES
+SV4a,シャイニートレジャーex,169,169,勇気のおまもり,,https://images.scrydex.com/pokemon/sv4a_ja-169/medium,YES
+SV4a,シャイニートレジャーex,170,170,ワザマシン かじばのいっぱつ,,https://images.scrydex.com/pokemon/sv4a_ja-170/medium,YES
+SV4a,シャイニートレジャーex,171,171,オモダカ,,https://images.scrydex.com/pokemon/sv4a_ja-171/medium,YES
+SV4a,シャイニートレジャーex,172,172,クラベル,,https://images.scrydex.com/pokemon/sv4a_ja-172/medium,YES
+SV4a,シャイニートレジャーex,173,173,サカキのカリスマ,,https://images.scrydex.com/pokemon/sv4a_ja-173/medium,YES
+SV4a,シャイニートレジャーex,174,174,ナンジャモ,,https://images.scrydex.com/pokemon/sv4a_ja-174/medium,YES
+SV4a,シャイニートレジャーex,175,175,ネルケ,,https://images.scrydex.com/pokemon/sv4a_ja-175/medium,YES
+SV4a,シャイニートレジャーex,176,176,博士の研究,,https://images.scrydex.com/pokemon/sv4a_ja-176/medium,YES
+SV4a,シャイニートレジャーex,177,177,博士の研究,,https://images.scrydex.com/pokemon/sv4a_ja-177/medium,YES
+SV4a,シャイニートレジャーex,178,178,パルデアの学生,,https://images.scrydex.com/pokemon/sv4a_ja-178/medium,YES
+SV4a,シャイニートレジャーex,179,179,パルデアの学生,,https://images.scrydex.com/pokemon/sv4a_ja-179/medium,YES
+SV4a,シャイニートレジャーex,180,180,ペパー,,https://images.scrydex.com/pokemon/sv4a_ja-180/medium,YES
+SV4a,シャイニートレジャーex,181,181,ボスの指令,,https://images.scrydex.com/pokemon/sv4a_ja-181/medium,YES
+SV4a,シャイニートレジャーex,182,182,ボタン,,https://images.scrydex.com/pokemon/sv4a_ja-182/medium,YES
+SV4a,シャイニートレジャーex,183,183,タウンデパート,,https://images.scrydex.com/pokemon/sv4a_ja-183/medium,YES
+SV4a,シャイニートレジャーex,184,184,ビーチコート,,https://images.scrydex.com/pokemon/sv4a_ja-184/medium,YES
+SV4a,シャイニートレジャーex,185,185,ボウルタウン,,https://images.scrydex.com/pokemon/sv4a_ja-185/medium,YES
+SV4a,シャイニートレジャーex,186,186,ポケモンリーグ本部,,https://images.scrydex.com/pokemon/sv4a_ja-186/medium,YES
+SV4a,シャイニートレジャーex,187,187,レッスンスタジオ,,https://images.scrydex.com/pokemon/sv4a_ja-187/medium,YES
+SV4a,シャイニートレジャーex,188,188,セラピーエネルギー,,https://images.scrydex.com/pokemon/sv4a_ja-188/medium,YES
+SV4a,シャイニートレジャーex,189,189,リバーサルエネルギー,,https://images.scrydex.com/pokemon/sv4a_ja-189/medium,YES
+SV4a,シャイニートレジャーex,190,190,ルミナスエネルギー,,https://images.scrydex.com/pokemon/sv4a_ja-190/medium,YES
+SV4a,シャイニートレジャーex,191,191,ナゾノクサ,S,https://images.scrydex.com/pokemon/sv4a_ja-191/medium,YES
+SV4a,シャイニートレジャーex,192,192,クサイハナ,S,https://images.scrydex.com/pokemon/sv4a_ja-192/medium,YES
+SV4a,シャイニートレジャーex,193,193,ラフレシア,S,https://images.scrydex.com/pokemon/sv4a_ja-193/medium,YES
+SV4a,シャイニートレジャーex,194,194,ストライク,S,https://images.scrydex.com/pokemon/sv4a_ja-194/medium,YES
+SV4a,シャイニートレジャーex,195,195,ハネッコ,S,https://images.scrydex.com/pokemon/sv4a_ja-195/medium,YES
+SV4a,シャイニートレジャーex,196,196,ポポッコ,S,https://images.scrydex.com/pokemon/sv4a_ja-196/medium,YES
+SV4a,シャイニートレジャーex,197,197,ワタッコ,S,https://images.scrydex.com/pokemon/sv4a_ja-197/medium,YES
+SV4a,シャイニートレジャーex,198,198,クヌギダマ,S,https://images.scrydex.com/pokemon/sv4a_ja-198/medium,YES
+SV4a,シャイニートレジャーex,199,199,ユキカブリ,S,https://images.scrydex.com/pokemon/sv4a_ja-199/medium,YES
+SV4a,シャイニートレジャーex,200,200,ユキノオー,S,https://images.scrydex.com/pokemon/sv4a_ja-200/medium,YES
+SV4a,シャイニートレジャーex,201,201,ニャオハ,S,https://images.scrydex.com/pokemon/sv4a_ja-201/medium,YES
+SV4a,シャイニートレジャーex,202,202,ニャローテ,S,https://images.scrydex.com/pokemon/sv4a_ja-202/medium,YES
+SV4a,シャイニートレジャーex,203,203,ミニーブ,S,https://images.scrydex.com/pokemon/sv4a_ja-203/medium,YES
+SV4a,シャイニートレジャーex,204,204,オリーニョ,S,https://images.scrydex.com/pokemon/sv4a_ja-204/medium,YES
+SV4a,シャイニートレジャーex,205,205,オリーヴァ,S,https://images.scrydex.com/pokemon/sv4a_ja-205/medium,YES
+SV4a,シャイニートレジャーex,206,206,ノノクラゲ,S,https://images.scrydex.com/pokemon/sv4a_ja-206/medium,YES
+SV4a,シャイニートレジャーex,207,207,カプサイジ,S,https://images.scrydex.com/pokemon/sv4a_ja-207/medium,YES
+SV4a,シャイニートレジャーex,208,208,スコヴィラン,S,https://images.scrydex.com/pokemon/sv4a_ja-208/medium,YES
+SV4a,シャイニートレジャーex,209,209,シガロコ,S,https://images.scrydex.com/pokemon/sv4a_ja-209/medium,YES
+SV4a,シャイニートレジャーex,210,210,ヒトカゲ,S,https://images.scrydex.com/pokemon/sv4a_ja-210/medium,YES
+SV4a,シャイニートレジャーex,211,211,リザード,S,https://images.scrydex.com/pokemon/sv4a_ja-211/medium,YES
+SV4a,シャイニートレジャーex,212,212,パルデア ケンタロス,S,https://images.scrydex.com/pokemon/sv4a_ja-212/medium,YES
+SV4a,シャイニートレジャーex,213,213,エンテイ,S,https://images.scrydex.com/pokemon/sv4a_ja-213/medium,YES
+SV4a,シャイニートレジャーex,214,214,オドリドリ,S,https://images.scrydex.com/pokemon/sv4a_ja-214/medium,YES
+SV4a,シャイニートレジャーex,215,215,ホゲータ,S,https://images.scrydex.com/pokemon/sv4a_ja-215/medium,YES
+SV4a,シャイニートレジャーex,216,216,アチゲータ,S,https://images.scrydex.com/pokemon/sv4a_ja-216/medium,YES
+SV4a,シャイニートレジャーex,217,217,カルボウ,S,https://images.scrydex.com/pokemon/sv4a_ja-217/medium,YES
+SV4a,シャイニートレジャーex,218,218,グレンアルマ,S,https://images.scrydex.com/pokemon/sv4a_ja-218/medium,YES
+SV4a,シャイニートレジャーex,219,219,ヤドン,S,https://images.scrydex.com/pokemon/sv4a_ja-219/medium,YES
+SV4a,シャイニートレジャーex,220,220,ヤドラン,S,https://images.scrydex.com/pokemon/sv4a_ja-220/medium,YES
+SV4a,シャイニートレジャーex,221,221,ヒトデマン,S,https://images.scrydex.com/pokemon/sv4a_ja-221/medium,YES
+SV4a,シャイニートレジャーex,222,222,スターミー,S,https://images.scrydex.com/pokemon/sv4a_ja-222/medium,YES
+SV4a,シャイニートレジャーex,223,223,パルデア ケンタロス,S,https://images.scrydex.com/pokemon/sv4a_ja-223/medium,YES
+SV4a,シャイニートレジャーex,224,224,クワッス,S,https://images.scrydex.com/pokemon/sv4a_ja-224/medium,YES
+SV4a,シャイニートレジャーex,225,225,ウェルカモ,S,https://images.scrydex.com/pokemon/sv4a_ja-225/medium,YES
+SV4a,シャイニートレジャーex,226,226,ウミディグダ,S,https://images.scrydex.com/pokemon/sv4a_ja-226/medium,YES
+SV4a,シャイニートレジャーex,227,227,ウミトリオ,S,https://images.scrydex.com/pokemon/sv4a_ja-227/medium,YES
+SV4a,シャイニートレジャーex,228,228,ナミイルカ,S,https://images.scrydex.com/pokemon/sv4a_ja-228/medium,YES
+SV4a,シャイニートレジャーex,229,229,イルカマン,S,https://images.scrydex.com/pokemon/sv4a_ja-229/medium,YES
+SV4a,シャイニートレジャーex,230,230,ミガルーサ,S,https://images.scrydex.com/pokemon/sv4a_ja-230/medium,YES
+SV4a,シャイニートレジャーex,231,231,ヘイラッシャ,S,https://images.scrydex.com/pokemon/sv4a_ja-231/medium,YES
+SV4a,シャイニートレジャーex,232,232,シャリタツ,S,https://images.scrydex.com/pokemon/sv4a_ja-232/medium,YES
+SV4a,シャイニートレジャーex,233,233,セビエ,S,https://images.scrydex.com/pokemon/sv4a_ja-233/medium,YES
+SV4a,シャイニートレジャーex,234,234,セゴール,S,https://images.scrydex.com/pokemon/sv4a_ja-234/medium,YES
+SV4a,シャイニートレジャーex,235,235,セグレイブ,S,https://images.scrydex.com/pokemon/sv4a_ja-235/medium,YES
+SV4a,シャイニートレジャーex,236,236,ピカチュウ,S,https://images.scrydex.com/pokemon/sv4a_ja-236/medium,YES
+SV4a,シャイニートレジャーex,237,237,ライチュウ,S,https://images.scrydex.com/pokemon/sv4a_ja-237/medium,YES
+SV4a,シャイニートレジャーex,238,238,ビリリダマ,S,https://images.scrydex.com/pokemon/sv4a_ja-238/medium,YES
+SV4a,シャイニートレジャーex,239,239,マルマイン,S,https://images.scrydex.com/pokemon/sv4a_ja-239/medium,YES
+SV4a,シャイニートレジャーex,240,240,コリンク,S,https://images.scrydex.com/pokemon/sv4a_ja-240/medium,YES
+SV4a,シャイニートレジャーex,241,241,ルクシオ,S,https://images.scrydex.com/pokemon/sv4a_ja-241/medium,YES
+SV4a,シャイニートレジャーex,242,242,レントラー,S,https://images.scrydex.com/pokemon/sv4a_ja-242/medium,YES
+SV4a,シャイニートレジャーex,243,243,パチリス,S,https://images.scrydex.com/pokemon/sv4a_ja-243/medium,YES
+SV4a,シャイニートレジャーex,244,244,ボルトロス,S,https://images.scrydex.com/pokemon/sv4a_ja-244/medium,YES
+SV4a,シャイニートレジャーex,245,245,エレズン,S,https://images.scrydex.com/pokemon/sv4a_ja-245/medium,YES
+SV4a,シャイニートレジャーex,246,246,ストリンダー,S,https://images.scrydex.com/pokemon/sv4a_ja-246/medium,YES
+SV4a,シャイニートレジャーex,247,247,パモ,S,https://images.scrydex.com/pokemon/sv4a_ja-247/medium,YES
+SV4a,シャイニートレジャーex,248,248,パモット,S,https://images.scrydex.com/pokemon/sv4a_ja-248/medium,YES
+SV4a,シャイニートレジャーex,249,249,パーモット,S,https://images.scrydex.com/pokemon/sv4a_ja-249/medium,YES
+SV4a,シャイニートレジャーex,250,250,カイデン,S,https://images.scrydex.com/pokemon/sv4a_ja-250/medium,YES
+SV4a,シャイニートレジャーex,251,251,タイカイデン,,"https://images.scrydex.com/magicthegathering/HOB-251/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-251/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-251/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,252,252,プクリン,,"https://images.scrydex.com/magicthegathering/HOB-252/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-252/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-252/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,253,253,ケーシィ,,"https://images.scrydex.com/magicthegathering/HOB-253/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-253/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-253/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,254,254,ユンゲラー,,"https://images.scrydex.com/magicthegathering/HOB-254/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-254/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-254/large""}],""rulings"":[],""printings"":[""HOB"",""PW26""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,255,255,ピィ,,"https://images.scrydex.com/magicthegathering/HOB-255/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-255/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-255/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,256,256,ネイティ,,"https://images.scrydex.com/magicthegathering/HOB-256/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-256/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-256/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,257,257,ネイティオ,,"https://images.scrydex.com/magicthegathering/HOB-257/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-257/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-257/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,258,258,ラルトス,,"https://images.scrydex.com/magicthegathering/HOB-258/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-258/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-258/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,259,259,キルリア,,"https://images.scrydex.com/magicthegathering/HOB-259/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-259/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-259/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,260,260,フワンテ,,"https://images.scrydex.com/magicthegathering/HOB-260/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-260/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-260/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,261,261,フワライド,,"https://images.scrydex.com/magicthegathering/HOB-261/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-261/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-261/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,262,262,マネネ,,"https://images.scrydex.com/magicthegathering/HOB-262/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-262/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-262/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,263,263,ミカルゲ,,"https://images.scrydex.com/magicthegathering/HOB-263/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-263/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-263/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,264,264,クレッフィ,,"https://images.scrydex.com/pokemon/swsh8-264/small"",""medium"":""https://images.scrydex.com/pokemon/swsh8-264/medium"",""large"":""https://images.scrydex.com/pokemon/swsh8-264/large""}],""expansion"":{""id"":""swsh8"",""name"":""Fusion",NO
+SV4a,シャイニートレジャーex,265,265,ミミッキュ,,"https://images.scrydex.com/magicthegathering/HOB-265/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-265/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-265/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,266,266,パピモッチ,,"https://images.scrydex.com/magicthegathering/HOB-266/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-266/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-266/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,267,267,バウッツェル,,"https://images.scrydex.com/magicthegathering/HOB-267/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-267/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-267/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,268,268,ソウブレイズ,,"https://images.scrydex.com/magicthegathering/HOB-268/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-268/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-268/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,269,269,ベラカス,,"https://images.scrydex.com/magicthegathering/HOB-269/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-269/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-269/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,270,270,ヒラヒナ,,"https://images.scrydex.com/magicthegathering/HOB-270/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-270/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-270/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,271,271,カヌチャン,,"https://images.scrydex.com/magicthegathering/HOB-271/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-271/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-271/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,272,272,ナカヌチャン,,"https://images.scrydex.com/magicthegathering/HOB-272/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-272/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-272/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,273,273,デカヌチャン,,"https://images.scrydex.com/magicthegathering/HOB-273/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-273/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-273/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,274,274,ボチ,,"https://images.scrydex.com/magicthegathering/HOB-274/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-274/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-274/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,275,275,ハカドッグ,,"https://images.scrydex.com/magicthegathering/HOB-275/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-275/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-275/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,276,276,マンキー,,"https://images.scrydex.com/magicthegathering/HOB-276/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-276/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-276/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,277,277,オコリザル,,"https://images.scrydex.com/magicthegathering/HOB-277/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-277/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-277/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,278,278,コノヨザル,,"https://images.scrydex.com/magicthegathering/HOB-278/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-278/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-278/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,279,279,パルデア ケンタロス,,"https://images.scrydex.com/magicthegathering/HOB-279/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-279/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-279/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,280,280,リオル,,"https://images.scrydex.com/magicthegathering/HOB-280/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-280/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-280/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,281,281,ルカリオ,,"https://images.scrydex.com/magicthegathering/HOB-281/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-281/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-281/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,282,282,ルチャブル,,"https://images.scrydex.com/magicthegathering/HOB-282/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-282/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-282/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,283,283,コジオ,,"https://images.scrydex.com/magicthegathering/HOB-283/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-283/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-283/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,284,284,ジオヅム,,"https://images.scrydex.com/magicthegathering/HOB-284/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-284/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-284/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,285,285,キョジオーン,,"https://images.scrydex.com/magicthegathering/HOB-285/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-285/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-285/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,286,286,キラーメ,,"https://images.scrydex.com/magicthegathering/HOB-286/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-286/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-286/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,287,287,パルデア ウパー,,"https://images.scrydex.com/magicthegathering/HOB-287/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-287/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-287/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,288,288,ヤミカラス,,"https://images.scrydex.com/magicthegathering/HOB-288/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-288/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-288/large""}],""rulings"":[{""date"":""2017/09/29"",""text"":""Settle",NO
+SV4a,シャイニートレジャーex,289,289,ニューラ,,"https://images.scrydex.com/magicthegathering/HOB-289/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-289/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-289/large""}],""rulings"":[],""printings"":[""HOB"",""PW26""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,290,290,マニューラ,,"https://images.scrydex.com/magicthegathering/HOB-290/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-290/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-290/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,291,291,ヤミラミ,,"https://images.scrydex.com/magicthegathering/HOB-291/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-291/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-291/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,292,292,コマタナ,,"https://images.scrydex.com/magicthegathering/HOB-292/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-292/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-292/large""}],""rulings"":[],""printings"":[""HOB"",""PSPL""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,293,293,キリキザン,,"https://images.scrydex.com/magicthegathering/HOB-293/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-293/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-293/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,294,294,ドドゲザン,,"https://images.scrydex.com/magicthegathering/HOB-294/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-294/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-294/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,295,295,オラチフ,,"https://images.scrydex.com/magicthegathering/HOB-295/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-295/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-295/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,296,296,マフィティフ,,"https://images.scrydex.com/magicthegathering/HOB-296/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-296/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-296/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,297,297,シルシュルー,,"https://images.scrydex.com/magicthegathering/HOB-297/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-297/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-297/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,298,298,タギングル,,"https://images.scrydex.com/riftbound/OGN-298/small"",""medium"":""https://images.scrydex.com/riftbound/OGN-298/medium"",""large"":""https://images.scrydex.com/riftbound/OGN-298/large""}],""expansion"":{""id"":""OGN"",""name"":""Origins"",""type"":""Main"",""code"":""OGN"",""total"":352,""printed_total"":298,""release_date"":""2025/10/31"",""logo"":""https://images.scrydex.com/riftbound/OGN-logo/logo"",""symbol"":null,""language"":""English"",""language_code"":""EN""},""language"":""English"",""language_code"":""EN"",""expansion_sort_order"":328,""variants"":[{""name"":""normal"",""images"":[],""marketplaces"":[{""name"":""tcgplayer"",""product_id"":""653092"",""purchase_url"":""https://scrydex.com/riftbound/cards/OGN-298/purchase?type=tcgplayer",NO
+SV4a,シャイニートレジャーex,299,299,ハッサム,,"https://images.scrydex.com/magicthegathering/HOB-299/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-299/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-299/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,300,300,ブロロン,,"https://images.scrydex.com/magicthegathering/HOB-300/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-300/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-300/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,301,301,ブロロローム,,"https://images.scrydex.com/magicthegathering/HOB-301/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-301/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-301/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,302,302,オンバット,,"https://images.scrydex.com/magicthegathering/HOB-302/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-302/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-302/large""}],""rulings"":[],""printings"":[""HOB"",""PMEI""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,303,303,モトトカゲ,,"https://images.scrydex.com/magicthegathering/HOB-303/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-303/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-303/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,304,304,ポッポ,,"https://images.scrydex.com/magicthegathering/HOB-304/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-304/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-304/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,305,305,ピジョン,,"https://images.scrydex.com/magicthegathering/HOB-305/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-305/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-305/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,306,306,プリン,,"https://images.scrydex.com/magicthegathering/HOB-306/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-306/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-306/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,307,307,ドードー,,"https://images.scrydex.com/magicthegathering/HOB-307/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-307/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-307/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,308,308,ドードリオ,,"https://images.scrydex.com/magicthegathering/HOB-308/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-308/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-308/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,309,309,メタモン,,"https://images.scrydex.com/magicthegathering/HOB-309/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-309/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-309/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,310,310,カビゴン,,"https://images.scrydex.com/magicthegathering/HOB-310/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-310/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-310/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,311,311,キャモメ,,"https://images.scrydex.com/magicthegathering/HOB-311/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-311/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-311/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,312,312,ペリッパー,,"https://images.scrydex.com/magicthegathering/HOB-312/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-312/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-312/large""}],""rulings"":[],""printings"":[""HOB"",""PURL""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,313,313,ホシガリス,,"https://images.scrydex.com/magicthegathering/HOB-313/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-313/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-313/large""}],""rulings"":[],""printings"":[""10E"",""2ED"",""2XM"",""30A"",""3ED"",""40K"",""4BB"",""4ED"",""5ED"",""6ED"",""7ED"",""8ED"",""9ED"",""ACR"",""AFR"",""AKH"",""AKR"",""ALA"",""ANA"",""ANB"",""ARC"",""ATH"",""AVR"",""BBD"",""BFZ"",""BLB"",""BRB"",""BRC"",""BRO"",""C13"",""C14"",""C15"",""C16"",""C17"",""C18"",""C19"",""CED"",""CEI"",""CHK"",""CLB"",""CLU"",""CM2"",""CMA"",""CMD"",""CMM"",""CMR"",""CST"",""DDC"",""DDE"",""DDF"",""DDG"",""DDH"",""DDI"",""DDK"",""DDL"",""DDN"",""DDO"",""DDP"",""DDQ"",""DFT"",""DMR"",""DMU"",""DOM"",""DSK"",""DTK"",""DVD"",""E01"",""ECL"",""ELD"",""EOE"",""FBB"",""FDN"",""FIC"",""FIN"",""FRF"",""G17"",""GK1"",""GK2"",""GN2"",""GN3"",""GNT"",""GRN"",""GS1"",""H09"",""HBG"",""HOB"",""HOP"",""HOU"",""ICE"",""IKO"",""INR"",""INV"",""ISD"",""ITP"",""J14"",""J22"",""J25"",""JMP"",""KHM"",""KLD"",""KLR"",""KTK"",""LCI"",""LEA"",""LEB"",""LRW"",""LTR"",""M10"",""M11"",""M12"",""M13"",""M14"",""M15"",""M19"",""M20"",""M21"",""MBS"",""MD1"",""ME1"",""ME3"",""MH2"",""MH3"",""MID"",""MIR"",""MKM"",""MMQ"",""MOM"",""MRD"",""MSC"",""MSH"",""NEO"",""NPH"",""ODY"",""OLEP"",""ONE"",""ONS"",""ORI"",""OTJ"",""P02"",""P23"",""PAL00"",""PAL01"",""PAL03"",""PAL04"",""PAL05"",""PAL06"",""PAL99"",""PALP"",""PANA"",""PARL"",""PC2"",""PCA"",""PDGM"",""PELP"",""PF19"",""PF20"",""PGPX"",""PGRU"",""PIP"",""PL26"",""PLST"",""PMPS"",""PMPS06"",""PMPS07"",""PMPS08"",""PMPS09"",""PMPS10"",""PMPS11"",""POR"",""PPP1"",""PRM"",""PRW2"",""PRWK"",""PS11"",""PSAL"",""PSS2"",""PSS3"",""PSS4"",""PTC"",""PTK"",""PZ2"",""RAV"",""REX"",""RIX"",""RNA"",""ROE"",""RQS"",""RTR"",""S99"",""SCD"",""SHM"",""SIR"",""SLD"",""SLP"",""SNC"",""SOI"",""SOM"",""SOS"",""SPM"",""STX"",""SUM"",""TD0"",""TD2"",""TDM"",""THB"",""THS"",""TLA"",""TLE"",""TMP"",""TMT"",""TPR"",""TSP"",""UGL"",""UND"",""UNF"",""UNH"",""USG"",""UST"",""VOW"",""WAR"",""WC00"",""WC02"",""WC03"",""WC04"",""WC97"",""WC98"",""WHO"",""WOE"",""XANA"",""XLN"",""ZEN"",""ZNR""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,314,314,ヨクバリス,,"https://images.scrydex.com/magicthegathering/HOB-314/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-314/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-314/large""}],""rulings"":[],""printings"":[""10E"",""2ED"",""2XM"",""30A"",""3ED"",""40K"",""4BB"",""4ED"",""5ED"",""6ED"",""7ED"",""8ED"",""9ED"",""ACR"",""AFR"",""AKH"",""AKR"",""ALA"",""ANA"",""ANB"",""ARC"",""ATH"",""AVR"",""BBD"",""BFZ"",""BLB"",""BRB"",""BRC"",""BRO"",""C13"",""C14"",""C15"",""C16"",""C17"",""C18"",""C19"",""CED"",""CEI"",""CHK"",""CLB"",""CLU"",""CM2"",""CMA"",""CMD"",""CMM"",""CMR"",""CST"",""DDC"",""DDE"",""DDF"",""DDG"",""DDH"",""DDI"",""DDK"",""DDL"",""DDN"",""DDO"",""DDP"",""DDQ"",""DFT"",""DMR"",""DMU"",""DOM"",""DSK"",""DTK"",""DVD"",""E01"",""ECL"",""ELD"",""EOE"",""FBB"",""FDN"",""FIC"",""FIN"",""FRF"",""G17"",""GK1"",""GK2"",""GN2"",""GN3"",""GNT"",""GRN"",""GS1"",""H09"",""HBG"",""HOB"",""HOP"",""HOU"",""ICE"",""IKO"",""INR"",""INV"",""ISD"",""ITP"",""J14"",""J22"",""J25"",""JMP"",""KHM"",""KLD"",""KLR"",""KTK"",""LCI"",""LEA"",""LEB"",""LRW"",""LTR"",""M10"",""M11"",""M12"",""M13"",""M14"",""M15"",""M19"",""M20"",""M21"",""MBS"",""MD1"",""ME1"",""ME3"",""MH2"",""MH3"",""MID"",""MIR"",""MKM"",""MMQ"",""MOM"",""MRD"",""MSC"",""MSH"",""NEO"",""NPH"",""ODY"",""OLEP"",""ONE"",""ONS"",""ORI"",""OTJ"",""P02"",""P23"",""PAL00"",""PAL01"",""PAL03"",""PAL04"",""PAL05"",""PAL06"",""PAL99"",""PALP"",""PANA"",""PARL"",""PC2"",""PCA"",""PDGM"",""PELP"",""PF19"",""PF20"",""PGPX"",""PGRU"",""PIP"",""PL26"",""PLST"",""PMPS"",""PMPS06"",""PMPS07"",""PMPS08"",""PMPS09"",""PMPS10"",""PMPS11"",""POR"",""PPP1"",""PRM"",""PRW2"",""PRWK"",""PS11"",""PSAL"",""PSS2"",""PSS3"",""PSS4"",""PTC"",""PTK"",""PZ2"",""RAV"",""REX"",""RIX"",""RNA"",""ROE"",""RQS"",""RTR"",""S99"",""SCD"",""SHM"",""SIR"",""SLD"",""SLP"",""SNC"",""SOI"",""SOM"",""SOS"",""SPM"",""STX"",""SUM"",""TD0"",""TD2"",""TDM"",""THB"",""THS"",""TLA"",""TLE"",""TMP"",""TMT"",""TPR"",""TSP"",""UGL"",""UND"",""UNF"",""UNH"",""USG"",""UST"",""VOW"",""WAR"",""WC00"",""WC02"",""WC03"",""WC04"",""WC97"",""WC98"",""WHO"",""WOE"",""XANA"",""XLN"",""ZEN"",""ZNR""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,315,315,グルトン,,"https://images.scrydex.com/magicthegathering/HOB-315/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-315/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-315/large""}],""rulings"":[],""printings"":[""10E"",""2ED"",""2XM"",""30A"",""3ED"",""40K"",""4BB"",""4ED"",""5ED"",""6ED"",""7ED"",""8ED"",""9ED"",""ACR"",""AFR"",""AKH"",""AKR"",""ALA"",""ANA"",""ANB"",""ARC"",""ATH"",""AVR"",""BBD"",""BFZ"",""BLB"",""BRB"",""BRC"",""BRO"",""C13"",""C14"",""C15"",""C16"",""C17"",""C18"",""C19"",""CED"",""CEI"",""CHK"",""CLB"",""CLU"",""CM2"",""CMA"",""CMD"",""CMM"",""CMR"",""CST"",""DDC"",""DDE"",""DDF"",""DDG"",""DDH"",""DDI"",""DDK"",""DDL"",""DDN"",""DDO"",""DDP"",""DDQ"",""DFT"",""DMR"",""DMU"",""DOM"",""DSK"",""DTK"",""DVD"",""E01"",""ECL"",""ELD"",""EOE"",""FBB"",""FDN"",""FIC"",""FIN"",""FRF"",""G17"",""GK1"",""GK2"",""GN2"",""GN3"",""GNT"",""GRN"",""GS1"",""H09"",""HBG"",""HOB"",""HOP"",""HOU"",""ICE"",""IKO"",""INR"",""INV"",""ISD"",""ITP"",""J14"",""J22"",""J25"",""JMP"",""KHM"",""KLD"",""KLR"",""KTK"",""LCI"",""LEA"",""LEB"",""LRW"",""LTR"",""M10"",""M11"",""M12"",""M13"",""M14"",""M15"",""M19"",""M20"",""M21"",""MBS"",""MD1"",""ME1"",""ME3"",""MH2"",""MH3"",""MID"",""MIR"",""MKM"",""MMQ"",""MOM"",""MRD"",""MSC"",""MSH"",""NEO"",""NPH"",""ODY"",""OLEP"",""ONE"",""ONS"",""ORI"",""OTJ"",""P02"",""P23"",""PAL00"",""PAL01"",""PAL03"",""PAL04"",""PAL05"",""PAL06"",""PAL99"",""PALP"",""PANA"",""PARL"",""PC2"",""PCA"",""PDGM"",""PELP"",""PF19"",""PF20"",""PGPX"",""PGRU"",""PIP"",""PL26"",""PLST"",""PMPS"",""PMPS06"",""PMPS07"",""PMPS08"",""PMPS09"",""PMPS10"",""PMPS11"",""POR"",""PPP1"",""PRM"",""PRW2"",""PRWK"",""PS11"",""PSAL"",""PSS2"",""PSS3"",""PSS4"",""PTC"",""PTK"",""PZ2"",""RAV"",""REX"",""RIX"",""RNA"",""ROE"",""RQS"",""RTR"",""S99"",""SCD"",""SHM"",""SIR"",""SLD"",""SLP"",""SNC"",""SOI"",""SOM"",""SOS"",""SPM"",""STX"",""SUM"",""TD0"",""TD2"",""TDM"",""THB"",""THS"",""TLA"",""TLE"",""TMP"",""TMT"",""TPR"",""TSP"",""UGL"",""UND"",""UNF"",""UNH"",""USG"",""UST"",""VOW"",""WAR"",""WC00"",""WC02"",""WC03"",""WC04"",""WC97"",""WC98"",""WHO"",""WOE"",""XANA"",""XLN"",""ZEN"",""ZNR""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,316,316,パフュートン,,"https://images.scrydex.com/magicthegathering/HOB-316/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-316/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-316/large""}],""rulings"":[],""printings"":[""10E"",""2ED"",""2XM"",""30A"",""3ED"",""40K"",""4BB"",""4ED"",""5ED"",""6ED"",""7ED"",""8ED"",""9ED"",""ACR"",""AFR"",""AKH"",""AKR"",""ALA"",""ANA"",""ANB"",""ARC"",""ATH"",""AVR"",""BBD"",""BFZ"",""BLB"",""BRB"",""BRC"",""BRO"",""C13"",""C14"",""C15"",""C16"",""C17"",""C18"",""C19"",""CED"",""CEI"",""CHK"",""CLB"",""CLU"",""CM2"",""CMA"",""CMD"",""CMM"",""CMR"",""CST"",""DDC"",""DDE"",""DDF"",""DDG"",""DDH"",""DDI"",""DDK"",""DDL"",""DDN"",""DDO"",""DDP"",""DDQ"",""DFT"",""DMR"",""DMU"",""DOM"",""DSK"",""DTK"",""DVD"",""E01"",""ECL"",""ELD"",""EOE"",""FBB"",""FDN"",""FIC"",""FIN"",""FRF"",""G17"",""GK1"",""GK2"",""GN2"",""GN3"",""GNT"",""GRN"",""GS1"",""H09"",""HBG"",""HOB"",""HOP"",""HOU"",""ICE"",""IKO"",""INR"",""INV"",""ISD"",""ITP"",""J14"",""J22"",""J25"",""JMP"",""KHM"",""KLD"",""KLR"",""KTK"",""LCI"",""LEA"",""LEB"",""LRW"",""LTR"",""M10"",""M11"",""M12"",""M13"",""M14"",""M15"",""M19"",""M20"",""M21"",""MBS"",""MD1"",""ME1"",""ME3"",""MH2"",""MH3"",""MID"",""MIR"",""MKM"",""MMQ"",""MOM"",""MRD"",""MSC"",""MSH"",""NEO"",""NPH"",""ODY"",""OLEP"",""ONE"",""ONS"",""ORI"",""OTJ"",""P02"",""P23"",""PAL00"",""PAL01"",""PAL03"",""PAL04"",""PAL05"",""PAL06"",""PAL99"",""PALP"",""PANA"",""PARL"",""PC2"",""PCA"",""PDGM"",""PELP"",""PF19"",""PF20"",""PGPX"",""PGRU"",""PIP"",""PL26"",""PLST"",""PMPS"",""PMPS06"",""PMPS07"",""PMPS08"",""PMPS09"",""PMPS10"",""PMPS11"",""POR"",""PPP1"",""PRM"",""PRW2"",""PRWK"",""PS11"",""PSAL"",""PSS2"",""PSS3"",""PSS4"",""PTC"",""PTK"",""PZ2"",""RAV"",""REX"",""RIX"",""RNA"",""ROE"",""RQS"",""RTR"",""S99"",""SCD"",""SHM"",""SIR"",""SLD"",""SLP"",""SNC"",""SOI"",""SOM"",""SOS"",""SPM"",""STX"",""SUM"",""TD0"",""TD2"",""TDM"",""THB"",""THS"",""TLA"",""TLE"",""TMP"",""TMT"",""TPR"",""TSP"",""UGL"",""UND"",""UNF"",""UNH"",""USG"",""UST"",""VOW"",""WAR"",""WC00"",""WC02"",""WC03"",""WC04"",""WC97"",""WC98"",""WHO"",""WOE"",""XANA"",""XLN"",""ZEN"",""ZNR""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,317,317,ワッカネズミ,,"https://images.scrydex.com/magicthegathering/HOB-317/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-317/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-317/large""}],""rulings"":[],""printings"":[""10E"",""2ED"",""2XM"",""30A"",""3ED"",""40K"",""4BB"",""4ED"",""5ED"",""6ED"",""7ED"",""8ED"",""9ED"",""ACR"",""AFR"",""AKH"",""AKR"",""ALA"",""ANA"",""ANB"",""ARC"",""ATH"",""AVR"",""BBD"",""BFZ"",""BLB"",""BRB"",""BRC"",""BRO"",""C13"",""C14"",""C15"",""C16"",""C17"",""C18"",""C19"",""CED"",""CEI"",""CHK"",""CLB"",""CLU"",""CM2"",""CMA"",""CMD"",""CMM"",""CMR"",""CST"",""DDC"",""DDE"",""DDF"",""DDG"",""DDH"",""DDI"",""DDK"",""DDL"",""DDN"",""DDO"",""DDP"",""DDQ"",""DFT"",""DMR"",""DMU"",""DOM"",""DSK"",""DTK"",""DVD"",""E01"",""ECL"",""ELD"",""EOE"",""FBB"",""FDN"",""FIC"",""FIN"",""FRF"",""G17"",""GK1"",""GK2"",""GN2"",""GN3"",""GNT"",""GRN"",""GS1"",""H09"",""HBG"",""HOB"",""HOP"",""HOU"",""ICE"",""IKO"",""INR"",""INV"",""ISD"",""ITP"",""J14"",""J22"",""J25"",""JMP"",""KHM"",""KLD"",""KLR"",""KTK"",""LCI"",""LEA"",""LEB"",""LRW"",""LTR"",""M10"",""M11"",""M12"",""M13"",""M14"",""M15"",""M19"",""M20"",""M21"",""MBS"",""MD1"",""ME1"",""ME3"",""MH2"",""MH3"",""MID"",""MIR"",""MKM"",""MMQ"",""MOM"",""MRD"",""MSC"",""MSH"",""NEO"",""NPH"",""ODY"",""OLEP"",""ONE"",""ONS"",""ORI"",""OTJ"",""P02"",""P23"",""PAL00"",""PAL01"",""PAL03"",""PAL04"",""PAL05"",""PAL06"",""PAL99"",""PALP"",""PANA"",""PARL"",""PC2"",""PCA"",""PDGM"",""PELP"",""PF19"",""PF20"",""PGPX"",""PGRU"",""PIP"",""PL26"",""PLST"",""PMPS"",""PMPS06"",""PMPS07"",""PMPS08"",""PMPS09"",""PMPS10"",""PMPS11"",""POR"",""PPP1"",""PRM"",""PRW2"",""PRWK"",""PS11"",""PSAL"",""PSS2"",""PSS3"",""PSS4"",""PTC"",""PTK"",""PZ2"",""RAV"",""REX"",""RIX"",""RNA"",""ROE"",""RQS"",""RTR"",""S99"",""SCD"",""SHM"",""SIR"",""SLD"",""SLP"",""SNC"",""SOI"",""SOM"",""SOS"",""SPM"",""STX"",""SUM"",""TD0"",""TD2"",""TDM"",""THB"",""THS"",""TLA"",""TLE"",""TMP"",""TMT"",""TPR"",""TSP"",""UGL"",""UND"",""UNF"",""UNH"",""USG"",""UST"",""VOW"",""WAR"",""WC00"",""WC02"",""WC03"",""WC04"",""WC97"",""WC98"",""WHO"",""WOE"",""XANA"",""XLN"",""ZEN"",""ZNR""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,318,318,イッカネズミ,,"https://images.scrydex.com/magicthegathering/HOB-318/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-318/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-318/large""}],""rulings"":[],""printings"":[""10E"",""2ED"",""2XM"",""30A"",""3ED"",""40K"",""4BB"",""4ED"",""5ED"",""6ED"",""7ED"",""8ED"",""9ED"",""ACR"",""AFR"",""AKH"",""AKR"",""ALA"",""ANA"",""ANB"",""ARC"",""ATH"",""AVR"",""BBD"",""BFZ"",""BLB"",""BRB"",""BRC"",""BRO"",""C13"",""C14"",""C15"",""C16"",""C17"",""C18"",""C19"",""CED"",""CEI"",""CHK"",""CLB"",""CLU"",""CM2"",""CMA"",""CMD"",""CMM"",""CMR"",""CST"",""DDC"",""DDE"",""DDF"",""DDG"",""DDH"",""DDI"",""DDK"",""DDL"",""DDN"",""DDO"",""DDP"",""DDQ"",""DFT"",""DMR"",""DMU"",""DOM"",""DSK"",""DTK"",""DVD"",""E01"",""ECL"",""ELD"",""EOE"",""FBB"",""FDN"",""FIC"",""FIN"",""FRF"",""G17"",""GK1"",""GK2"",""GN2"",""GN3"",""GNT"",""GRN"",""GS1"",""H09"",""HBG"",""HOB"",""HOP"",""HOU"",""ICE"",""IKO"",""INR"",""INV"",""ISD"",""ITP"",""J14"",""J22"",""J25"",""JMP"",""KHM"",""KLD"",""KLR"",""KTK"",""LCI"",""LEA"",""LEB"",""LRW"",""LTR"",""M10"",""M11"",""M12"",""M13"",""M14"",""M15"",""M19"",""M20"",""M21"",""MBS"",""MD1"",""ME1"",""ME3"",""MH2"",""MH3"",""MID"",""MIR"",""MKM"",""MMQ"",""MOM"",""MRD"",""MSC"",""MSH"",""NEO"",""NPH"",""ODY"",""OLEP"",""ONE"",""ONS"",""ORI"",""OTJ"",""P02"",""P23"",""PAL00"",""PAL01"",""PAL03"",""PAL04"",""PAL05"",""PAL06"",""PAL99"",""PALP"",""PANA"",""PARL"",""PC2"",""PCA"",""PDGM"",""PELP"",""PF19"",""PF20"",""PGPX"",""PGRU"",""PIP"",""PL26"",""PLST"",""PMPS"",""PMPS06"",""PMPS07"",""PMPS08"",""PMPS09"",""PMPS10"",""PMPS11"",""POR"",""PPP1"",""PRM"",""PRW2"",""PRWK"",""PS11"",""PSAL"",""PSS2"",""PSS3"",""PSS4"",""PTC"",""PTK"",""PZ2"",""RAV"",""REX"",""RIX"",""RNA"",""ROE"",""RQS"",""RTR"",""S99"",""SCD"",""SHM"",""SIR"",""SLD"",""SLP"",""SNC"",""SOI"",""SOM"",""SOS"",""SPM"",""STX"",""SUM"",""TD0"",""TD2"",""TDM"",""THB"",""THS"",""TLA"",""TLE"",""TMP"",""TMT"",""TPR"",""TSP"",""UGL"",""UND"",""UNF"",""UNH"",""USG"",""UST"",""VOW"",""WAR"",""WC00"",""WC02"",""WC03"",""WC04"",""WC97"",""WC98"",""WHO"",""WOE"",""XANA"",""XLN"",""ZEN"",""ZNR""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,319,319,カラミンゴ,,"https://images.scrydex.com/magicthegathering/HOB-319/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-319/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-319/large""}],""rulings"":[],""printings"":[""10E"",""2ED"",""2XM"",""30A"",""3ED"",""40K"",""4BB"",""4ED"",""5ED"",""6ED"",""7ED"",""8ED"",""9ED"",""ACR"",""AFR"",""AKH"",""AKR"",""ALA"",""ANA"",""ANB"",""ARC"",""ATH"",""AVR"",""BBD"",""BFZ"",""BLB"",""BRB"",""BRC"",""BRO"",""C13"",""C14"",""C15"",""C16"",""C17"",""C18"",""C19"",""CED"",""CEI"",""CHK"",""CLB"",""CLU"",""CM2"",""CMA"",""CMD"",""CMM"",""CMR"",""CST"",""DDC"",""DDE"",""DDF"",""DDG"",""DDH"",""DDI"",""DDK"",""DDL"",""DDN"",""DDO"",""DDP"",""DDQ"",""DFT"",""DMR"",""DMU"",""DOM"",""DSK"",""DTK"",""DVD"",""E01"",""ECL"",""ELD"",""EOE"",""FBB"",""FDN"",""FIC"",""FIN"",""FRF"",""G17"",""GK1"",""GK2"",""GN2"",""GN3"",""GNT"",""GRN"",""GS1"",""H09"",""HBG"",""HOB"",""HOP"",""HOU"",""ICE"",""IKO"",""INR"",""INV"",""ISD"",""ITP"",""J14"",""J22"",""J25"",""JMP"",""KHM"",""KLD"",""KLR"",""KTK"",""LCI"",""LEA"",""LEB"",""LRW"",""LTR"",""M10"",""M11"",""M12"",""M13"",""M14"",""M15"",""M19"",""M20"",""M21"",""MBS"",""MD1"",""ME1"",""ME3"",""MH2"",""MH3"",""MID"",""MIR"",""MKM"",""MMQ"",""MOM"",""MRD"",""MSC"",""MSH"",""NEO"",""NPH"",""ODY"",""OLEP"",""ONE"",""ONS"",""ORI"",""OTJ"",""P02"",""P23"",""PAL00"",""PAL01"",""PAL03"",""PAL04"",""PAL05"",""PAL06"",""PAL99"",""PALP"",""PANA"",""PARL"",""PC2"",""PCA"",""PDGM"",""PELP"",""PF19"",""PF20"",""PGPX"",""PGRU"",""PIP"",""PL26"",""PLST"",""PMPS"",""PMPS06"",""PMPS07"",""PMPS08"",""PMPS09"",""PMPS10"",""PMPS11"",""POR"",""PPP1"",""PRM"",""PRW2"",""PRWK"",""PS11"",""PSAL"",""PSS2"",""PSS3"",""PSS4"",""PTC"",""PTK"",""PZ2"",""RAV"",""REX"",""RIX"",""RNA"",""ROE"",""RQS"",""RTR"",""S99"",""SCD"",""SHM"",""SIR"",""SLD"",""SLP"",""SNC"",""SOI"",""SOM"",""SOS"",""SPM"",""STX"",""SUM"",""TD0"",""TD2"",""TDM"",""THB"",""THS"",""TLA"",""TLE"",""TMP"",""TMT"",""TPR"",""TSP"",""UGL"",""UND"",""UNF"",""UNH"",""USG"",""UST"",""VOW"",""WAR"",""WC00"",""WC02"",""WC03"",""WC04"",""WC97"",""WC98"",""WHO"",""WOE"",""XANA"",""XLN"",""ZEN"",""ZNR""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,320,320,フォレトスex,,"https://images.scrydex.com/magicthegathering/HOB-320/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-320/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-320/large""}],""rulings"":[],""printings"":[""10E"",""2ED"",""2XM"",""30A"",""3ED"",""40K"",""4BB"",""4ED"",""5ED"",""6ED"",""7ED"",""8ED"",""9ED"",""ACR"",""AFR"",""AKH"",""AKR"",""ALA"",""ANA"",""ANB"",""ARC"",""ATH"",""AVR"",""BBD"",""BFZ"",""BLB"",""BRB"",""BRC"",""BRO"",""C13"",""C14"",""C15"",""C16"",""C17"",""C18"",""C19"",""CED"",""CEI"",""CHK"",""CLB"",""CLU"",""CM2"",""CMA"",""CMD"",""CMM"",""CMR"",""CST"",""DDC"",""DDE"",""DDF"",""DDG"",""DDH"",""DDI"",""DDK"",""DDL"",""DDN"",""DDO"",""DDP"",""DDQ"",""DFT"",""DMR"",""DMU"",""DOM"",""DSK"",""DTK"",""DVD"",""E01"",""ECL"",""ELD"",""EOE"",""FBB"",""FDN"",""FIC"",""FIN"",""FRF"",""G17"",""GK1"",""GK2"",""GN2"",""GN3"",""GNT"",""GRN"",""GS1"",""H09"",""HBG"",""HOB"",""HOP"",""HOU"",""ICE"",""IKO"",""INR"",""INV"",""ISD"",""ITP"",""J14"",""J22"",""J25"",""JMP"",""KHM"",""KLD"",""KLR"",""KTK"",""LCI"",""LEA"",""LEB"",""LRW"",""LTR"",""M10"",""M11"",""M12"",""M13"",""M14"",""M15"",""M19"",""M20"",""M21"",""MBS"",""MD1"",""ME1"",""ME3"",""MH2"",""MH3"",""MID"",""MIR"",""MKM"",""MMQ"",""MOM"",""MRD"",""MSC"",""MSH"",""NEO"",""NPH"",""ODY"",""OLEP"",""ONE"",""ONS"",""ORI"",""OTJ"",""P02"",""P23"",""PAL00"",""PAL01"",""PAL03"",""PAL04"",""PAL05"",""PAL06"",""PAL99"",""PALP"",""PANA"",""PARL"",""PC2"",""PCA"",""PDGM"",""PELP"",""PF19"",""PF20"",""PGPX"",""PGRU"",""PIP"",""PL26"",""PLST"",""PMPS"",""PMPS06"",""PMPS07"",""PMPS08"",""PMPS09"",""PMPS10"",""PMPS11"",""POR"",""PPP1"",""PRM"",""PRW2"",""PRWK"",""PS11"",""PSAL"",""PSS2"",""PSS3"",""PSS4"",""PTC"",""PTK"",""PZ2"",""RAV"",""REX"",""RIX"",""RNA"",""ROE"",""RQS"",""RTR"",""S99"",""SCD"",""SHM"",""SIR"",""SLD"",""SLP"",""SNC"",""SOI"",""SOM"",""SOS"",""SPM"",""STX"",""SUM"",""TD0"",""TD2"",""TDM"",""THB"",""THS"",""TLA"",""TLE"",""TMP"",""TMT"",""TPR"",""TSP"",""UGL"",""UND"",""UNF"",""UNH"",""USG"",""UST"",""VOW"",""WAR"",""WC00"",""WC02"",""WC03"",""WC04"",""WC97"",""WC98"",""WHO"",""WOE"",""XANA"",""XLN"",""ZEN"",""ZNR""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,321,321,マスカーニャex,,"https://images.scrydex.com/magicthegathering/HOB-321/small"",""medium"":""https://images.scrydex.com/magicthegathering/HOB-321/medium"",""large"":""https://images.scrydex.com/magicthegathering/HOB-321/large""}],""rulings"":[],""printings"":[""HOB""],""availability"":[""arena"",""mtgo"",""paper""],""expansion"":{""id"":""HOB"",""name"":""The",NO
+SV4a,シャイニートレジャーex,322,322,リククラゲex,,"https://images.scrydex.com/magicthegathering/MSH-322/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-322/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-322/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,323,323,クエスパトラex,,"https://images.scrydex.com/magicthegathering/MSH-323/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-323/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-323/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,324,324,ラウドボーンex,,"https://images.scrydex.com/magicthegathering/MSH-324/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-324/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-324/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,325,325,ウェーニバルex,,"https://images.scrydex.com/magicthegathering/MSH-325/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-325/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-325/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,326,326,フーディンex,,"https://images.scrydex.com/magicthegathering/MSH-326/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-326/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-326/large""}],""rulings"":[],""printings"":[""MSH"",""PSPL""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,327,327,ミュウex,,"https://images.scrydex.com/magicthegathering/MSH-327/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-327/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-327/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,328,328,サーナイトex,,"https://images.scrydex.com/magicthegathering/MSH-328/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-328/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-328/large""},{""type"":""back"",""small"":""https://images.scrydex.com/magicthegathering/MSH-328A/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-328A/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-328A/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,329,329,キラフロルex,,"https://images.scrydex.com/magicthegathering/MSH-329/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-329/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-329/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,330,330,イダイナキバex,,"https://images.scrydex.com/magicthegathering/MSH-330/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-330/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-330/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,331,331,リザードンex,,"https://images.scrydex.com/magicthegathering/MSH-331/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-331/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-331/large""},{""type"":""back"",""small"":""https://images.scrydex.com/magicthegathering/MSH-331A/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-331A/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-331A/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,332,332,パルデア ドオーex,,"https://images.scrydex.com/magicthegathering/MSH-332/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-332/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-332/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,333,333,テツノワダチex,,"https://images.scrydex.com/magicthegathering/MSH-333/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-333/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-333/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,334,334,オンバーンex,,"https://images.scrydex.com/magicthegathering/MSH-334/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-334/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-334/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,335,335,ピジョットex,,"https://images.scrydex.com/magicthegathering/MSH-335/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-335/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-335/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,336,336,プクリンex,,"https://images.scrydex.com/magicthegathering/MSH-336/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-336/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-336/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,337,337,イキリンコex,,"https://images.scrydex.com/magicthegathering/MSH-337/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-337/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-337/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,338,338,ウミトリオ,,"https://images.scrydex.com/magicthegathering/MSH-338/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-338/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-338/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,339,339,イルカマン,,"https://images.scrydex.com/magicthegathering/MSH-339/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-339/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-339/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,340,340,パモ,,"https://images.scrydex.com/magicthegathering/MSH-340/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-340/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-340/large""}],""rulings"":[{""date"":""2023/02/04"",""text"":""If",NO
+SV4a,シャイニートレジャーex,341,341,ミミッキュ,,"https://images.scrydex.com/magicthegathering/MSH-341/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-341/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-341/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,342,342,ジャッジマン,,"https://images.scrydex.com/magicthegathering/MSH-342/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-342/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-342/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,343,343,ネモ,,"https://images.scrydex.com/magicthegathering/MSH-343/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-343/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-343/large""}],""rulings"":[],""printings"":[""MSH"",""PMEI""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,344,344,ネルケ,,"https://images.scrydex.com/magicthegathering/MSH-344/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-344/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-344/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,345,345,パルデアの学生,,"https://images.scrydex.com/magicthegathering/MSH-345/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-345/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-345/large""},{""type"":""back"",""small"":""https://images.scrydex.com/magicthegathering/MSH-345A/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-345A/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-345A/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,346,346,パルデアの学生,,"https://images.scrydex.com/magicthegathering/MSH-346/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-346/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-346/large""},{""type"":""back"",""small"":""https://images.scrydex.com/magicthegathering/MSH-346A/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-346A/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-346A/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,347,347,ミュウex,,"https://images.scrydex.com/magicthegathering/MSH-347/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-347/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-347/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,348,348,サーナイトex,,"https://images.scrydex.com/magicthegathering/MSH-348/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-348/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-348/large""}],""rulings"":[],""printings"":[""DMU"",""J25"",""MSH"",""OTJ""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,349,349,リザードンex,,"https://images.scrydex.com/magicthegathering/MSH-349/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-349/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-349/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,350,350,ナンジャモ,,"https://images.scrydex.com/magicthegathering/MSH-350/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-350/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-350/large""},{""type"":""back"",""small"":""https://images.scrydex.com/magicthegathering/MSH-350A/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-350A/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-350A/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,351,351,ネモ,,"https://images.scrydex.com/magicthegathering/MSH-351/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-351/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-351/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,352,352,ネルケ,,"https://images.scrydex.com/magicthegathering/MSH-352/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-352/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-352/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,353,353,ペパー,,"https://images.scrydex.com/magicthegathering/MSH-353/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-353/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-353/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,354,354,ボタン,,"https://images.scrydex.com/magicthegathering/MSH-354/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-354/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-354/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,355,355,チオンジェンex,,"https://images.scrydex.com/magicthegathering/MSH-355/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-355/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-355/large""},{""type"":""back"",""small"":""https://images.scrydex.com/magicthegathering/MSH-355A/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-355A/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-355A/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,356,356,イーユイex,,"https://images.scrydex.com/magicthegathering/MSH-356/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-356/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-356/large""},{""type"":""back"",""small"":""https://images.scrydex.com/magicthegathering/MSH-356A/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-356A/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-356A/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,357,357,パオジアンex,,"https://images.scrydex.com/magicthegathering/MSH-357/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-357/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-357/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,358,358,ミライドンex,,"https://images.scrydex.com/magicthegathering/MSH-358/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-358/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-358/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,359,359,ディンルーex,,"https://images.scrydex.com/magicthegathering/MSH-359/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-359/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-359/large""},{""type"":""back"",""small"":""https://images.scrydex.com/magicthegathering/MSH-359A/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-359A/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-359A/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+SV4a,シャイニートレジャーex,360,360,コライドンex,,"https://images.scrydex.com/magicthegathering/MSH-360/small"",""medium"":""https://images.scrydex.com/magicthegathering/MSH-360/medium"",""large"":""https://images.scrydex.com/magicthegathering/MSH-360/large""}],""rulings"":[],""printings"":[""MSH""],""availability"":[""mtgo"",""paper""],""expansion"":{""id"":""MSH"",""name"":""Marvel",NO
+XY,ハイクラスパック「THE BEST OF XY」,12,012,バクーダEX,,https://images.scrydex.com/pokemon/xy_ja-12/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,55,055,オーロットBREAK,,https://images.scrydex.com/pokemon/xy_ja-55/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,58,058,フーパEX,,https://images.scrydex.com/pokemon/xy_ja-58/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,61,061,レジロックEX,,https://images.scrydex.com/pokemon/xy_ja-61/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,62,062,ルカリオEX,,https://images.scrydex.com/pokemon/xy_ja-62/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,63,063,megaルカリオEX,,https://images.scrydex.com/pokemon/xy_ja-63/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,67,067,メレシーBREAK,,https://images.scrydex.com/pokemon/xy_ja-67/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,69,069,ジガルデEX,,https://images.scrydex.com/pokemon/xy_ja-69/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,70,070,サメハダーEX,,https://images.scrydex.com/pokemon/xy_ja-70/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,71,071,megaサメハダーEX,,https://images.scrydex.com/pokemon/xy_ja-71/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,72,072,ダークライEX,,https://images.scrydex.com/pokemon/xy_ja-72/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,75,075,ゾロアークBREAK,,https://images.scrydex.com/pokemon/xy_ja-75/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,76,076,カラマネロEX,,https://images.scrydex.com/pokemon/xy_ja-76/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,79,079,イベルタルEX,,https://images.scrydex.com/pokemon/xy_ja-79/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,83,083,ドータクンBREAK,,https://images.scrydex.com/pokemon/xy_ja-83/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,86,086,ゲノセクトEX,,https://images.scrydex.com/pokemon/xy_ja-86/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,87,087,ギルガルドEX,,https://images.scrydex.com/pokemon/xy_ja-87/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,89,089,マギアナEX,,https://images.scrydex.com/pokemon/xy_ja-89/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,91,091,サーナイトEX,,https://images.scrydex.com/pokemon/xy_ja-91/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,92,092,megaサーナイトEX,,https://images.scrydex.com/pokemon/xy_ja-92/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,97,097,ゼルネアスBREAK,,https://images.scrydex.com/pokemon/xy_ja-97/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,98,098,ギラティナEX,,https://images.scrydex.com/pokemon/xy_ja-98/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,99,099,サザンドラEX,,https://images.scrydex.com/pokemon/xy_ja-99/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,103,103,ルギアEX,,https://images.scrydex.com/pokemon/xy_ja-103/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,104,104,レックウザEX,,https://images.scrydex.com/pokemon/xy_ja-104/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,105,105,megaレックウザEX,,https://images.scrydex.com/pokemon/xy_ja-105/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,106,106,シェイミEX,,https://images.scrydex.com/pokemon/xy_ja-106/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,172,172,megaバクーダEX,,https://images.scrydex.com/pokemon/xy_ja-172/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,173,173,サンダースEX,,https://images.scrydex.com/pokemon/xy_ja-173/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,174,174,megaライボルトEX,,https://images.scrydex.com/pokemon/xy_ja-174/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,175,175,レジロックEX,,https://images.scrydex.com/pokemon/xy_ja-175/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,176,176,megaルカリオEX,,https://images.scrydex.com/pokemon/xy_ja-176/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,177,177,ジガルデEX,,https://images.scrydex.com/pokemon/xy_ja-177/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,178,178,megaサメハダーEX,,https://images.scrydex.com/pokemon/xy_ja-178/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,179,179,ギルガルドEX,,https://images.scrydex.com/pokemon/xy_ja-179/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,180,180,N,,https://images.scrydex.com/pokemon/xy_ja-180/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,181,181,オカルトマニア,,https://images.scrydex.com/pokemon/xy_ja-181/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,182,182,鍛冶屋,,https://images.scrydex.com/pokemon/xy_ja-182/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,183,183,カリン,,https://images.scrydex.com/pokemon/xy_ja-183/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,184,184,こわいおねえさん,,https://images.scrydex.com/pokemon/xy_ja-184/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,185,185,サナ,,https://images.scrydex.com/pokemon/xy_ja-185/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,186,186,フレア団のしたっぱ,,https://images.scrydex.com/pokemon/xy_ja-186/medium,YES
+XY,ハイクラスパック「THE BEST OF XY」,187,187,イベルタルEX,,https://images.scrydex.com/pokemon/xy_ja-187/large,YES
+XY,ハイクラスパック「THE BEST OF XY」,188,188,シェイミEX,,https://images.scrydex.com/pokemon/xy_ja-188/large,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,1,001,ピカチュウ,,https://images.scrydex.com/pokemon/swsh8a_ja-1/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,2,002,ミュウ,,https://images.scrydex.com/pokemon/swsh8a_ja-2/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,3,003,博士の研究（オーキド博士）,,https://images.scrydex.com/pokemon/swsh8a_ja-3/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,4,004,ホウオウ,,https://images.scrydex.com/pokemon/swsh8a_ja-4/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,5,005,ルギア,,https://images.scrydex.com/pokemon/swsh8a_ja-5/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,6,006,グラードン,,https://images.scrydex.com/pokemon/swsh8a_ja-6/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,7,007,カイオーガ,,https://images.scrydex.com/pokemon/swsh8a_ja-7/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,8,008,ディアルガ,,https://images.scrydex.com/pokemon/swsh8a_ja-8/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,9,009,パルキア,,https://images.scrydex.com/pokemon/swsh8a_ja-9/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,10,010,レシラム,,https://images.scrydex.com/pokemon/swsh8a_ja-10/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,11,011,ゼクロム,,https://images.scrydex.com/pokemon/swsh8a_ja-11/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,12,012,ゼルネアス,,https://images.scrydex.com/pokemon/swsh8a_ja-12/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,13,013,イベルタル,,https://images.scrydex.com/pokemon/swsh8a_ja-13/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,14,014,コスモッグ,,https://images.scrydex.com/pokemon/swsh8a_ja-14/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,15,015,コスモウム,,https://images.scrydex.com/pokemon/swsh8a_ja-15/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,16,016,ソルガレオ,,https://images.scrydex.com/pokemon/swsh8a_ja-16/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,17,017,ルナアーラ,,https://images.scrydex.com/pokemon/swsh8a_ja-17/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,18,018,ザシアンV,RR,https://images.scrydex.com/pokemon/swsh8a_ja-18/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,19,019,ザマゼンタV,RR,https://images.scrydex.com/pokemon/swsh8a_ja-19/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,20,020,ピカチュウV,RR,https://images.scrydex.com/pokemon/swsh8a_ja-20/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,21,021,なみのりピカチュウV,RR,https://images.scrydex.com/pokemon/swsh8a_ja-21/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,22,022,なみのりピカチュウVMAX,RRR,https://images.scrydex.com/pokemon/swsh8a_ja-22/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,23,023,そらをとぶピカチュウV,RR,https://images.scrydex.com/pokemon/swsh8a_ja-23/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,24,024,そらをとぶピカチュウVMAX,RRR,https://images.scrydex.com/pokemon/swsh8a_ja-24/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,25,025,ピカチュウV-UNION,RRR,https://images.scrydex.com/pokemon/swsh8a_ja-25/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,29,029,博士の研究（オーキド博士）,SR,https://images.scrydex.com/pokemon/swsh8a_ja-29/medium,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,30,030,ミュウ,UR,https://images.scrydex.com/pokemon/swsh8a_ja-30/large,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,31,031,基本草エネルギー,,https://images.scrydex.com/pokemon/swsh8a_ja-31/large,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,32,032,基本炎エネルギー,,https://images.scrydex.com/pokemon/swsh8a_ja-32/large,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,33,033,基本水エネルギー,,https://images.scrydex.com/pokemon/swsh8a_ja-33/large,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,34,034,基本雷エネルギー,,https://images.scrydex.com/pokemon/swsh8a_ja-34/large,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,35,035,基本超エネルギー,,https://images.scrydex.com/pokemon/swsh8a_ja-35/large,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,36,036,基本闘エネルギー,,https://images.scrydex.com/pokemon/swsh8a_ja-36/large,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,37,037,基本悪エネルギー,,https://images.scrydex.com/pokemon/swsh8a_ja-37/large,YES
+S8a,拡張パック「25th ANNIVERSARY COLLECTION」,38,038,基本鋼エネルギー,,https://images.scrydex.com/pokemon/swsh8a_ja-38/large,YES
+XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,79,079,ボルトロスEX,SR,https://images.scrydex.com/pokemon/xy6_ja-79/medium,YES
+XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,80,080,エルレイドEX,SR,https://images.scrydex.com/pokemon/xy6_ja-80/medium,YES
+XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,81,081,megaエルレイドEX,SR,https://images.scrydex.com/pokemon/xy6_ja-81/medium,YES
+XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,82,082,ラティオスEX,SR,https://images.scrydex.com/pokemon/xy6_ja-82/medium,YES
+XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,83,083,megaラティオスEX,SR,https://images.scrydex.com/pokemon/xy6_ja-83/medium,YES
+XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,84,084,サザンドラEX,SR,https://images.scrydex.com/pokemon/xy6_ja-84/medium,YES
+XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,85,085,レックウザEX,SR,https://images.scrydex.com/pokemon/xy6_ja-85/medium,YES
+XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,86,086,megaレックウザEX,SR,https://images.scrydex.com/pokemon/xy6_ja-86/medium,YES
+XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,87,087,シェイミEX,SR,https://images.scrydex.com/pokemon/xy6_ja-87/medium,YES
+XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,88,088,ナギ,SR,https://images.scrydex.com/pokemon/xy6_ja-88/medium,YES
+XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,89,089,ミツル,SR,https://images.scrydex.com/pokemon/xy6_ja-89/medium,YES
+XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,90,090,エネルギーつけかえ,UR,https://images.scrydex.com/pokemon/xy6_ja-90/large,YES
+XY6,ポケモンカードゲームXY 拡張パック「エメラルドブレイク」,91,091,バトルサーチャー,UR,https://images.scrydex.com/pokemon/xy6_ja-91/large,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,82,082,ジュカインEX,SR,https://images.scrydex.com/pokemon/xy7_ja-82/medium,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,83,083,megaジュカインEX,SR,https://images.scrydex.com/pokemon/xy7_ja-83/medium,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,84,084,キュレムEX,SR,https://images.scrydex.com/pokemon/xy7_ja-84/medium,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,85,085,デンリュウEX,SR,https://images.scrydex.com/pokemon/xy7_ja-85/medium,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,86,086,megaデンリュウEX,SR,https://images.scrydex.com/pokemon/xy7_ja-86/medium,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,87,087,フーパEX,SR,https://images.scrydex.com/pokemon/xy7_ja-87/medium,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,88,088,カイリキーEX,SR,https://images.scrydex.com/pokemon/xy7_ja-88/medium,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,89,089,バンギラスEX,SR,https://images.scrydex.com/pokemon/xy7_ja-89/medium,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,90,090,megaバンギラスEX,SR,https://images.scrydex.com/pokemon/xy7_ja-90/medium,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,91,091,ギラティナEX,SR,https://images.scrydex.com/pokemon/xy7_ja-91/medium,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,92,092,ルギアEX,SR,https://images.scrydex.com/pokemon/xy7_ja-92/medium,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,93,093,ゲンシカイオーガEX,UR,https://images.scrydex.com/pokemon/xy7_ja-93/large,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,94,094,ゲンシグラードンEX,UR,https://images.scrydex.com/pokemon/xy7_ja-94/large,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,95,095,megaレックウザEX,UR,https://images.scrydex.com/pokemon/xy7_ja-95/large,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,96,096,エネルギー回収,UR,https://images.scrydex.com/pokemon/xy7_ja-96/large,YES
+XY7,ポケモンカードゲームXY 拡張パック「バンデットリング」,97,097,トレーナーズポスト,UR,https://images.scrydex.com/pokemon/xy7_ja-97/large,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,1,001,ピカチュウex,,https://images.scrydex.com/pokemon/wcs23_ja-1/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,2,002,コイル,,https://images.scrydex.com/pokemon/wcs23_ja-2/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,3,003,パモ,,https://images.scrydex.com/pokemon/wcs23_ja-3/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,4,004,パモット,,https://images.scrydex.com/pokemon/wcs23_ja-4/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,5,005,パーモット,,https://images.scrydex.com/pokemon/wcs23_ja-5/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,6,006,ズピカ,,https://images.scrydex.com/pokemon/wcs23_ja-6/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,7,007,カイデン,,https://images.scrydex.com/pokemon/wcs23_ja-7/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,8,008,タイカイデン,,https://images.scrydex.com/pokemon/wcs23_ja-8/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,9,009,ミライドン,,https://images.scrydex.com/pokemon/wcs23_ja-9/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,10,010,マンキー,,https://images.scrydex.com/pokemon/wcs23_ja-10/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,11,011,オコリザル,,https://images.scrydex.com/pokemon/wcs23_ja-11/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,12,012,コノヨザル,,https://images.scrydex.com/pokemon/wcs23_ja-12/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,13,013,コライドン,,https://images.scrydex.com/pokemon/wcs23_ja-13/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,14,014,イキリンコ,,https://images.scrydex.com/pokemon/wcs23_ja-14/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,15,015,モトトカゲ,,https://images.scrydex.com/pokemon/wcs23_ja-15/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,16,016,エネルギー回収,,https://images.scrydex.com/pokemon/wcs23_ja-16/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,17,017,エネルギー転送,,https://images.scrydex.com/pokemon/wcs23_ja-17/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,18,018,スーパーボール,,https://images.scrydex.com/pokemon/wcs23_ja-18/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,19,019,ハイパーボール,,https://images.scrydex.com/pokemon/wcs23_ja-19/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,20,020,ポケモンいれかえ,,https://images.scrydex.com/pokemon/wcs23_ja-20/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,21,021,ポケモンキャッチャー,,https://images.scrydex.com/pokemon/wcs23_ja-21/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,22,022,学習装置,,https://images.scrydex.com/pokemon/wcs23_ja-22/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,23,023,キハダ,,https://images.scrydex.com/pokemon/wcs23_ja-23/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,24,024,ジニア,,https://images.scrydex.com/pokemon/wcs23_ja-24/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,25,025,ジャッジマン,,https://images.scrydex.com/pokemon/wcs23_ja-25/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,26,026,たんぱんこぞう,,https://images.scrydex.com/pokemon/wcs23_ja-26/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,27,027,ネモ,,https://images.scrydex.com/pokemon/wcs23_ja-27/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,28,028,ネモ,,https://images.scrydex.com/pokemon/wcs23_ja-28/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,29,029,博士の研究（オーリム博士）,,https://images.scrydex.com/pokemon/wcs23_ja-29/medium,YES
+WCS23,ポケモンワールドチャンピオンシップス2023横浜 記念デッキ「ピカチュウ」,30,030,博士の研究（フトゥー博士）,,https://images.scrydex.com/pokemon/wcs23_ja-30/medium,YES

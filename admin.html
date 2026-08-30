@@ -305,6 +305,23 @@ button, select { touch-action: manipulation; }
     </div>
 
     <div class="pixel-window">
+      <h2>サイト表示設定</h2>
+      <label for="search-default-sort">SEARCHページを開いたときの並び順</label>
+      <select id="search-default-sort">
+        <option value="default">標準</option>
+        <option value="release_desc">最新版（パック発売日が新しい順）</option>
+        <option value="name_asc">五十音順 あ→ん</option>
+        <option value="name_desc">五十音順 ん→あ</option>
+        <option value="number_asc">カード番号 小→大</option>
+        <option value="number_desc">カード番号 大→小</option>
+      </select>
+      <div class="inline-actions">
+        <button class="btn" id="site-settings-save" type="button">デフォルト表示を保存</button>
+      </div>
+      <div id="site-settings-status" class="status-msg"></div>
+    </div>
+
+    <div class="pixel-window">
       <h2>カード検索</h2>
       <div class="search-row">
         <input id="admin-search-input" type="search" placeholder="カード名・番号で検索">
@@ -333,6 +350,19 @@ button, select { touch-action: manipulation; }
           <option value="MUR">MUR</option>
           <option value="BWR">BWR</option>
           <option value="旧裏R">旧裏R</option>
+        </select>
+        <select id="admin-sort" aria-label="並び順">
+          <option value="default">標準</option>
+          <option value="number_asc">番号 小→大</option>
+          <option value="number_desc">番号 大→小</option>
+          <option value="name_asc">名前 あ→ん</option>
+          <option value="name_desc">名前 ん→あ</option>
+        </select>
+        <select id="admin-page-size" aria-label="表示件数">
+          <option value="20">20件表示</option>
+          <option value="50">50件表示</option>
+          <option value="100">100件表示</option>
+          <option value="all">すべて表示</option>
         </select>
         <button class="btn" id="admin-search-btn" type="button">検索</button>
       </div>
@@ -505,11 +535,16 @@ button, select { touch-action: manipulation; }
     adminSection: document.getElementById("admin-section"),
     whoAmI: document.getElementById("who-am-i"),
     logoutBtn: document.getElementById("logout-btn"),
+    searchDefaultSort: document.getElementById("search-default-sort"),
+    siteSettingsSave: document.getElementById("site-settings-save"),
+    siteSettingsStatus: document.getElementById("site-settings-status"),
 
     searchInput: document.getElementById("admin-search-input"),
     filterSet: document.getElementById("admin-filter-set"),
     filterRarity: document.getElementById("admin-filter-rarity"),
     searchBtn: document.getElementById("admin-search-btn"),
+    sort: document.getElementById("admin-sort"),
+    pageSize: document.getElementById("admin-page-size"),
     results: document.getElementById("admin-results"),
     resultCount: document.getElementById("admin-result-count"),
     loadMoreWrap: document.getElementById("admin-load-more-wrap"),
@@ -633,7 +668,14 @@ button, select { touch-action: manipulation; }
   var adminSearchTotal = 0;
   var adminSearchLoading = false;
   var ADMIN_PAGE_SIZE = 20;
+  var ADMIN_ALL_BATCH_SIZE = 500;
   var adminSelectedIds = new Set();
+
+  function getAdminPageSize(){
+    if(els.pageSize && els.pageSize.value === "all") return "all";
+    var n = Number(els.pageSize && els.pageSize.value);
+    return n > 0 ? n : ADMIN_PAGE_SIZE;
+  }
 
   function updateBulkUI(){
     var count = adminSelectedIds.size;
@@ -724,6 +766,48 @@ button, select { touch-action: manipulation; }
 
   els.priceSource.addEventListener("change", updatePriceTypeForSource);
 
+  // ---- サイト表示設定 ----
+  var SEARCH_SORT_VALUES = ["default", "release_desc", "name_asc", "name_desc", "number_asc", "number_desc"];
+
+  function loadSiteSettings(){
+    clearStatus(els.siteSettingsStatus);
+    return ADMIN.getSiteSetting("search_default_sort").then(function(value){
+      if(SEARCH_SORT_VALUES.indexOf(value) !== -1){
+        els.searchDefaultSort.value = value;
+      } else {
+        els.searchDefaultSort.value = "default";
+      }
+    }).catch(function(err){
+      console.error(err);
+      els.searchDefaultSort.value = "default";
+      showStatus(els.siteSettingsStatus, "表示設定の読み込みに失敗しました。DB更新SQLが未適用の可能性があります。", true);
+    });
+  }
+
+  els.siteSettingsSave.addEventListener("click", function(){
+    var value = els.searchDefaultSort.value;
+    if(SEARCH_SORT_VALUES.indexOf(value) === -1){
+      showStatus(els.siteSettingsStatus, "並び順の指定が不正です。", true);
+      return;
+    }
+    els.siteSettingsSave.disabled = true;
+    clearStatus(els.siteSettingsStatus);
+    ADMIN.adminSetSiteSetting("search_default_sort", value).then(function(){
+      // 保存直後にDBから読み返し、実際に反映された値まで確認する。
+      return ADMIN.getSiteSetting("search_default_sort");
+    }).then(function(savedValue){
+      if(savedValue !== value){
+        throw new Error("保存値の確認に失敗しました（DB値: " + String(savedValue) + "）");
+      }
+      showStatus(els.siteSettingsStatus, "SEARCHページのデフォルト表示を保存しました（DB確認済み）。", false);
+    }).catch(function(err){
+      console.error(err);
+      showStatus(els.siteSettingsStatus, "保存に失敗しました: " + friendlyError(err), true);
+    }).finally(function(){
+      els.siteSettingsSave.disabled = false;
+    });
+  });
+
   // ---- ログイン状態の切り替え ----
   // ログアウト状態（初期表示・手動ログアウト・セッション失効・管理者以外のログイン、すべて共通）に
   // 戻すときは、フォームや検索結果、選択中カードなど画面上の情報を必ずクリアする。
@@ -743,6 +827,7 @@ button, select { touch-action: manipulation; }
       loadCardSets();
       loadPriceSources();
     }
+    loadSiteSettings();
     runAdminSearch();
   }
 
@@ -754,15 +839,21 @@ button, select { touch-action: manipulation; }
       return;
     }
     ADMIN.checkAdminAccess().then(function(isAdmin){
-      if(isAdmin){
-        showLoggedIn(session);
-      } else {
-        ADMIN.logout().then(function(){
+      if(!isAdmin){
+        return ADMIN.logout().then(function(){
           showLoggedOut();
           showStatus(els.loginStatus, "このアカウントには管理者権限がありません。", true);
         });
       }
-    }).catch(function(err){
+
+      // 権限確認後のUI初期化エラーを「権限確認失敗」と誤表示しない。
+      try {
+        showLoggedIn(session);
+      } catch (uiErr) {
+        console.error("admin UI init failed", uiErr);
+        showStatus(els.loginStatus, "管理画面の初期化に失敗しました: " + friendlyError(uiErr), true);
+      }
+    }, function(err){
       console.error(err);
       ADMIN.logout().then(function(){
         showLoggedOut();
@@ -771,7 +862,8 @@ button, select { touch-action: manipulation; }
     });
   }
 
-  ADMIN.getSession().then(handleSessionChange);
+  // onAuthStateChange は初期状態(INITIAL_SESSION)も通知するため、
+  // getSession() を同時に走らせない。二重の admin_check_access を防ぐ。
   ADMIN.onAuthChange(handleSessionChange);
 
   els.loginForm.addEventListener("submit", function(e){
@@ -879,6 +971,7 @@ button, select { touch-action: manipulation; }
     var li = document.createElement("li");
     li.className = "result-row";
     li.dataset.cardId = card.id;
+    li._cardData = card;
 
     var select = document.createElement("input");
     select.type = "checkbox";
@@ -939,6 +1032,41 @@ button, select { touch-action: manipulation; }
     els.loadMoreWrap.style.display = shown < adminSearchTotal ? "block" : "none";
   }
 
+  function compareAdminCards(a, b){
+    var mode = els.sort ? els.sort.value : "default";
+    if(mode === "default") return 0;
+
+    if(mode === "name_asc" || mode === "name_desc"){
+      var cmpName = String(a.name || "").localeCompare(String(b.name || ""), "ja", {
+        numeric: true, sensitivity: "base"
+      });
+      return mode === "name_desc" ? -cmpName : cmpName;
+    }
+
+    function numberParts(v){
+      var s = String(v || "").trim();
+      var m = s.match(/^(\d+)(.*)$/);
+      return m ? [Number(m[1]), m[2] || ""] : [Number.POSITIVE_INFINITY, s];
+    }
+    var ap = numberParts(a.card_number), bp = numberParts(b.card_number);
+    var cmp = ap[0] === bp[0]
+      ? String(ap[1]).localeCompare(String(bp[1]), "ja", {numeric:true})
+      : ap[0] - bp[0];
+    return mode === "number_desc" ? -cmp : cmp;
+  }
+
+  function sortRenderedAdminResults(){
+    var mode = els.sort ? els.sort.value : "default";
+    if(mode === "default") return;
+    var items = Array.prototype.slice.call(els.results.children);
+    items.sort(function(la, lb){
+      var a = la._cardData || {};
+      var b = lb._cardData || {};
+      return compareAdminCards(a,b);
+    });
+    items.forEach(function(li){ els.results.appendChild(li); });
+  }
+
   function runAdminSearch(append){
     if(adminSearchLoading) return;
     adminSearchLoading = true;
@@ -957,31 +1085,66 @@ button, select { touch-action: manipulation; }
     els.loadMoreBtn.disabled = true;
     els.loadMoreBtn.textContent = "読み込み中...";
 
-    MARKET.searchCards({
-      query: els.searchInput.value,
-      rarity: els.filterRarity.value || null,
-      setId: els.filterSet.value || null,
-      limit: ADMIN_PAGE_SIZE,
-      offset: adminSearchOffset
-    }).then(function(rows){
+    var requestedSize = getAdminPageSize();
+
+    function fetchBatch(limit, offset){
+      return MARKET.searchCards({
+        query: els.searchInput.value,
+        rarity: els.filterRarity.value || null,
+        setId: els.filterSet.value || null,
+        limit: limit,
+        offset: offset
+      });
+    }
+
+    function finishRows(rows){
       rows = rows || [];
       if(rows.length && rows[0].total_count != null){
         adminSearchTotal = Number(rows[0].total_count) || 0;
       }
       rows.forEach(renderAdminResult);
       adminSearchOffset += rows.length;
+      sortRenderedAdminResults();
       updateAdminSearchFooter();
-    }).catch(function(err){
+      return rows;
+    }
+
+    var job;
+    if(requestedSize !== "all"){
+      job = fetchBatch(requestedSize, adminSearchOffset).then(finishRows);
+    } else {
+      // 「すべて表示」でも1リクエストを巨大化させず、500件ずつ最後まで取得する。
+      job = (function loadAll(){
+        return fetchBatch(ADMIN_ALL_BATCH_SIZE, adminSearchOffset).then(function(rows){
+          rows = finishRows(rows);
+          if(rows.length === 0) return;
+          if(adminSearchTotal > 0 && adminSearchOffset >= adminSearchTotal) return;
+          if(rows.length < ADMIN_ALL_BATCH_SIZE) return;
+          return loadAll();
+        });
+      })();
+    }
+
+    job.catch(function(err){
       console.error(err);
       if(!append) els.resultCount.textContent = "検索に失敗しました";
     }).finally(function(){
       adminSearchLoading = false;
       els.loadMoreBtn.disabled = false;
       els.loadMoreBtn.textContent = "もっと見る";
+      if(requestedSize === "all") els.loadMoreWrap.style.display = "none";
     });
   }
 
   els.searchBtn.addEventListener("click", function(){ runAdminSearch(false); });
+  els.sort.addEventListener("change", function(){
+    if(getAdminPageSize() === "all"){
+      sortRenderedAdminResults();
+    } else {
+      runAdminSearch(false);
+    }
+  });
+  els.pageSize.addEventListener("change", function(){ runAdminSearch(false); });
   els.filterSet.addEventListener("change", function(){ runAdminSearch(false); });
   els.filterRarity.addEventListener("change", function(){ runAdminSearch(false); });
   els.loadMoreBtn.addEventListener("click", function(){ runAdminSearch(true); });
