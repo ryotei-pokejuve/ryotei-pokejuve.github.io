@@ -1125,7 +1125,7 @@ button, select { touch-action: manipulation; }
     els.loadMoreBtn.disabled = true;
     els.loadMoreBtn.textContent = "読み込み中...";
 
-    MARKET.searchCards({
+    MARKET.searchCardsSorted({
       query: els.searchInput.value,
       rarity: els.filterRarity.value || null,
       setId: els.filterSet.value || null,
@@ -1789,7 +1789,7 @@ button, select { touch-action: manipulation; }
     els.priceCardSearchBtn.disabled = true;
     els.priceCardLoadMore.disabled = true;
 
-    MARKET.searchCards({
+    MARKET.searchCardsSorted({
       query: q,
       limit: PRICE_SEARCH_PAGE_SIZE,
       offset: priceSearchOffset
