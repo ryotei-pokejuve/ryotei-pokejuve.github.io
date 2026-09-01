@@ -361,8 +361,6 @@
     if(dex.length) hasAny = appendSummaryRow("図鑑ID", dex.join(", ")) || hasAny;
 
     hasAny = appendSummaryRow("セット内順序", card.set_order) || hasAny;
-    hasAny = appendSummaryRow("TCGdex ID", card.tcgdex_id) || hasAny;
-    hasAny = appendSummaryRow("バリアント", card.variant) || hasAny;
 
     hasAny = showTextBlock("card-effect-block", "card-effect", card.effect_ja) || hasAny;
     hasAny = showTextBlock("card-description-block", "card-description", card.description_ja) || hasAny;
