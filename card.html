@@ -331,6 +331,25 @@
     return true;
   }
 
+  function categoryJa(value){
+    var map = {
+      Pokemon:"ポケモン",
+      Pokémon:"ポケモン",
+      Trainer:"トレーナー",
+      Energy:"エネルギー"
+    };
+    return map[String(value || "")] || String(value || "");
+  }
+
+  function stageJa(value){
+    var map = {
+      Basic:"たね",
+      Stage1:"1進化",
+      Stage2:"2進化"
+    };
+    return map[String(value || "")] || String(value || "");
+  }
+
   function renderCardDetails(card){
     var section = document.getElementById("card-detail-section");
     var summary = document.getElementById("card-detail-summary");
@@ -346,9 +365,9 @@
     var hasAny = false;
 
     // RPCから返るカード情報は、値があるものだけ表示する。
-    hasAny = appendSummaryRow("カテゴリ", card.category) || hasAny;
+    hasAny = appendSummaryRow("カテゴリ", categoryJa(card.category)) || hasAny;
     hasAny = appendSummaryRow("種類", card.trainer_type) || hasAny;
-    hasAny = appendSummaryRow("進化段階", card.stage) || hasAny;
+    hasAny = appendSummaryRow("進化段階", stageJa(card.stage)) || hasAny;
     hasAny = appendSummaryRow("HP", card.hp) || hasAny;
 
     var types = asArray(card.types);
@@ -360,7 +379,6 @@
     var dex = asArray(card.dex_ids);
     if(dex.length) hasAny = appendSummaryRow("図鑑ID", dex.join(", ")) || hasAny;
 
-    hasAny = appendSummaryRow("セット内順序", card.set_order) || hasAny;
 
     hasAny = showTextBlock("card-effect-block", "card-effect", card.effect_ja) || hasAny;
     hasAny = showTextBlock("card-description-block", "card-description", card.description_ja) || hasAny;
