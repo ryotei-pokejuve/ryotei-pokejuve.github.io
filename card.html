@@ -46,6 +46,66 @@
   .price-label{color:var(--sub)}
   .price-value{font-size:18px;color:var(--blue);font-weight:bold}
   .updated{font-size:12px;color:var(--sub);text-align:right;margin-top:8px}
+  .external-actions{margin-top:14px}
+  .mercari-link{
+    display:inline-block;
+    min-height:44px;
+    padding:10px 14px;
+    border:3px solid #28305d;
+    background:#fff;
+    color:var(--ink);
+    text-decoration:none;
+    font-weight:bold;
+  }
+  .mercari-link:focus{outline:3px solid var(--blue);outline-offset:2px}
+  .detail-section{margin-top:18px}
+  .detail-panel{
+    border:3px solid #293363;
+    background:#fbf6e6;
+    padding:12px 14px;
+  }
+  .detail-summary{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:0 16px;
+    margin-bottom:4px;
+  }
+  .detail-summary .meta-row{grid-template-columns:110px 1fr}
+  .detail-block{
+    border-top:2px dotted #46517c;
+    padding-top:12px;
+    margin-top:12px;
+  }
+  .detail-title{
+    color:var(--orange);
+    font-weight:bold;
+    font-size:16px;
+    margin-bottom:8px;
+  }
+  .ability-box,.attack-box{
+    border:2px solid #69729a;
+    background:#fff;
+    padding:10px 12px;
+    margin-top:8px;
+  }
+  .ability-name,.attack-name{font-weight:bold;font-size:16px}
+  .ability-effect,.attack-effect{margin-top:6px;white-space:pre-wrap;line-height:1.6}
+  .attack-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .attack-main{min-width:0}
+  .attack-cost{font-size:12px;color:var(--sub);margin-bottom:3px}
+  .attack-damage{font-size:19px;font-weight:bold;color:var(--blue);white-space:nowrap}
+  .detail-inline{display:flex;flex-wrap:wrap;gap:8px 16px}
+  .detail-chip{
+    border:2px solid #69729a;
+    background:#fff;
+    padding:6px 9px;
+  }
+  .detail-empty{color:var(--sub)}
   .short-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
   .short-card{border:3px solid #293363;background:#fbf6e6;padding:10px;min-width:0}
   .short-link{text-decoration:none;color:inherit}
@@ -68,6 +128,7 @@
     .no-img{height:165px}
     .meta-row{grid-template-columns:90px 1fr}
     .short-grid{grid-template-columns:1fr}
+    .detail-summary{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -84,9 +145,39 @@
         <div class="meta-row"><span class="meta-label">番号</span><span id="card-number"></span></div>
         <div class="meta-row"><span class="meta-label">レアリティ</span><span id="card-rarity"></span></div>
         <div class="meta-row"><span class="meta-label">収録パック</span><span id="card-set"></span></div>
+        <div class="meta-row" id="card-expansion-row" style="display:none"><span class="meta-label">エキスパンションマーク</span><span id="card-expansion-mark"></span></div>
         <div class="meta-row" id="card-illustrator-row" style="display:none"><span class="meta-label">イラストレーター</span><span id="card-illustrator"></span></div>
       </div>
     </div>
+    <div class="external-actions">
+      <a id="mercari-link" class="mercari-link" href="https://jp.mercari.com/" target="_blank" rel="noopener noreferrer" style="display:none">メルカリで探す</a>
+    </div>
+    <section id="card-detail-section" class="detail-section" style="display:none">
+      <h2>CARD DATA</h2>
+      <div class="detail-panel">
+        <div id="card-detail-summary" class="detail-summary"></div>
+        <div id="card-effect-block" class="detail-block" style="display:none">
+          <div class="detail-title">効果</div>
+          <div id="card-effect" class="ability-effect"></div>
+        </div>
+        <div id="card-description-block" class="detail-block" style="display:none">
+          <div class="detail-title">カード説明</div>
+          <div id="card-description" class="ability-effect"></div>
+        </div>
+        <div id="card-abilities-block" class="detail-block" style="display:none">
+          <div class="detail-title">特性</div>
+          <div id="card-abilities"></div>
+        </div>
+        <div id="card-attacks-block" class="detail-block" style="display:none">
+          <div class="detail-title">ワザ</div>
+          <div id="card-attacks"></div>
+        </div>
+        <div id="card-battle-block" class="detail-block" style="display:none">
+          <div class="detail-title">バトル情報</div>
+          <div id="card-battle" class="detail-inline"></div>
+        </div>
+      </div>
+    </section>
     <section id="price-section" style="display:none">
       <h2>PRICE</h2>
       <div class="price-box" id="price-box"></div>
@@ -155,6 +246,253 @@
     latestUpdated.textContent = latest ? "最終更新: " + MARKET.formatDateTime(latest.toISOString()) : "";
   }
 
+  function mercariSearchTerm(card){
+    var name = String((card && card.name) || "").trim();
+    var code = String((card && card.set_code) || "").trim();
+    var setName = String((card && card.set_name) || "").trim();
+    return [name, code || setName].filter(Boolean).join(" ");
+  }
+
+  function setupMercariLink(card){
+    var link = document.getElementById("mercari-link");
+    var term = mercariSearchTerm(card);
+    if(!term) return;
+    link.href = "https://jp.mercari.com/search?keyword=" + encodeURIComponent(term);
+    link.title = term + " でメルカリ検索";
+    link.style.display = "inline-block";
+  }
+
+  function asArray(value){
+    if(Array.isArray(value)) return value;
+    if(value == null || value === "") return [];
+    if(typeof value === "string"){
+      try{
+        var parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [];
+      }catch(_e){
+        return [];
+      }
+    }
+    return [];
+  }
+
+  function typeJa(value){
+    var map = {
+      Grass:"草", Fire:"炎", Water:"水", Lightning:"雷",
+      Psychic:"超", Fighting:"闘", Darkness:"悪",
+      Dark:"悪", Metal:"鋼", Steel:"鋼",
+      Colorless:"無色", Dragon:"ドラゴン", Fairy:"フェアリー"
+    };
+    return map[String(value || "")] || String(value || "");
+  }
+
+  function typeListJa(value){
+    if(Array.isArray(value)) return value.map(typeJa).filter(Boolean).join("・");
+    return typeJa(value);
+  }
+
+  function damageText(value){
+    if(value == null || value === "") return "";
+    if(typeof value === "object"){
+      var amount = value.amount == null ? "" : String(value.amount);
+      var suffix = value.suffix == null ? "" : String(value.suffix);
+      return amount + suffix;
+    }
+    return String(value);
+  }
+
+  function appendSummaryRow(label, value){
+    if(value == null || String(value).trim() === "") return false;
+    var row = document.createElement("div");
+    row.className = "meta-row";
+    var l = document.createElement("span");
+    l.className = "meta-label";
+    l.textContent = label;
+    var v = document.createElement("span");
+    v.textContent = String(value);
+    row.append(l, v);
+    document.getElementById("card-detail-summary").appendChild(row);
+    return true;
+  }
+
+  function hasValue(value){
+    if(value == null) return false;
+    if(Array.isArray(value)) return value.length > 0;
+    if(typeof value === "string") return value.trim() !== "";
+    return true;
+  }
+
+  function showTextBlock(blockId, valueId, value){
+    var block = document.getElementById(blockId);
+    var target = document.getElementById(valueId);
+    if(!hasValue(value)){ block.style.display = "none"; target.textContent = ""; return false; }
+    target.textContent = String(value);
+    block.style.display = "block";
+    return true;
+  }
+
+  function renderCardDetails(card){
+    var section = document.getElementById("card-detail-section");
+    var summary = document.getElementById("card-detail-summary");
+    var abilitiesWrap = document.getElementById("card-abilities");
+    var attacksWrap = document.getElementById("card-attacks");
+    var battleWrap = document.getElementById("card-battle");
+
+    summary.innerHTML = "";
+    abilitiesWrap.innerHTML = "";
+    attacksWrap.innerHTML = "";
+    battleWrap.innerHTML = "";
+
+    var hasAny = false;
+
+    // RPCから返るカード情報は、値があるものだけ表示する。
+    hasAny = appendSummaryRow("カテゴリ", card.category) || hasAny;
+    hasAny = appendSummaryRow("種類", card.trainer_type) || hasAny;
+    hasAny = appendSummaryRow("進化段階", card.stage) || hasAny;
+    hasAny = appendSummaryRow("HP", card.hp) || hasAny;
+
+    var types = asArray(card.types);
+    if(types.length) hasAny = appendSummaryRow("タイプ", types.map(typeJa).join("・")) || hasAny;
+
+    hasAny = appendSummaryRow("レギュレーション", card.regulation_mark) || hasAny;
+    hasAny = appendSummaryRow("図鑑番号", card.pokedex_number) || hasAny;
+
+    var dex = asArray(card.dex_ids);
+    if(dex.length) hasAny = appendSummaryRow("図鑑ID", dex.join(", ")) || hasAny;
+
+    hasAny = appendSummaryRow("セット内順序", card.set_order) || hasAny;
+    hasAny = appendSummaryRow("TCGdex ID", card.tcgdex_id) || hasAny;
+    hasAny = appendSummaryRow("バリアント", card.variant) || hasAny;
+
+    hasAny = showTextBlock("card-effect-block", "card-effect", card.effect_ja) || hasAny;
+    hasAny = showTextBlock("card-description-block", "card-description", card.description_ja) || hasAny;
+
+    // 特性: {name,effect} / {nameJa,effectJa} の両形式に対応
+    var abilities = asArray(card.abilities);
+    abilities.forEach(function(a){
+      if(!a || typeof a !== "object") return;
+      var name = String(a.nameJa || a.name || "").trim();
+      var effect = String(a.effectJa || a.effect || "").trim();
+      if(!name && !effect) return;
+
+      var box = document.createElement("div");
+      box.className = "ability-box";
+      if(name){
+        var n = document.createElement("div");
+        n.className = "ability-name";
+        n.textContent = name;
+        box.appendChild(n);
+      }
+      if(effect){
+        var e = document.createElement("div");
+        e.className = "ability-effect";
+        e.textContent = effect;
+        box.appendChild(e);
+      }
+      abilitiesWrap.appendChild(box);
+    });
+    if(abilitiesWrap.children.length){
+      document.getElementById("card-abilities-block").style.display = "block";
+      hasAny = true;
+    }else{
+      document.getElementById("card-abilities-block").style.display = "none";
+    }
+
+    // ワザ: name/nameJa, effect/effectJa, damage number/object の混在に対応
+    var attacks = asArray(card.attacks);
+    attacks.forEach(function(a){
+      if(!a || typeof a !== "object") return;
+      var name = String(a.nameJa || a.name || "").trim();
+      var effect = String(a.effectJa || a.effect || "").trim();
+      var damage = damageText(a.damage);
+      var cost = asArray(a.cost).map(typeJa).join("・");
+      if(!name && !effect && !damage && !cost) return;
+
+      var box = document.createElement("div");
+      box.className = "attack-box";
+      var head = document.createElement("div");
+      head.className = "attack-head";
+      var main = document.createElement("div");
+      main.className = "attack-main";
+
+      if(cost){
+        var c = document.createElement("div");
+        c.className = "attack-cost";
+        c.textContent = "必要エネルギー：" + cost;
+        main.appendChild(c);
+      }
+      if(name){
+        var n = document.createElement("div");
+        n.className = "attack-name";
+        n.textContent = name;
+        main.appendChild(n);
+      }
+      head.appendChild(main);
+
+      if(damage){
+        var d = document.createElement("div");
+        d.className = "attack-damage";
+        d.textContent = damage;
+        head.appendChild(d);
+      }
+      box.appendChild(head);
+
+      if(effect){
+        var e = document.createElement("div");
+        e.className = "attack-effect";
+        e.textContent = effect;
+        box.appendChild(e);
+      }
+      attacksWrap.appendChild(box);
+    });
+    if(attacksWrap.children.length){
+      document.getElementById("card-attacks-block").style.display = "block";
+      hasAny = true;
+    }else{
+      document.getElementById("card-attacks-block").style.display = "none";
+    }
+
+    function addBattleChip(label, text){
+      if(!text) return;
+      var chip = document.createElement("div");
+      chip.className = "detail-chip";
+      chip.textContent = label + "：" + text;
+      battleWrap.appendChild(chip);
+    }
+
+    asArray(card.weaknesses).forEach(function(w){
+      if(!w || typeof w !== "object") return;
+      var t = typeListJa(w.type);
+      var v = w.value == null ? "" : String(w.value);
+      if(t || v) addBattleChip("弱点", [t, v].filter(Boolean).join(" "));
+    });
+
+    asArray(card.resistances).forEach(function(r){
+      if(!r || typeof r !== "object") return;
+      var t = typeListJa(r.type);
+      var v = r.value == null ? "" : String(r.value);
+      if(t || v) addBattleChip("抵抗力", [t, v].filter(Boolean).join(" "));
+    });
+
+    // DB/RPCに存在する場合だけ自動表示。命名差も吸収する。
+    var retreat = card.retreat_cost != null ? card.retreat_cost :
+                  (card.retreatCost != null ? card.retreatCost :
+                  (card.retreat != null ? card.retreat : null));
+    if(Array.isArray(retreat)) retreat = retreat.map(typeJa).join("・");
+    if(retreat != null && String(retreat).trim() !== ""){
+      addBattleChip("にげる", String(retreat));
+    }
+
+    if(battleWrap.children.length){
+      document.getElementById("card-battle-block").style.display = "block";
+      hasAny = true;
+    }else{
+      document.getElementById("card-battle-block").style.display = "none";
+    }
+
+    section.style.display = hasAny ? "block" : "none";
+  }
+
   if(!id){ loading.style.display="none"; error.style.display="block"; return; }
 
   Promise.all([MARKET.getCard(id), MARKET.getCardMarketPrices(id)]).then(function(result){
@@ -165,11 +503,18 @@
     document.getElementById("card-number").textContent = card.card_number || "";
     document.getElementById("card-rarity").textContent = card.rarity || "ー";
     document.getElementById("card-set").textContent = card.set_name || "";
+    var expansionMark = String((card && card.set_code) || "").trim();
+    if(expansionMark){
+      document.getElementById("card-expansion-mark").textContent = expansionMark;
+      document.getElementById("card-expansion-row").style.display = "";
+    }
     var illustrator = card.illustrator ? String(card.illustrator).trim() : "";
     if(illustrator){
       document.getElementById("card-illustrator").textContent = illustrator;
       document.getElementById("card-illustrator-row").style.display = "";
     }
+    renderCardDetails(card);
+    setupMercariLink(card);
     addImage(card); renderPrices(prices);
     loading.style.display="none"; content.style.display="block";
   }).catch(function(err){

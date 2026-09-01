@@ -188,6 +188,7 @@
   }
   .card-name{ font-size: 12.5px; line-height:1.4; margin-bottom:4px; word-break: break-word; }
   .card-meta{ font-size: 10.5px; color: var(--text-sub); margin-bottom: 2px; }
+  .card-expansion-mark{font-size:10.5px;color:var(--text-sub);margin-top:4px;}
   .card-rarity{ font-size: 13px; color: var(--accent-2); font-weight:bold; }
 
   #pager{
@@ -827,6 +828,14 @@
     rarityEl.className = "card-rarity";
     rarityEl.textContent = card.rarity ? "レアリティ：" + card.rarity : "レアリティ：ー";
     a.appendChild(rarityEl);
+
+    var expansionMark = String((card && card.set_code) || "").trim();
+    if(expansionMark){
+      var expansionEl = document.createElement("div");
+      expansionEl.className = "card-expansion-mark";
+      expansionEl.textContent = "エキスパンションマーク：" + expansionMark;
+      a.appendChild(expansionEl);
+    }
 
     // illustrator がAPIから返っているカードだけ表示する。
     // 未設定/未返却でも既存カード表示は壊さない。
