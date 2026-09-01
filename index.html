@@ -125,13 +125,14 @@
     var content = document.getElementById("detail-content");
     var message = document.getElementById("message-text");
     if(!title || !content || title.textContent.trim() !== "CARD MARKET") return;
-    if(content.dataset.cardMarketLinks === "1") return;
+    if(content.dataset.cardMarketLinks === "1" && content.querySelector('[data-card-market-panel="1"]')) return;
 
     content.dataset.cardMarketLinks = "1";
     content.innerHTML = "";
 
     var box = document.createElement("div");
     box.className = "external-card";
+    box.setAttribute("data-card-market-panel", "1");
 
     var cardText = document.createElement("p");
     cardText.textContent = "ポケモンカードを一覧で見れます。";
