@@ -55,6 +55,42 @@
     });
   }
 
+  // 検索ページ v4:
+  // カード名検索は cards.name / name_normalized のみを対象にし、
+  // イラストレーター検索にも対応する。
+  function searchCardsV4(opts){
+    opts = opts || {};
+    return client().schema("api").rpc("search_cards_v4", {
+      p_query: opts.query || null,
+      p_set_id: opts.setId || null,
+      p_series_name: opts.seriesName || null,
+      p_rarity: opts.rarity || null,
+      p_illustrator: opts.illustrator || null,
+      p_sort: opts.sort || "default",
+      p_limit: opts.limit || 20,
+      p_offset: opts.offset || 0
+    }).then(function(res){
+      if(res.error) throw res.error;
+      return res.data || [];
+    });
+  }
+
+  function listCardIllustrators(){
+    return client().schema("api").rpc("list_card_illustrators", {}).then(function(res){
+      if(res.error) throw res.error;
+      return res.data || [];
+    });
+  }
+
+  function listIllustratorSeries(illustrator){
+    return client().schema("api").rpc("list_illustrator_series", {
+      p_illustrator: illustrator
+    }).then(function(res){
+      if(res.error) throw res.error;
+      return res.data || [];
+    });
+  }
+
   // カード詳細（api.get_card）
   function getCard(cardId, priceType, condition){
     return client().schema("api").rpc("get_card", {
@@ -178,6 +214,9 @@
   global.MARKET = {
     searchCards: searchCards,
     searchCardsSorted: searchCardsSorted,
+    searchCardsV4: searchCardsV4,
+    listCardIllustrators: listCardIllustrators,
+    listIllustratorSeries: listIllustratorSeries,
     getCard: getCard,
     getPriceHistory: getPriceHistory,
     getCardMarketPrices: getCardMarketPrices,

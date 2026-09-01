@@ -239,6 +239,24 @@
     min-height:36px;
   }
   #search-panel-toggle:active{transform:translate(1px,1px);box-shadow:none;}
+
+  #illustrator-search-wrap{display:none;gap:8px;flex-wrap:wrap;width:100%}
+  #illustrator-search-wrap.open{display:flex}
+  #illustrator-search-wrap .search-control{flex:1 1 210px}
+  #illustrator-filter,#illustrator-select{
+    width:100%;min-height:44px;padding:8px 10px;font-size:13px;font-family:inherit;
+    border:3px solid var(--window-border-outer);
+    box-shadow:inset 0 0 0 2px var(--window-border-inner);
+    background:var(--window-bg);color:var(--text-color)
+  }
+  .illustrator-control{flex-basis:100%!important}
+  .illustrator-letters{display:flex;gap:4px;flex-wrap:wrap}
+  .illustrator-letter{
+    min-width:34px;min-height:34px;padding:5px 7px;font-family:inherit;font-size:11px;
+    border:2px solid var(--window-border-outer);background:var(--window-bg);color:var(--text-color)
+  }
+  .illustrator-letter.active{background:var(--accent);color:#fff}
+
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3405662051867998" crossorigin="anonymous"></script>
 </head>
@@ -261,6 +279,7 @@
           <option value="card">カード名で検索</option>
           <option value="series">シリーズから検索</option>
           <option value="pack">パックから検索</option>
+          <option value="illustrator">イラストレーターから検索</option>
         </select>
       </label>
 
@@ -268,6 +287,22 @@
         <span>カード名</span>
         <input id="search-input" type="search" placeholder="例: ピカチュウ" autocomplete="off">
       </label>
+
+
+      <div id="illustrator-search-wrap">
+        <div class="search-control illustrator-control">
+          <span>頭文字 A-Z</span>
+          <div id="illustrator-letters" class="illustrator-letters" aria-label="イラストレーター頭文字"></div>
+        </div>
+        <label class="search-control">
+          <span>イラストレーター名を絞り込み</span>
+          <input id="illustrator-filter" type="search" placeholder="例: Komiya" autocomplete="off">
+        </label>
+        <label class="search-control">
+          <span>イラストレーター</span>
+          <select id="illustrator-select"><option value="">選択してください</option></select>
+        </label>
+      </div>
 
       <div id="series-search-wrap">
         <label class="search-control">
@@ -299,6 +334,8 @@
           <option value="name_desc">五十音順 ん→あ</option>
           <option value="number_asc">カード番号 小→大</option>
           <option value="number_desc">カード番号 大→小</option>
+          <option value="oldest">古い順</option>
+          <option value="newest">新しい順</option>
         </select>
       </label>
 <button id="search-btn" type="submit">けんさく</button>
@@ -377,9 +414,12 @@
     var state = MARKET.loadSearchState() || { query: "", rarity: "", setId: "", offset: 0, limit: 20, sort: "default", mode: "card", seriesName: "" };
   state.limit = Number(state.limit) || 20;
   state.sort = state.sort || "default";
-  state.mode = ["card","series","pack"].indexOf(state.mode) !== -1 ? state.mode : "card";
+  state.mode = ["card","series","pack","illustrator"].indexOf(state.mode) !== -1 ? state.mode : "card";
+  state.illustrator = state.illustrator || "";
+  state.illustratorLetter = state.illustratorLetter || "";
   state.seriesName = state.seriesName || "";
   var allCardSets = [];
+  var allIllustrators = [];
   var isInitialLoad = true;
   var searchSeq = 0; // 古いレスポンスが後から届いても画面を上書きしないための連番
 
@@ -392,6 +432,10 @@
     series: document.getElementById("series-select"),
     packSearchWrap: document.getElementById("pack-search-wrap"),
     pack: document.getElementById("pack-select"),
+    illustratorWrap: document.getElementById("illustrator-search-wrap"),
+    illustratorLetters: document.getElementById("illustrator-letters"),
+    illustratorFilter: document.getElementById("illustrator-filter"),
+    illustrator: document.getElementById("illustrator-select"),
     filterToggle: document.getElementById("filter-toggle"),
     filterPanel: document.getElementById("filter-panel"),
     rarity: document.getElementById("filter-rarity"),
@@ -453,7 +497,16 @@
       return (order[a]-order[b]) || a.localeCompare(b,"ja");
     }).forEach(function(label){
       var rows=groups[label];
-      rows.sort(function(a,b){return setOptionLabel(a).localeCompare(setOptionLabel(b),"ja",{numeric:true})});
+      // 旧裏・e・VS は発売日順。今回追加した拡張シートも正しい年代位置へ入る。
+      if(label === "旧裏・e・VS"){
+        rows.sort(function(a,b){
+          var ad=String(a.release_date || "9999-12-31");
+          var bd=String(b.release_date || "9999-12-31");
+          return ad.localeCompare(bd) || setOptionLabel(a).localeCompare(setOptionLabel(b),"ja",{numeric:true});
+        });
+      }else{
+        rows.sort(function(a,b){return setOptionLabel(a).localeCompare(setOptionLabel(b),"ja",{numeric:true})});
+      }
       var group=document.createElement("optgroup"); group.label=label;
       rows.forEach(function(s){
         var opt=document.createElement("option"); opt.value=s.id; opt.textContent=setOptionLabel(s); group.appendChild(opt);
@@ -494,15 +547,76 @@
     if(selectedName) els.series.value = selectedName;
   }
 
+  function illustratorInitial(name){
+    var c = String(name || "").trim().charAt(0).toUpperCase();
+    return /^[A-Z]$/.test(c) ? c : "その他";
+  }
+
+  function rebuildIllustratorOptions(){
+    var letter = state.illustratorLetter || "";
+    var q = String(els.illustratorFilter.value || "").trim().toLowerCase();
+    var current = state.illustrator || "";
+    els.illustrator.innerHTML = '<option value="">選択してください</option>';
+    allIllustrators.filter(function(row){
+      var name = String(row.illustrator || "");
+      if(letter && illustratorInitial(name) !== letter) return false;
+      if(q && name.toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    }).forEach(function(row){
+      var opt=document.createElement("option");
+      opt.value=row.illustrator;
+      opt.textContent=row.illustrator + " (" + row.card_count + ")";
+      els.illustrator.appendChild(opt);
+    });
+    if(current) els.illustrator.value=current;
+  }
+
+  function renderIllustratorLetters(){
+    els.illustratorLetters.innerHTML="";
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").concat(["その他"]).forEach(function(letter){
+      var exists=allIllustrators.some(function(r){return illustratorInitial(r.illustrator)===letter;});
+      if(!exists) return;
+      var b=document.createElement("button");
+      b.type="button"; b.className="illustrator-letter";
+      if(state.illustratorLetter===letter) b.classList.add("active");
+      b.textContent=letter;
+      b.addEventListener("click",function(){
+        state.illustratorLetter = state.illustratorLetter===letter ? "" : letter;
+        state.illustrator="";
+        renderIllustratorLetters();
+        rebuildIllustratorOptions();
+      });
+      els.illustratorLetters.appendChild(b);
+    });
+  }
+
+  function rebuildIllustratorSeries(selectedName){
+    els.series.innerHTML='<option value="">全シリーズ</option>';
+    if(!state.illustrator) return;
+    MARKET.listIllustratorSeries(state.illustrator).then(function(rows){
+      (rows||[]).forEach(function(row){
+        var opt=document.createElement("option");
+        opt.value=row.series_name;
+        opt.textContent=row.series_name + " (" + row.card_count + ")";
+        els.series.appendChild(opt);
+      });
+      if(selectedName) els.series.value=selectedName;
+    }).catch(function(err){ console.error(err); });
+  }
+
   function applySearchMode(){
     var mode = els.mode.value || "card";
     els.nameSearchWrap.classList.toggle("hidden", mode !== "card");
-    els.seriesSearchWrap.classList.toggle("open", mode === "card" || mode === "series");
+    els.illustratorWrap.classList.toggle("open", mode === "illustrator");
+    els.seriesSearchWrap.style.display = (mode === "card" || mode === "series" || mode === "illustrator") ? "" : "none";
     els.packSearchWrap.classList.toggle("open", mode === "pack");
     if(mode !== "card") els.input.value = "";
+    if(mode === "illustrator") rebuildIllustratorSeries(state.seriesName || "");
+    else rebuildSeriesOptions(state.seriesName || "");
   }
 
   els.input.value = state.query || "";
+  els.illustratorFilter.value = "";
   els.mode.value = state.mode;
   els.rarity.value = state.rarity || "";
   els.pageSize.value = String(state.limit);
@@ -529,6 +643,12 @@
   });
 
   // パック一覧を読み込んで選択肢に追加（失敗しても検索自体は使えるようにする）
+  MARKET.listCardIllustrators().then(function(rows){
+    allIllustrators = rows || [];
+    renderIllustratorLetters();
+    rebuildIllustratorOptions();
+  }).catch(function(err){ console.error(err); });
+
   MARKET.listCardSets().then(function(sets){
     allCardSets = sets || [];
     appendGroupedSetOptions(els.set, allCardSets);
@@ -542,7 +662,7 @@
   });
 
   els.mode.addEventListener("change", function(){
-    state.mode = ["card","series","pack"].indexOf(els.mode.value) !== -1 ? els.mode.value : "card";
+    state.mode = ["card","series","pack","illustrator"].indexOf(els.mode.value) !== -1 ? els.mode.value : "card";
     state.offset = 0;
     if(state.mode === "card"){
       state.setId = els.set.value || "";
@@ -551,15 +671,32 @@
       state.query = "";
       state.setId = "";
       state.seriesName = els.series.value || "";
-    }else{
+    }else if(state.mode === "pack"){
       state.query = "";
+      state.illustrator = "";
       state.seriesName = els.series.value || "";
       state.setId = "";
       rebuildPackOptions(state.seriesName, "");
+    }else{
+      state.query = "";
+      state.setId = "";
+      state.seriesName = "";
+      state.illustrator = els.illustrator.value || "";
     }
     applySearchMode();
   });
 
+
+  els.illustratorFilter.addEventListener("input", function(){
+    state.illustrator="";
+    rebuildIllustratorOptions();
+  });
+
+  els.illustrator.addEventListener("change", function(){
+    state.illustrator=els.illustrator.value || "";
+    state.seriesName="";
+    rebuildIllustratorSeries("");
+  });
 
   els.series.addEventListener("change", function(){
     state.seriesName = els.series.value || "";
@@ -575,11 +712,21 @@
 
   els.form.addEventListener("submit", function(e){
     e.preventDefault();
-    state.mode = ["card","series","pack"].indexOf(els.mode.value) !== -1 ? els.mode.value : "card";
+    state.mode = ["card","series","pack","illustrator"].indexOf(els.mode.value) !== -1 ? els.mode.value : "card";
     state.query = state.mode === "card" ? els.input.value.trim() : "";
     state.rarity = els.rarity.value;
 
-    if(state.mode === "pack"){
+    if(state.mode === "illustrator"){
+      state.query = "";
+      state.setId = "";
+      state.illustrator = els.illustrator.value || "";
+      state.seriesName = els.series.value || "";
+      if(!state.illustrator){
+        els.status.textContent = "イラストレーターを選択してください。";
+        return;
+      }
+    }else if(state.mode === "pack"){
+      state.illustrator = "";
       state.seriesName = els.series.value || "";
       state.setId = els.pack.value || "";
       if(!state.setId){
@@ -587,9 +734,11 @@
         return;
       }
     }else if(state.mode === "series"){
+      state.illustrator = "";
       state.setId = "";
       state.seriesName = els.series.value || "";
     }else{
+      state.illustrator = "";
       state.setId = els.set.value;
       state.seriesName = els.series.value || "";
     }
@@ -676,6 +825,15 @@
     rarityEl.textContent = card.rarity ? "レアリティ：" + card.rarity : "レアリティ：ー";
     a.appendChild(rarityEl);
 
+    // illustrator がAPIから返っているカードだけ表示する。
+    // 未設定/未返却でも既存カード表示は壊さない。
+    if(card.illustrator && String(card.illustrator).trim()){
+      var illustratorEl = document.createElement("div");
+      illustratorEl.className = "card-meta";
+      illustratorEl.textContent = "Illus. " + String(card.illustrator).trim();
+      a.appendChild(illustratorEl);
+    }
+
     return a;
   }
 
@@ -695,11 +853,12 @@
     els.empty.style.display = "none";
     els.error.style.display = "none";
 
-    MARKET.searchCardsSorted({
+    MARKET.searchCardsV4({
       query: state.query,
       rarity: state.rarity || null,
       setId: state.setId || null,
       seriesName: state.mode === "pack" ? null : (state.seriesName || null),
+      illustrator: state.mode === "illustrator" ? (state.illustrator || null) : null,
       limit: state.limit,
       sort: state.sort,
       offset: state.offset

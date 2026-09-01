@@ -84,6 +84,7 @@
         <div class="meta-row"><span class="meta-label">番号</span><span id="card-number"></span></div>
         <div class="meta-row"><span class="meta-label">レアリティ</span><span id="card-rarity"></span></div>
         <div class="meta-row"><span class="meta-label">収録パック</span><span id="card-set"></span></div>
+        <div class="meta-row" id="card-illustrator-row" style="display:none"><span class="meta-label">イラストレーター</span><span id="card-illustrator"></span></div>
       </div>
     </div>
     <section id="price-section" style="display:none">
@@ -164,6 +165,11 @@
     document.getElementById("card-number").textContent = card.card_number || "";
     document.getElementById("card-rarity").textContent = card.rarity || "ー";
     document.getElementById("card-set").textContent = card.set_name || "";
+    var illustrator = card.illustrator ? String(card.illustrator).trim() : "";
+    if(illustrator){
+      document.getElementById("card-illustrator").textContent = illustrator;
+      document.getElementById("card-illustrator-row").style.display = "";
+    }
     addImage(card); renderPrices(prices);
     loading.style.display="none"; content.style.display="block";
   }).catch(function(err){
