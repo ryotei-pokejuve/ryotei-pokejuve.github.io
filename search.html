@@ -188,7 +188,6 @@
   }
   .card-name{ font-size: 12.5px; line-height:1.4; margin-bottom:4px; word-break: break-word; }
   .card-meta{ font-size: 10.5px; color: var(--text-sub); margin-bottom: 2px; }
-  .card-expansion-mark{font-size:10.5px;color:var(--text-sub);margin-top:4px;}
   .card-rarity{ font-size: 13px; color: var(--accent-2); font-weight:bold; }
 
   #pager{
@@ -482,9 +481,6 @@
   function setOptionLabel(s){
     var code = String((s && s.code) || "").trim();
     var name = String((s && s.name) || "").trim();
-    var series = String((s && s.series_name) || "").trim();
-    // プレイヤーズは内部code(PLAY)を表示せず、タブ名を「プレイヤーズ」に統一する。
-    if(series === "プレイヤーズ" && name === "プレイヤーズ") return "プレイヤーズ";
     return code && name && name.indexOf(code) !== 0 ? code + "  " + name : (name || code);
   }
 
@@ -668,25 +664,31 @@
   els.mode.addEventListener("change", function(){
     state.mode = ["card","series","pack","illustrator"].indexOf(els.mode.value) !== -1 ? els.mode.value : "card";
     state.offset = 0;
-    if(state.mode === "card"){
-      state.setId = els.set.value || "";
-      state.seriesName = els.series.value || "";
-    }else if(state.mode === "series"){
-      state.query = "";
-      state.setId = "";
-      state.seriesName = els.series.value || "";
-    }else if(state.mode === "pack"){
-      state.query = "";
-      state.illustrator = "";
-      state.seriesName = els.series.value || "";
-      state.setId = "";
-      rebuildPackOptions(state.seriesName, "");
-    }else{
-      state.query = "";
-      state.setId = "";
-      state.seriesName = "";
-      state.illustrator = els.illustrator.value || "";
-    }
+
+    // 検索方法を切り替えたら、前の検索方法の入力・選択・結果を持ち越さない。
+    state.query = "";
+    state.setId = "";
+    state.seriesName = "";
+    state.illustrator = "";
+
+    els.input.value = "";
+    els.series.value = "";
+    els.pack.value = "";
+    els.illustrator.value = "";
+    els.illustratorFilter.value = "";
+
+    rebuildSeriesOptions("");
+    rebuildPackOptions("", "");
+    rebuildIllustratorOptions();
+
+    els.results.innerHTML = "";
+    els.empty.style.display = "none";
+    els.error.style.display = "none";
+    els.status.textContent = "";
+    els.pageInfo.textContent = "";
+    els.prev.disabled = true;
+    els.next.disabled = true;
+
     applySearchMode();
   });
 
@@ -828,23 +830,6 @@
     rarityEl.className = "card-rarity";
     rarityEl.textContent = card.rarity ? "レアリティ：" + card.rarity : "レアリティ：ー";
     a.appendChild(rarityEl);
-
-    var expansionMark = String((card && card.set_code) || "").trim();
-    if(expansionMark){
-      var expansionEl = document.createElement("div");
-      expansionEl.className = "card-expansion-mark";
-      expansionEl.textContent = "エキスパンションマーク：" + expansionMark;
-      a.appendChild(expansionEl);
-    }
-
-    // illustrator がAPIから返っているカードだけ表示する。
-    // 未設定/未返却でも既存カード表示は壊さない。
-    if(card.illustrator && String(card.illustrator).trim()){
-      var illustratorEl = document.createElement("div");
-      illustratorEl.className = "card-meta";
-      illustratorEl.textContent = "Illus. " + String(card.illustrator).trim();
-      a.appendChild(illustratorEl);
-    }
 
     return a;
   }
