@@ -392,6 +392,7 @@ button, select { touch-action: manipulation; }
       <h2>カード検索</h2>
       <div class="search-row">
         <input id="admin-search-input" type="search" placeholder="カード名・番号で検索">
+        <select id="admin-filter-series"><option value="">シリーズ（すべて）</option></select>
         <select id="admin-filter-set"><option value="">パック（すべて）</option></select>
         <select id="admin-filter-rarity">
           <option value="">レアリティ（すべて）</option>
@@ -616,6 +617,7 @@ button, select { touch-action: manipulation; }
     siteSettingsStatus: document.getElementById("site-settings-status"),
 
     searchInput: document.getElementById("admin-search-input"),
+    filterSeries: document.getElementById("admin-filter-series"),
     filterSet: document.getElementById("admin-filter-set"),
     filterRarity: document.getElementById("admin-filter-rarity"),
     searchBtn: document.getElementById("admin-search-btn"),
@@ -693,48 +695,75 @@ button, select { touch-action: manipulation; }
   // パックをシリーズ別にまとめてプルダウン表示する。
   // APIがcodeを返す場合はcodeを優先し、返さない場合はnameから判定する。
   function getSetGroup(s){
+    // DBにseries_nameがある場合は、それをそのまま管理画面のシリーズ名として使う。
+    // これにより今後シリーズやパックを追加してもadmin.html側のハードコード更新が不要。
+    var explicit = String((s && s.series_name) || "").trim();
+    if(explicit) return explicit;
+
+    // 旧データなどseries_name未設定行だけ従来ルールで補完する。
     var code = String((s && s.code) || "").trim().toUpperCase();
     var name = String((s && s.name) || "").trim();
     var key = code || name.toUpperCase();
 
-    if(/プロモ/.test(name) || /^(SV-P|S-P|SMP|XYP|BWP|DPP|SM-P|XY-P|BW-P|ADV-P)$/.test(code)) return "プロモ";
+    if(/プロモ/.test(name) || /^(SV-P|S8A-P|S-P|SMP|XYP|BWP|LP|DPTP|DPP|PCGP|ADVP|PPP|PLAY)$/.test(code)) return "プロモ";
     if(/^SV/.test(key)) return "SVシリーズ";
     if(/^SM/.test(key)) return "SMシリーズ";
     if(/^XY/.test(key)) return "XYシリーズ";
     if(/^BW/.test(key)) return "BWシリーズ";
+    if(/^(L1|L2|L3|LL$|LP$|BK$|BR$|EL$|EM$)/.test(key)) return "LEGEND";
     if(/^(DPT|DP)/.test(key)) return "DP・DPtシリーズ";
     if(/^(ADV|PCG)/.test(key)) return "ADV・PCGシリーズ";
-    if(/^(PMCG|NEO|E\b|WEB\b|VS\b)/.test(key)) return "旧裏・e・VS";
-    if(/^S(?:\d|[A-Z-])/.test(key)) return "Sシリーズ";
+    if(/^(PMCG|NEO|VND|E\b|WEB\b|VS\b)/.test(key)) return "旧裏・e・VS";
+    if(/^S(?:\d|[A-Z-])/.test(key)) return "ソード・シールド";
     return "その他";
   }
 
   function setOptionLabel(s){
     var code = String((s && s.code) || "").trim();
     var name = String((s && s.name) || "").trim();
+    var series = String((s && s.series_name) || "").trim();
+
+    // 統合済みプレイヤーズは内部コードPLAYを画面には出さない。
+    if(series === "プレイヤーズ" && name === "プレイヤーズ") return "プレイヤーズ";
     return code && name && name.indexOf(code) !== 0 ? code + "  " + name : (name || code);
   }
 
   function appendGroupedSetOptions(select, sets){
-    var order = [
-      "SVシリーズ", "Sシリーズ", "SMシリーズ", "XYシリーズ", "BWシリーズ",
-      "DP・DPtシリーズ", "ADV・PCGシリーズ", "旧裏・e・VS", "プロモ", "その他"
-    ];
     var groups = {};
-    order.forEach(function(label){ groups[label] = []; });
+    var order = {};
 
     (sets || []).forEach(function(s){
-      groups[getSetGroup(s)].push(s);
+      var label = getSetGroup(s);
+      if(!groups[label]) groups[label] = [];
+      groups[label].push(s);
+
+      var n = Number(s && s.series_order);
+      if(!Number.isFinite(n)) n = 500;
+      order[label] = Math.min(order[label] == null ? 9999 : order[label], n);
     });
 
-    order.forEach(function(label){
-      if(!groups[label].length) return;
-      groups[label].sort(function(a, b){
-        return setOptionLabel(a).localeCompare(setOptionLabel(b), "ja", { numeric: true });
-      });
+    Object.keys(groups).sort(function(a, b){
+      return (order[a] - order[b]) || a.localeCompare(b, "ja");
+    }).forEach(function(label){
+      var rows = groups[label];
+
+      // 旧裏・e・VSは発売日順。それ以外は表示名順。
+      if(label === "旧裏・e・VS"){
+        rows.sort(function(a, b){
+          var ad = String((a && a.release_date) || "9999-12-31");
+          var bd = String((b && b.release_date) || "9999-12-31");
+          return ad.localeCompare(bd) ||
+            setOptionLabel(a).localeCompare(setOptionLabel(b), "ja", { numeric:true });
+        });
+      } else {
+        rows.sort(function(a, b){
+          return setOptionLabel(a).localeCompare(setOptionLabel(b), "ja", { numeric:true });
+        });
+      }
+
       var group = document.createElement("optgroup");
       group.label = label;
-      groups[label].forEach(function(s){
+      rows.forEach(function(s){
         var opt = document.createElement("option");
         opt.value = s.id;
         opt.textContent = setOptionLabel(s);
@@ -743,6 +772,45 @@ button, select { touch-action: manipulation; }
       select.appendChild(group);
     });
   }
+
+  var allAdminCardSets = [];
+
+  function rebuildAdminSeriesOptions(selectedName){
+    var previous = selectedName || "";
+    els.filterSeries.innerHTML = '<option value="">シリーズ（すべて）</option>';
+
+    var map = {};
+    (allAdminCardSets || []).forEach(function(s){
+      var name = getSetGroup(s);
+      var n = Number(s && s.series_order);
+      if(!Number.isFinite(n)) n = 500;
+      if(!map[name] || n < map[name].order) map[name] = { order:n };
+    });
+
+    Object.keys(map).sort(function(a, b){
+      return (map[a].order - map[b].order) || a.localeCompare(b, "ja");
+    }).forEach(function(name){
+      var opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name;
+      els.filterSeries.appendChild(opt);
+    });
+
+    if(previous) els.filterSeries.value = previous;
+  }
+
+  function rebuildAdminPackFilter(selectedSetId){
+    var seriesName = String(els.filterSeries.value || "").trim();
+    clearSetOptions(els.filterSet, "パック（すべて）");
+
+    var rows = (allAdminCardSets || []).filter(function(s){
+      return !seriesName || getSetGroup(s) === seriesName;
+    });
+    appendGroupedSetOptions(els.filterSet, rows);
+
+    if(selectedSetId) els.filterSet.value = selectedSetId;
+  }
+
 
   var selectedCardId = null;
   var setsLoaded = false;
@@ -965,24 +1033,29 @@ button, select { touch-action: manipulation; }
 
   function loadCardSets(selectCardId){
     return MARKET.listCardSets().then(function(sets){
+      var previousSeries = els.filterSeries.value;
       var previousFilter = els.filterSet.value;
       var previousCard = selectCardId || els.cardSet.value;
 
-      clearSetOptions(els.filterSet, "パック（すべて）");
+      allAdminCardSets = sets || [];
+
+      // 検索側: DBのseries_nameからシリーズ一覧を自動生成し、
+      // 選択シリーズに属するパックだけをパック欄へ表示。
+      rebuildAdminSeriesOptions(previousSeries);
+      rebuildAdminPackFilter(previousFilter);
+
+      // カード登録側: 全パックをDBのseries_nameごとに自動グループ化。
       clearSetOptions(els.cardSet, "パックを選択");
-
-      appendGroupedSetOptions(els.filterSet, sets);
-      appendGroupedSetOptions(els.cardSet, sets);
-
-      if(previousFilter) els.filterSet.value = previousFilter;
+      appendGroupedSetOptions(els.cardSet, allAdminCardSets);
       if(previousCard) els.cardSet.value = previousCard;
 
-      return sets;
+      return allAdminCardSets;
     }).catch(function(err){
       console.error(err);
       throw err;
     });
   }
+
 
   // ---- 新しいパックの追加 ----
   function setNewSetPanel(open){
@@ -1129,6 +1202,7 @@ button, select { touch-action: manipulation; }
       query: els.searchInput.value,
       rarity: els.filterRarity.value || null,
       setId: els.filterSet.value || null,
+      seriesName: els.filterSeries.value || null,
       limit: ADMIN_PAGE_SIZE,
       offset: adminSearchOffset
     }).then(function(rows){
@@ -1150,6 +1224,10 @@ button, select { touch-action: manipulation; }
   }
 
   els.searchBtn.addEventListener("click", function(){ runAdminSearch(false); });
+  els.filterSeries.addEventListener("change", function(){
+    rebuildAdminPackFilter("");
+    runAdminSearch(false);
+  });
   els.filterSet.addEventListener("change", function(){ runAdminSearch(false); });
   els.filterRarity.addEventListener("change", function(){ runAdminSearch(false); });
   els.loadMoreBtn.addEventListener("click", function(){ runAdminSearch(true); });

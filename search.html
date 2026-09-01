@@ -481,6 +481,9 @@
   function setOptionLabel(s){
     var code = String((s && s.code) || "").trim();
     var name = String((s && s.name) || "").trim();
+    var series = String((s && s.series_name) || "").trim();
+    // プレイヤーズは内部code(PLAY)を表示せず、タブ名を「プレイヤーズ」に統一する。
+    if(series === "プレイヤーズ" && name === "プレイヤーズ") return "プレイヤーズ";
     return code && name && name.indexOf(code) !== 0 ? code + "  " + name : (name || code);
   }
 
