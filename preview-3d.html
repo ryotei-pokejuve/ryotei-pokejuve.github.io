@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>3D MODE Preview | RYOTEI</title>
+  <meta name="description" content="RYOTEI 3D MODEの単独検証ページです。">
+  <link rel="stylesheet" href="assets/css/preview-3d.css">
+  <script src="assets/js/preview-3d-host.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">3Dプレビューへ移動</a>
+
+  <main id="main-content" class="preview-shell" aria-labelledby="preview-title">
+    <header class="preview-header">
+      <div>
+        <p class="eyebrow">RYOTEI SPATIAL VIEWER</p>
+        <h1 id="preview-title">RYOTEI / 3D MODE</h1>
+      </div>
+      <span class="mode-chip" aria-label="現在の表示モード">3D PREVIEW</span>
+    </header>
+
+    <section class="viewer-panel" aria-labelledby="viewer-heading">
+      <div class="viewer-heading">
+        <div>
+          <p class="eyebrow">LIVE VIEW</p>
+          <h2 id="viewer-heading">3D空間</h2>
+        </div>
+        <p class="viewer-status">WASD / Q,E / 右ドラッグ</p>
+      </div>
+
+      <div id="unity-container" class="unity-container" data-state="idle" aria-busy="true">
+        <canvas id="unity-canvas" width="1280" height="720" tabindex="-1" aria-label="RYOTEI 3Dプレビュー"></canvas>
+
+        <div id="unity-loading" class="unity-overlay unity-loading" role="status" aria-live="polite">
+          <p class="loading-label">3D MODEを準備しています</p>
+          <div class="progress-row">
+            <progress id="unity-progress" max="100" value="0">0%</progress>
+            <output id="unity-progress-text" for="unity-progress">0%</output>
+          </div>
+        </div>
+
+        <div id="unity-error" class="unity-overlay unity-error" role="alert" hidden>
+          <strong>3D MODEを起動できませんでした</strong>
+          <p id="unity-error-message">時間をおいて再読み込みするか、2D MODEへ戻ってください。</p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="preview-footer">
+      <p>このページは3D MODE専用のプレビューです。</p>
+      <a class="back-link" href="preview-2d.html">← 2D MODEへ戻る</a>
+    </footer>
+  </main>
+</body>
+</html>
