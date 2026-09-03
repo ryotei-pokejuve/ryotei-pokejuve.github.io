@@ -12,6 +12,12 @@ const expectedFiles = [
   'WebGL.wasm.unityweb',
 ];
 
+assert.deepEqual(
+  fs.readdirSync(buildDirectory).sort(),
+  [...expectedFiles].sort(),
+  'Unity Build directory contains exactly the four approved artifacts',
+);
+
 for (const fileName of expectedFiles) {
   const filePath = path.join(buildDirectory, fileName);
   assert.ok(fs.existsSync(filePath), `${fileName} exists`);

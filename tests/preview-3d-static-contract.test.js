@@ -5,6 +5,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'preview-3d.html'), 'utf8');
 const host = fs.readFileSync(path.join(root, 'assets/js/preview-3d-host.js'), 'utf8');
+const css = fs.readFileSync(path.join(root, 'assets/css/preview-3d.css'), 'utf8');
 
 assert.match(html, /<html\s+lang="ja">/i, '3D preview declares Japanese content');
 assert.match(
@@ -60,6 +61,9 @@ assert.doesNotMatch(html, /http-equiv="Content-Security-Policy"/i, 'meta CSP is 
 
 assert.doesNotMatch(host, /\balert\s*\(/, '3D host reports errors in-page instead of using alert');
 assert.doesNotMatch(host, /https?:\/\//i, '3D host does not load external URLs');
+assert.doesNotMatch(css, /https?:\/\//i, '3D styles do not load external URLs');
+assert.doesNotMatch(css, /\burl\s*\(/i, '3D styles do not load image or font assets');
+assert.doesNotMatch(css, /@import\b/i, '3D styles do not import external styles or fonts');
 assert.deepEqual(
   [...new Set(host.match(/RYOTEI_[A-Z0-9_]+/g) || [])],
   ['RYOTEI_HOST_3D'],
