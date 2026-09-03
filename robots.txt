@@ -3,3 +3,5 @@ Disallow: /admin.html
 Disallow: /supabase/
 Disallow: /lain.html
 Disallow: /preview-2d.html
+Disallow: /preview-3d.html
+Disallow: /assets/3d/
