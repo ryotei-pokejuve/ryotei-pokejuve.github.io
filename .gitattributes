@@ -1,0 +1,3 @@
+*.unityweb binary
+*.wasm     binary
+*.data     binary
