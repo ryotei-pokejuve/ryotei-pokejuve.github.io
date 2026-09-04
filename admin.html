@@ -345,6 +345,16 @@ button, select { touch-action: manipulation; }
     .short-price-actions .btn,.short-price-link{ width:100%; text-align:center; min-height:44px; }
   }
 
+
+  /* ===== カード複数タグ ===== */
+  .card-tag-box{margin-top:6px;padding:10px;border:2px dashed var(--accent);background:rgba(61,127,212,.06)}
+  .card-tag-list{display:flex;gap:7px;flex-wrap:wrap;margin:6px 0}
+  .card-tag-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:2px solid var(--window-border-outer);background:#fff;font-size:12px;cursor:pointer}
+  .card-tag-chip input{width:auto!important;min-height:auto!important;margin:0}
+  .card-tag-empty{font-size:11px;color:var(--text-sub);padding:4px 0}
+  #card-new-tag-name{flex:1 1 180px}
+  @media(max-width:720px){#card-tag-list{display:grid;grid-template-columns:1fr 1fr}.card-tag-chip{min-height:44px}.card-tag-add-row,.card-existing-tag-row{display:grid!important;grid-template-columns:1fr!important}}
+
 </style>
 </head>
 <body>
@@ -424,20 +434,45 @@ button, select { touch-action: manipulation; }
       <div id="admin-bulk-toolbar" class="bulk-toolbar">
         <label class="bulk-check-label"><input id="admin-select-page" type="checkbox"> 表示中を全選択</label>
         <span id="admin-selected-count">選択中 0件</span>
-        <select id="admin-bulk-rarity">
-          <option value="">変更後レアリティ</option>
-          <option value="ー">ー</option>
-          <option value="●">●</option><option value="◆">◆</option><option value="★">★</option><option value="★H">★H</option><option value="☆">☆</option>
-          <option value="C">C</option><option value="U">U</option><option value="R">R</option>
-          <option value="RR">RR</option><option value="RRR">RRR</option><option value="AR">AR</option>
-          <option value="SR">SR</option><option value="SAR">SAR</option><option value="UR">UR</option><option value="HR">HR</option>
-          <option value="PROMO">PROMO</option><option value="プロモ">プロモ</option>
-          <option value="CHR">CHR</option><option value="CSR">CSR</option><option value="S">S</option><option value="SSR">SSR</option>
-          <option value="ACE">ACE</option><option value="K">K</option><option value="MUR">MUR</option><option value="BWR">BWR</option>
-          <option value="__CUSTOM__">その他を入力…</option>
+
+        <select id="admin-bulk-field">
+          <option value="rarity">レアリティを変更</option>
+          <option value="set">所属パックを変更</option>
+          <option value="variant">バリアントを変更</option>
+          <option value="tag_add">タグを追加</option>
+          <option value="tag_remove">タグを削除</option>
         </select>
-        <input id="admin-bulk-rarity-custom" type="text" maxlength="40" placeholder="任意のレアリティ" style="display:none">
+
+        <div id="admin-bulk-rarity-wrap" style="display:contents;">
+          <select id="admin-bulk-rarity">
+            <option value="">変更後レアリティ</option>
+            <option value="ー">ー</option>
+            <option value="●">●</option><option value="◆">◆</option><option value="★">★</option><option value="★H">★H</option><option value="☆">☆</option>
+            <option value="C">C</option><option value="U">U</option><option value="R">R</option>
+            <option value="RR">RR</option><option value="RRR">RRR</option><option value="AR">AR</option>
+            <option value="SR">SR</option><option value="SAR">SAR</option><option value="UR">UR</option><option value="HR">HR</option>
+            <option value="PROMO">PROMO</option><option value="プロモ">プロモ</option>
+            <option value="CHR">CHR</option><option value="CSR">CSR</option><option value="S">S</option><option value="SSR">SSR</option>
+            <option value="ACE">ACE</option><option value="K">K</option><option value="MUR">MUR</option><option value="BWR">BWR</option>
+            <option value="__CUSTOM__">その他を入力…</option>
+          </select>
+          <input id="admin-bulk-rarity-custom" type="text" maxlength="40" placeholder="任意のレアリティ" style="display:none">
+        </div>
+
+        <select id="admin-bulk-set" style="display:none;">
+          <option value="">変更後パックを選択</option>
+        </select>
+
+        <input id="admin-bulk-variant" type="text" maxlength="50" placeholder="変更後バリアント（空欄で通常）" style="display:none;">
+
+        <select id="admin-bulk-tag" style="display:none;">
+          <option value="">タグを選択</option>
+        </select>
+
         <button class="btn" id="admin-bulk-apply" type="button" disabled>選択カードを一括変更</button>
+        <div style="font-size:11px;color:var(--text-sub);flex-basis:100%;">
+          ※ カード名・番号・画像URLはカードごとに異なるため一括変更対象にはしていません。タグ追加/削除は他のタグを保持します。
+        </div>
         <div id="admin-bulk-status" class="status-msg"></div>
       </div>
       <ul id="admin-results"></ul>
@@ -445,9 +480,68 @@ button, select { touch-action: manipulation; }
       <div id="admin-load-more-wrap">
         <button class="btn secondary" id="admin-load-more-btn" type="button">もっと見る</button>
       </div>
+      <div class="inline-actions" style="margin-top:12px;">
+        <button class="btn" id="new-card-btn" type="button">＋ 新しいカードを登録</button>
+      </div>
     </div>
 
-    <div class="pixel-window">
+
+    <div class="pixel-window" id="affiliation-manager-window">
+      <h2>シリーズ・所属管理</h2>
+      <div style="font-size:12px;color:var(--text-sub);margin-bottom:12px;">
+        シリーズ単独追加、既存パックの所属シリーズ変更、既存カードの所属パック変更をここだけで行えます。
+      </div>
+
+      <div style="padding:10px;border:2px dashed var(--accent);margin-bottom:14px;">
+        <strong style="font-size:13px;">シリーズを単独追加</strong>
+        <label for="series-create-name">新しいシリーズ名</label>
+        <input id="series-create-name" type="text" maxlength="80" placeholder="例: MEGAシリーズ">
+        <label for="series-create-reference">追加位置の基準シリーズ（任意）</label>
+        <select id="series-create-reference"><option value="">末尾に追加</option></select>
+        <label for="series-create-position">追加位置</label>
+        <select id="series-create-position">
+          <option value="after">基準シリーズの後</option>
+          <option value="before">基準シリーズの前</option>
+        </select>
+        <button class="btn" id="series-create-save" type="button">シリーズだけ追加</button>
+        <div id="series-create-status" class="status-msg"></div>
+      </div>
+
+      <div style="padding:10px;border:2px dashed var(--accent);margin-bottom:14px;">
+        <strong style="font-size:13px;">既存パックのシリーズ変更</strong>
+        <label for="pack-series-set">変更するパック</label>
+        <select id="pack-series-set"><option value="">パックを選択</option></select>
+        <label for="pack-series-name">変更後シリーズ</label>
+        <select id="pack-series-name"><option value="">シリーズを選択</option></select>
+        <button class="btn" id="pack-series-save" type="button">パックのシリーズだけ変更</button>
+        <div id="pack-series-status" class="status-msg"></div>
+      </div>
+
+      <div style="padding:10px;border:2px dashed var(--accent);">
+        <strong style="font-size:13px;">カードの所属変更</strong>
+        <div style="font-size:11px;color:var(--text-sub);margin-top:4px;">
+          カード自体にはシリーズ名を直接持たせず、所属パックのシリーズがカードのシリーズになります。
+        </div>
+        <label for="membership-card-search">カードを検索</label>
+        <div class="search-row">
+          <input id="membership-card-search" type="search" placeholder="カード名・番号">
+          <button class="btn secondary" id="membership-card-search-btn" type="button">検索</button>
+        </div>
+        <ul id="membership-card-results" style="list-style:none;padding:0;margin:8px 0;"></ul>
+        <input id="membership-card-id" type="hidden">
+        <div id="membership-card-target" style="font-size:13px;padding:8px;background:rgba(61,127,212,.1);border:2px solid var(--accent);margin:8px 0;">
+          カードが選択されていません
+        </div>
+        <label for="membership-series">シリーズ</label>
+        <select id="membership-series" disabled><option value="">シリーズを選択</option></select>
+        <label for="membership-set">所属パック</label>
+        <select id="membership-set" disabled><option value="">パックを選択</option></select>
+        <button class="btn" id="membership-save" type="button" disabled>カードの所属だけ変更</button>
+        <div id="membership-status" class="status-msg"></div>
+      </div>
+    </div>
+
+    <div class="pixel-window" id="card-editor-window">
       <h2 id="card-form-title">カード新規登録</h2>
       <form id="card-form">
         <input type="hidden" id="card-id">
@@ -457,6 +551,12 @@ button, select { touch-action: manipulation; }
           <button class="btn secondary" type="button" id="new-set-toggle">＋ 新しいパックを追加</button>
         </div>
         <div id="new-set-panel">
+          <label for="new-set-series">シリーズ</label>
+          <input id="new-set-series" type="text" maxlength="120" list="admin-series-suggestions" placeholder="既存シリーズを選択 / 新しいシリーズ名を入力">
+          <datalist id="admin-series-suggestions"></datalist>
+          <div style="font-size:11px;color:var(--text-sub);margin-top:4px;">
+            一覧にない名前を入力すると、そのシリーズ名で新しいパックを登録できます。
+          </div>
           <label for="new-set-code">パックコード</label>
           <input id="new-set-code" type="text" maxlength="40" placeholder="例: SV99">
           <label for="new-set-name">パック名</label>
@@ -504,6 +604,29 @@ button, select { touch-action: manipulation; }
         </div>
         <label for="card-variant">バリアント（ホロ・ミラー等の識別。通常は空欄でよい）</label>
         <input id="card-variant" type="text">
+        <label>カードタグ（複数選択可）</label>
+        <div class="card-tag-box">
+          <div id="card-tag-list" class="card-tag-list"></div>
+          <div id="card-tag-empty" class="card-tag-empty">タグがまだありません。下から追加できます。</div>
+
+          <label for="card-existing-tag-select" style="margin-top:10px;">すでにあるタグを追加</label>
+          <div class="inline-actions card-existing-tag-row">
+            <select id="card-existing-tag-select">
+              <option value="">既存タグを選択</option>
+            </select>
+            <button class="btn secondary" type="button" id="card-existing-tag-add">選択したタグを追加</button>
+          </div>
+
+          <label for="card-new-tag-name" style="margin-top:10px;">新しいタグを作成</label>
+          <div class="inline-actions card-tag-add-row">
+            <input id="card-new-tag-name" type="text" maxlength="80" placeholder="例: スター / クリスタルタイプ / δ種">
+            <button class="btn secondary" type="button" id="card-new-tag-add">＋ 新しいタグを作成</button>
+          </div>
+          <div style="font-size:11px;color:var(--text-sub);margin-top:4px;">
+            既存タグは上から選択、新しいタグだけ下から作成できます。1枚に複数タグを付けられます。
+          </div>
+          <div id="card-tag-status" class="status-msg"></div>
+        </div>
         <label for="card-image-url">画像URL（https のみ）</label>
         <input id="card-image-url" type="text" placeholder="https://...">
         <div id="image-preview-wrap"><img id="image-preview" alt="プレビュー"></div>
@@ -625,11 +748,18 @@ button, select { touch-action: manipulation; }
     resultCount: document.getElementById("admin-result-count"),
     loadMoreWrap: document.getElementById("admin-load-more-wrap"),
     loadMoreBtn: document.getElementById("admin-load-more-btn"),
+    newCardBtn: document.getElementById("new-card-btn"),
+    cardEditorWindow: document.getElementById("card-editor-window"),
     bulkToolbar: document.getElementById("admin-bulk-toolbar"),
     selectPage: document.getElementById("admin-select-page"),
     selectedCount: document.getElementById("admin-selected-count"),
+    bulkField: document.getElementById("admin-bulk-field"),
+    bulkRarityWrap: document.getElementById("admin-bulk-rarity-wrap"),
     bulkRarity: document.getElementById("admin-bulk-rarity"),
     bulkRarityCustom: document.getElementById("admin-bulk-rarity-custom"),
+    bulkSet: document.getElementById("admin-bulk-set"),
+    bulkVariant: document.getElementById("admin-bulk-variant"),
+    bulkTag: document.getElementById("admin-bulk-tag"),
     bulkApply: document.getElementById("admin-bulk-apply"),
     bulkStatus: document.getElementById("admin-bulk-status"),
 
@@ -639,6 +769,8 @@ button, select { touch-action: manipulation; }
     cardSet: document.getElementById("card-set"),
     newSetToggle: document.getElementById("new-set-toggle"),
     newSetPanel: document.getElementById("new-set-panel"),
+    newSetSeries: document.getElementById("new-set-series"),
+    seriesSuggestions: document.getElementById("admin-series-suggestions"),
     newSetCode: document.getElementById("new-set-code"),
     newSetName: document.getElementById("new-set-name"),
     newSetReleaseDate: document.getElementById("new-set-release-date"),
@@ -651,6 +783,13 @@ button, select { touch-action: manipulation; }
     cardRarityCustomWrap: document.getElementById("card-rarity-custom-wrap"),
     cardRarityCustom: document.getElementById("card-rarity-custom"),
     cardVariant: document.getElementById("card-variant"),
+    cardTagList: document.getElementById("card-tag-list"),
+    cardTagEmpty: document.getElementById("card-tag-empty"),
+    cardExistingTagSelect: document.getElementById("card-existing-tag-select"),
+    cardExistingTagAdd: document.getElementById("card-existing-tag-add"),
+    cardNewTagName: document.getElementById("card-new-tag-name"),
+    cardNewTagAdd: document.getElementById("card-new-tag-add"),
+    cardTagStatus: document.getElementById("card-tag-status"),
     cardImageUrl: document.getElementById("card-image-url"),
     imagePreview: document.getElementById("image-preview"),
     cardImageNote: document.getElementById("card-image-note"),
@@ -661,6 +800,25 @@ button, select { touch-action: manipulation; }
     shortFeaturePublished: document.getElementById("short-feature-published"),
     shortFeatureSave: document.getElementById("short-feature-save"),
     shortFeatureStatus: document.getElementById("short-feature-status"),
+
+    seriesCreateName: document.getElementById("series-create-name"),
+    seriesCreateReference: document.getElementById("series-create-reference"),
+    seriesCreatePosition: document.getElementById("series-create-position"),
+    seriesCreateSave: document.getElementById("series-create-save"),
+    seriesCreateStatus: document.getElementById("series-create-status"),
+    packSeriesSet: document.getElementById("pack-series-set"),
+    packSeriesName: document.getElementById("pack-series-name"),
+    packSeriesSave: document.getElementById("pack-series-save"),
+    packSeriesStatus: document.getElementById("pack-series-status"),
+    membershipCardSearch: document.getElementById("membership-card-search"),
+    membershipCardSearchBtn: document.getElementById("membership-card-search-btn"),
+    membershipCardResults: document.getElementById("membership-card-results"),
+    membershipCardId: document.getElementById("membership-card-id"),
+    membershipCardTarget: document.getElementById("membership-card-target"),
+    membershipSeries: document.getElementById("membership-series"),
+    membershipSet: document.getElementById("membership-set"),
+    membershipSave: document.getElementById("membership-save"),
+    membershipStatus: document.getElementById("membership-status"),
 
     shortPriceFilter: document.getElementById("short-price-filter"),
     shortPriceActiveOnly: document.getElementById("short-price-active-only"),
@@ -775,6 +933,100 @@ button, select { touch-action: manipulation; }
 
   var allAdminCardSets = [];
 
+  var allAdminSeries = [];
+  var membershipCard = null;
+
+  function seriesNameFromRow(row){
+    if(row == null) return "";
+    if(typeof row === "string") return row.trim();
+    return String(row.name || row.series_name || "").trim();
+  }
+
+  function rebuildStandaloneSeriesOptions(selectedName){
+    var names = [];
+    (allAdminSeries || []).forEach(function(row){
+      var n = seriesNameFromRow(row);
+      if(n && names.indexOf(n) === -1) names.push(n);
+    });
+    (allAdminCardSets || []).forEach(function(row){
+      var n = String((row && row.series_name) || getSetGroup(row) || "").trim();
+      if(n && names.indexOf(n) === -1) names.push(n);
+    });
+    names.sort(function(a,b){ return a.localeCompare(b, "ja"); });
+
+    var selects = [els.seriesCreateReference, els.packSeriesName, els.membershipSeries];
+    selects.forEach(function(select, index){
+      if(!select) return;
+      var first = index === 0 ? "末尾に追加" : "シリーズを選択";
+      select.innerHTML = '<option value="">' + first + '</option>';
+      names.forEach(function(name){
+        var opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name;
+        select.appendChild(opt);
+      });
+    });
+    if(selectedName){
+      if(els.packSeriesName) els.packSeriesName.value = selectedName;
+      if(els.membershipSeries) els.membershipSeries.value = selectedName;
+    }
+  }
+
+  function loadStandaloneSeries(){
+    if(!ADMIN.listCardSeries) {
+      rebuildStandaloneSeriesOptions();
+      return Promise.resolve([]);
+    }
+    return ADMIN.listCardSeries().then(function(rows){
+      allAdminSeries = rows || [];
+      rebuildStandaloneSeriesOptions();
+      return allAdminSeries;
+    }).catch(function(err){
+      console.error(err);
+      allAdminSeries = [];
+      rebuildStandaloneSeriesOptions();
+      return [];
+    });
+  }
+
+  function rebuildPackSeriesSetOptions(selectedSetId){
+    if(!els.packSeriesSet) return;
+    clearSetOptions(els.packSeriesSet, "パックを選択");
+    appendGroupedSetOptions(els.packSeriesSet, allAdminCardSets || []);
+    if(selectedSetId) els.packSeriesSet.value = selectedSetId;
+  }
+
+  function findSetById(setId){
+    return (allAdminCardSets || []).find(function(s){ return String(s.id) === String(setId); }) || null;
+  }
+
+  function rebuildMembershipPackOptions(selectedSetId){
+    if(!els.membershipSet) return;
+    var series = String(els.membershipSeries.value || "").trim();
+    clearSetOptions(els.membershipSet, "パックを選択");
+    var rows = (allAdminCardSets || []).filter(function(s){
+      return !series || getSetGroup(s) === series;
+    });
+    appendGroupedSetOptions(els.membershipSet, rows);
+    if(selectedSetId) els.membershipSet.value = selectedSetId;
+  }
+
+
+  function rebuildSeriesSuggestions(){
+    if(!els.seriesSuggestions) return;
+    els.seriesSuggestions.innerHTML = "";
+    var names = new Set();
+    (allAdminCardSets || []).forEach(function(s){
+      var name = String((s && s.series_name) || getSetGroup(s) || "").trim();
+      if(name) names.add(name);
+    });
+    Array.from(names).sort(function(a,b){ return a.localeCompare(b, "ja"); }).forEach(function(name){
+      var opt = document.createElement("option");
+      opt.value = name;
+      els.seriesSuggestions.appendChild(opt);
+    });
+  }
+
   function rebuildAdminSeriesOptions(selectedName){
     var previous = selectedName || "";
     els.filterSeries.innerHTML = '<option value="">シリーズ（すべて）</option>';
@@ -797,6 +1049,12 @@ button, select { touch-action: manipulation; }
     });
 
     if(previous) els.filterSeries.value = previous;
+  }
+
+  function rebuildBulkSetOptions(){
+    if(!els.bulkSet) return;
+    clearSetOptions(els.bulkSet, "変更後パックを選択");
+    appendGroupedSetOptions(els.bulkSet, allAdminCardSets || []);
   }
 
   function rebuildAdminPackFilter(selectedSetId){
@@ -857,6 +1115,7 @@ button, select { touch-action: manipulation; }
     if(msg.indexOf("observed_at is invalid") !== -1) return "日時が不正か、未来すぎます。";
     if(msg.indexOf("card not found") !== -1) return "対象のカードが見つかりませんでした。";
     if(msg.indexOf("set_id, name, card_number are required") !== -1) return "パック・カード名・番号は必須です。";
+    if(msg.indexOf("cards_set_id_card_number_variant_key") !== -1 || msg.indexOf("duplicate key value") !== -1) return "同じパックに同じカード番号・バリアントのカードがすでに登録されています。";
     return msg;
   }
 
@@ -951,6 +1210,132 @@ button, select { touch-action: manipulation; }
     });
   });
 
+  var allCardTags = [];
+
+  function selectedCardTagNames(){
+    if(!els.cardTagList) return [];
+    return Array.prototype.slice.call(els.cardTagList.querySelectorAll('input[type="checkbox"]:checked'))
+      .map(function(cb){ return cb.value; })
+      .filter(Boolean);
+  }
+
+  function renderCardTagCheckboxes(selectedNames){
+    if(!els.cardTagList) return;
+    var selected = new Set((selectedNames || []).map(function(x){ return String(x); }));
+    els.cardTagList.innerHTML = "";
+    (allCardTags || []).forEach(function(tag){
+      var name = String((tag && tag.name) || "").trim();
+      if(!name) return;
+      var label = document.createElement("label");
+      label.className = "card-tag-chip";
+      var cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.value = name;
+      cb.checked = selected.has(name);
+      var span = document.createElement("span");
+      span.textContent = name;
+      label.appendChild(cb);
+      label.appendChild(span);
+      els.cardTagList.appendChild(label);
+    });
+    if(els.cardTagEmpty) els.cardTagEmpty.style.display = allCardTags.length ? "none" : "block";
+
+    if(els.cardExistingTagSelect){
+      var currentExisting = els.cardExistingTagSelect.value || "";
+      els.cardExistingTagSelect.innerHTML = '<option value="">既存タグを選択</option>';
+      (allCardTags || []).forEach(function(tag){
+        var existingName = String((tag && tag.name) || "").trim();
+        if(!existingName) return;
+        var opt = document.createElement("option");
+        opt.value = existingName;
+        opt.textContent = existingName + (tag.card_count != null ? " (" + tag.card_count + "枚)" : "");
+        els.cardExistingTagSelect.appendChild(opt);
+      });
+      if(currentExisting && (allCardTags || []).some(function(tag){ return String((tag && tag.name) || "").trim() === currentExisting; })){
+        els.cardExistingTagSelect.value = currentExisting;
+      }
+    }
+
+    if(els.bulkTag){
+      var currentBulkTag = els.bulkTag.value || "";
+      els.bulkTag.innerHTML = '<option value="">タグを選択</option>';
+      (allCardTags || []).forEach(function(tag){
+        var bulkTagName = String((tag && tag.name) || "").trim();
+        if(!bulkTagName) return;
+        var bulkOpt = document.createElement("option");
+        bulkOpt.value = bulkTagName;
+        bulkOpt.textContent = bulkTagName + (tag.card_count != null ? " (" + tag.card_count + "枚)" : "");
+        els.bulkTag.appendChild(bulkOpt);
+      });
+      if(currentBulkTag) els.bulkTag.value = currentBulkTag;
+    }
+  }
+
+  function loadCardTags(selectedNames){
+    if(!MARKET.listCardTags) return Promise.resolve([]);
+    var preserve = selectedNames || selectedCardTagNames();
+    return MARKET.listCardTags().then(function(rows){
+      allCardTags = rows || [];
+      renderCardTagCheckboxes(preserve);
+      return allCardTags;
+    }).catch(function(err){
+      console.error("card tag list failed", err);
+      return [];
+    });
+  }
+
+  if(els.cardExistingTagAdd){
+    els.cardExistingTagAdd.addEventListener("click", function(){
+      clearStatus(els.cardTagStatus);
+      var name = String(els.cardExistingTagSelect.value || "").trim();
+      if(!name){
+        showStatus(els.cardTagStatus, "追加する既存タグを選択してください。", true);
+        return;
+      }
+
+      var checkbox = Array.prototype.slice.call(
+        els.cardTagList.querySelectorAll('input[type="checkbox"]')
+      ).find(function(cb){ return cb.value === name; });
+
+      if(!checkbox){
+        showStatus(els.cardTagStatus, "選択したタグが一覧に見つかりません。タグ一覧を再読込してください。", true);
+        return;
+      }
+
+      if(checkbox.checked){
+        showStatus(els.cardTagStatus, "タグ「" + name + "」はすでに選択されています。", false);
+        return;
+      }
+
+      checkbox.checked = true;
+      showStatus(els.cardTagStatus, "タグ「" + name + "」をこのカードに追加しました。カードを保存すると反映されます。", false);
+    });
+  }
+
+  if(els.cardNewTagAdd){
+    els.cardNewTagAdd.addEventListener("click", function(){
+      var name = String(els.cardNewTagName.value || "").trim();
+      clearStatus(els.cardTagStatus);
+      if(!name){
+        showStatus(els.cardTagStatus, "追加するタグ名を入力してください。", true);
+        return;
+      }
+      var preserve = selectedCardTagNames();
+      if(preserve.indexOf(name) === -1) preserve.push(name);
+      els.cardNewTagAdd.disabled = true;
+      ADMIN.adminCreateCardTag(name).then(function(){
+        els.cardNewTagName.value = "";
+        return loadCardTags(preserve);
+      }).then(function(){
+        showStatus(els.cardTagStatus, "タグ「" + name + "」を追加して選択しました。", false);
+      }).catch(function(err){
+        showStatus(els.cardTagStatus, friendlyError(err), true);
+      }).finally(function(){
+        els.cardNewTagAdd.disabled = false;
+      });
+    });
+  }
+
   // ---- ログイン状態の切り替え ----
   // ログアウト状態（初期表示・手動ログアウト・セッション失効・管理者以外のログイン、すべて共通）に
   // 戻すときは、フォームや検索結果、選択中カードなど画面上の情報を必ずクリアする。
@@ -968,6 +1353,7 @@ button, select { touch-action: manipulation; }
     if(!setsLoaded){
       setsLoaded = true;
       loadCardSets();
+      loadCardTags();
       loadPriceSources();
         loadShortPriceCards();
     }
@@ -1038,6 +1424,7 @@ button, select { touch-action: manipulation; }
       var previousCard = selectCardId || els.cardSet.value;
 
       allAdminCardSets = sets || [];
+      rebuildSeriesSuggestions();
 
       // 検索側: DBのseries_nameからシリーズ一覧を自動生成し、
       // 選択シリーズに属するパックだけをパック欄へ表示。
@@ -1049,13 +1436,240 @@ button, select { touch-action: manipulation; }
       appendGroupedSetOptions(els.cardSet, allAdminCardSets);
       if(previousCard) els.cardSet.value = previousCard;
 
-      return allAdminCardSets;
+      rebuildPackSeriesSetOptions();
+      rebuildMembershipPackOptions(els.membershipSet && els.membershipSet.value);
+      return loadStandaloneSeries().then(function(){ return allAdminCardSets; });
     }).catch(function(err){
       console.error(err);
       throw err;
     });
   }
 
+
+
+  // ---- シリーズ・所属管理 ----
+  if(els.seriesCreateSave){
+    els.seriesCreateSave.addEventListener("click", function(){
+      clearStatus(els.seriesCreateStatus);
+      var name = els.seriesCreateName.value.trim();
+      if(!name){
+        showStatus(els.seriesCreateStatus, "シリーズ名を入力してください。", true);
+        els.seriesCreateName.focus();
+        return;
+      }
+      els.seriesCreateSave.disabled = true;
+      ADMIN.adminCreateCardSeries({
+        name: name,
+        referenceSeriesName: els.seriesCreateReference.value || null,
+        position: els.seriesCreatePosition.value || "after"
+      }).then(function(){
+        return loadStandaloneSeries();
+      }).then(function(){
+        els.seriesCreateSave.disabled = false;
+        els.seriesCreateName.value = "";
+        showStatus(els.seriesCreateStatus, "シリーズを追加しました: " + name, false);
+      }).catch(function(err){
+        els.seriesCreateSave.disabled = false;
+        showStatus(els.seriesCreateStatus, friendlyError(err), true);
+      });
+    });
+  }
+
+  if(els.packSeriesSet){
+    els.packSeriesSet.addEventListener("change", function(){
+      clearStatus(els.packSeriesStatus);
+      var set = findSetById(els.packSeriesSet.value);
+      els.packSeriesName.value = set ? getSetGroup(set) : "";
+    });
+  }
+
+  if(els.packSeriesSave){
+    els.packSeriesSave.addEventListener("click", function(){
+      clearStatus(els.packSeriesStatus);
+      var set = findSetById(els.packSeriesSet.value);
+      var seriesName = String(els.packSeriesName.value || "").trim();
+      if(!set){
+        showStatus(els.packSeriesStatus, "変更するパックを選択してください。", true);
+        return;
+      }
+      if(!seriesName){
+        showStatus(els.packSeriesStatus, "変更後シリーズを選択してください。", true);
+        return;
+      }
+
+      // admin_update_card_set は全項目を書き戻すRPCなので、一覧RPCから
+      // 元値を安全に取得できる場合だけ実行してデータ消失を防ぐ。
+      var requiredKeys = ["code","name","release_date","series_name","image_url"];
+      var missing = requiredKeys.filter(function(k){
+        return !Object.prototype.hasOwnProperty.call(set, k);
+      });
+      if(missing.length){
+        showStatus(
+          els.packSeriesStatus,
+          "安全のため更新を中止しました。パック一覧APIに必要項目がありません: " + missing.join(", "),
+          true
+        );
+        return;
+      }
+
+      els.packSeriesSave.disabled = true;
+      ADMIN.adminUpdateCardSet({
+        id: set.id,
+        code: set.code,
+        name: set.name,
+        releaseDate: set.release_date,
+        seriesName: seriesName,
+        imageUrl: set.image_url
+      }).then(function(){
+        return loadCardSets();
+      }).then(function(){
+        els.packSeriesSave.disabled = false;
+        els.packSeriesSet.value = set.id;
+        els.packSeriesName.value = seriesName;
+        showStatus(els.packSeriesStatus, "パックの所属シリーズを変更しました。", false);
+        runAdminSearch();
+      }).catch(function(err){
+        els.packSeriesSave.disabled = false;
+        showStatus(els.packSeriesStatus, friendlyError(err), true);
+      });
+    });
+  }
+
+  function chooseMembershipCard(cardId){
+    clearStatus(els.membershipStatus);
+    els.membershipSave.disabled = true;
+    ADMIN.adminGetCard(cardId).then(function(card){
+      if(!card) throw new Error("card not found");
+      membershipCard = card;
+      els.membershipCardId.value = card.id;
+      els.membershipCardTarget.textContent =
+        (card.name || "カード") + "（" + (card.card_number || "") + "）";
+
+      var currentSet = findSetById(card.set_id);
+      var currentSeries = currentSet ? getSetGroup(currentSet) : "";
+      els.membershipSeries.disabled = false;
+      els.membershipSet.disabled = false;
+      rebuildStandaloneSeriesOptions(currentSeries);
+      els.membershipSeries.value = currentSeries;
+      rebuildMembershipPackOptions(card.set_id);
+      els.membershipSave.disabled = false;
+    }).catch(function(err){
+      membershipCard = null;
+      els.membershipCardId.value = "";
+      els.membershipCardTarget.textContent = "カードが選択されていません";
+      showStatus(els.membershipStatus, friendlyError(err), true);
+    });
+  }
+
+  function renderMembershipResults(rows){
+    els.membershipCardResults.innerHTML = "";
+    (rows || []).forEach(function(card){
+      var li = document.createElement("li");
+      li.className = "result-row";
+
+      var span = document.createElement("span");
+      span.className = "r-name";
+      span.textContent = (card.name || "") + "（" + (card.card_number || "") + "）";
+      li.appendChild(span);
+
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = "所属変更";
+      btn.addEventListener("click", function(){ chooseMembershipCard(card.id); });
+      li.appendChild(btn);
+      els.membershipCardResults.appendChild(li);
+    });
+    if(!rows || !rows.length){
+      var empty = document.createElement("li");
+      empty.style.fontSize = "12px";
+      empty.style.color = "var(--text-sub)";
+      empty.textContent = "該当カードがありません。";
+      els.membershipCardResults.appendChild(empty);
+    }
+  }
+
+  function runMembershipCardSearch(){
+    clearStatus(els.membershipStatus);
+    var q = els.membershipCardSearch.value.trim();
+    if(!q){
+      showStatus(els.membershipStatus, "カード名または番号を入力してください。", true);
+      return;
+    }
+    els.membershipCardSearchBtn.disabled = true;
+    MARKET.searchCardsV4({
+      query: q,
+      setId: null,
+      seriesName: null,
+      rarity: null,
+      illustrator: null,
+      sort: "default",
+      limit: 20,
+      offset: 0
+    }).then(function(rows){
+      els.membershipCardSearchBtn.disabled = false;
+      renderMembershipResults(rows || []);
+    }).catch(function(err){
+      els.membershipCardSearchBtn.disabled = false;
+      showStatus(els.membershipStatus, friendlyError(err), true);
+    });
+  }
+
+  if(els.membershipCardSearchBtn){
+    els.membershipCardSearchBtn.addEventListener("click", runMembershipCardSearch);
+    els.membershipCardSearch.addEventListener("keydown", function(e){
+      if(e.key === "Enter"){
+        e.preventDefault();
+        runMembershipCardSearch();
+      }
+    });
+  }
+
+  if(els.membershipSeries){
+    els.membershipSeries.addEventListener("change", function(){
+      rebuildMembershipPackOptions();
+    });
+  }
+
+  if(els.membershipSave){
+    els.membershipSave.addEventListener("click", function(){
+      clearStatus(els.membershipStatus);
+      if(!membershipCard){
+        showStatus(els.membershipStatus, "先にカードを選択してください。", true);
+        return;
+      }
+      var newSetId = els.membershipSet.value;
+      if(!newSetId){
+        showStatus(els.membershipStatus, "所属パックを選択してください。", true);
+        return;
+      }
+
+      els.membershipSave.disabled = true;
+      ADMIN.adminUpsertCard({
+        id: membershipCard.id,
+        setId: newSetId,
+        name: membershipCard.name,
+        cardNumber: membershipCard.card_number,
+        rarity: membershipCard.rarity,
+        variant: membershipCard.variant || "",
+        imageUrl: membershipCard.image_url,
+        imageSourceNote: membershipCard.image_source_note,
+        tagNames: Array.isArray(membershipCard.tag_names) ? membershipCard.tag_names : []
+      }).then(function(){
+        membershipCard.set_id = newSetId;
+        els.membershipSave.disabled = false;
+        showStatus(els.membershipStatus, "カードの所属パック／シリーズを変更しました。", false);
+        runAdminSearch();
+      }).catch(function(err){
+        els.membershipSave.disabled = false;
+        var msg = friendlyError(err);
+        if(String(msg).indexOf("cards_set_id_card_number_variant_key") !== -1 ||
+           String(msg).indexOf("duplicate key value") !== -1){
+          msg = "変更先パックに、同じカード番号・バリアントのカードがすでにあります。";
+        }
+        showStatus(els.membershipStatus, msg, true);
+      });
+    });
+  }
 
   // ---- 新しいパックの追加 ----
   function setNewSetPanel(open){
@@ -1072,6 +1686,7 @@ button, select { touch-action: manipulation; }
 
   els.newSetCancel.addEventListener("click", function(){
     setNewSetPanel(false);
+    els.newSetSeries.value = "";
     els.newSetCode.value = "";
     els.newSetName.value = "";
     els.newSetReleaseDate.value = "";
@@ -1081,9 +1696,16 @@ button, select { touch-action: manipulation; }
   els.newSetSave.addEventListener("click", function(){
     clearStatus(els.newSetStatus);
 
+    var seriesName = els.newSetSeries.value.trim();
     var name = els.newSetName.value.trim();
     var code = els.newSetCode.value.trim();
     var releaseDate = els.newSetReleaseDate.value || null;
+
+    if(!seriesName){
+      showStatus(els.newSetStatus, "シリーズ名を入力してください。", true);
+      els.newSetSeries.focus();
+      return;
+    }
 
     if(!name){
       showStatus(els.newSetStatus, "パック名を入力してください。", true);
@@ -1092,15 +1714,34 @@ button, select { touch-action: manipulation; }
     }
 
     els.newSetSave.disabled = true;
-    ADMIN.adminCreateCardSet({
-      code: code,
-      name: name,
-      releaseDate: releaseDate
+
+    var existingSeries = (allAdminCardSets || []).some(function(s){
+      return String((s && s.series_name) || "").trim().toLocaleLowerCase("ja") ===
+             seriesName.toLocaleLowerCase("ja");
+    });
+
+    var ensureSeries = existingSeries
+      ? Promise.resolve()
+      : ADMIN.adminCreateCardSeries({
+          name: seriesName,
+          referenceSeriesName: null,
+          position: "after"
+        });
+
+    ensureSeries.then(function(){
+      return ADMIN.adminCreateCardSetV2({
+        code: code,
+        name: name,
+        releaseDate: releaseDate,
+        seriesName: seriesName,
+        imageUrl: null
+      });
     }).then(function(newSetId){
       return loadCardSets(newSetId).then(function(){
         els.newSetSave.disabled = false;
         els.cardSet.value = newSetId;
-        showStatus(els.newSetStatus, "パックを登録しました。このパックを選択しています。", false);
+        showStatus(els.newSetStatus, "パックを登録しました（シリーズ: " + seriesName + "）。このパックを選択しています。", false);
+        els.newSetSeries.value = "";
         els.newSetCode.value = "";
         els.newSetName.value = "";
         els.newSetReleaseDate.value = "";
@@ -1252,6 +1893,19 @@ button, select { touch-action: manipulation; }
     updateBulkUI();
   });
 
+  function updateBulkEditor(){
+    var field = els.bulkField.value || "rarity";
+    var isRarity = field === "rarity";
+    els.bulkRarity.style.display = isRarity ? "" : "none";
+    els.bulkRarityCustom.style.display = isRarity && els.bulkRarity.value === "__CUSTOM__" ? "block" : "none";
+    els.bulkSet.style.display = field === "set" ? "" : "none";
+    els.bulkVariant.style.display = field === "variant" ? "" : "none";
+    els.bulkTag.style.display = (field === "tag_add" || field === "tag_remove") ? "" : "none";
+    clearStatus(els.bulkStatus);
+  }
+
+  els.bulkField.addEventListener("change", updateBulkEditor);
+
   els.bulkRarity.addEventListener("change", function(){
     var custom = els.bulkRarity.value === "__CUSTOM__";
     els.bulkRarityCustom.style.display = custom ? "block" : "none";
@@ -1260,34 +1914,70 @@ button, select { touch-action: manipulation; }
 
   els.bulkApply.addEventListener("click", function(){
     var ids = Array.from(adminSelectedIds);
-    var rarity = els.bulkRarity.value === "__CUSTOM__"
-      ? els.bulkRarityCustom.value.trim()
-      : els.bulkRarity.value;
-
+    var field = els.bulkField.value || "rarity";
     if(!ids.length){
       showStatus(els.bulkStatus, "カードを選択してください。", true);
       return;
     }
-    if(!rarity){
-      showStatus(els.bulkStatus, "変更後のレアリティを選択してください。", true);
+
+    var value = "";
+    if(field === "rarity"){
+      value = els.bulkRarity.value === "__CUSTOM__"
+        ? els.bulkRarityCustom.value.trim()
+        : els.bulkRarity.value;
+      if(!value){
+        showStatus(els.bulkStatus, "変更後のレアリティを選択してください。", true);
+        return;
+      }
+    }else if(field === "set"){
+      value = els.bulkSet.value || "";
+      if(!value){
+        showStatus(els.bulkStatus, "変更後の所属パックを選択してください。", true);
+        return;
+      }
+    }else if(field === "variant"){
+      value = els.bulkVariant.value.trim(); // 空欄も「通常へ戻す」として有効
+    }else if(field === "tag_add" || field === "tag_remove"){
+      value = els.bulkTag.value || "";
+      if(!value){
+        showStatus(els.bulkStatus, "タグを選択してください。", true);
+        return;
+      }
+    }
+
+    var labels = {
+      rarity: "レアリティ",
+      set: "所属パック",
+      variant: "バリアント",
+      tag_add: "タグ追加",
+      tag_remove: "タグ削除"
+    };
+
+    if(!window.confirm(ids.length + "件のカードの「" + labels[field] + "」を一括変更します。よろしいですか？")){
       return;
     }
-    if(!window.confirm(ids.length + "件のレアリティを「" + rarity + "」へ変更します。よろしいですか？")) return;
 
     els.bulkApply.disabled = true;
-    showStatus(els.bulkStatus, "変更中...", false);
+    showStatus(els.bulkStatus, "変更中... 0 / " + ids.length + "件", false);
 
-    ADMIN.adminBulkUpdateRarity(ids, rarity).then(function(updated){
-      showStatus(els.bulkStatus, (updated == null ? ids.length : updated) + "件を「" + rarity + "」へ変更しました。", false);
-      adminSelectedIds.clear();
-      runAdminSearch(false);
+    var task = field === "rarity"
+      ? ADMIN.adminBulkUpdateRarity(ids, value)
+      : ADMIN.adminBulkEditCards(ids, field, value);
+
+    task.then(function(updated){
+      var count = updated == null ? ids.length : updated;
+      showStatus(els.bulkStatus, count + "件の一括変更が完了しました。", false);
+      clearBulkSelection();
+      return loadCardTags().then(function(){ runAdminSearch(); });
     }).catch(function(err){
       console.error(err);
       showStatus(els.bulkStatus, "一括変更に失敗しました: " + friendlyError(err), true);
     }).finally(function(){
-      updateBulkUI();
+      els.bulkApply.disabled = adminSelectedIds.size === 0;
     });
   });
+
+  updateBulkEditor();
 
   // ---- カスタムレアリティ ----
   function isBuiltInRarity(value){
@@ -1341,6 +2031,7 @@ button, select { touch-action: manipulation; }
       els.cardNumber.value = card.card_number || "";
       setCardRarityValue(card.rarity || "");
       els.cardVariant.value = card.variant || "";
+      renderCardTagCheckboxes(Array.isArray(card.tag_names) ? card.tag_names : []);
       els.cardImageUrl.value = card.image_url || "";
       els.cardImageNote.value = card.image_source_note || "";
       updateImagePreview();
@@ -1355,6 +2046,8 @@ button, select { touch-action: manipulation; }
     els.cardFormTitle.textContent = "カード新規登録";
     els.cardSubmitBtn.textContent = "登録する";
     els.cardForm.reset();
+    renderCardTagCheckboxes([]);
+    clearStatus(els.cardTagStatus);
     els.cardId.value = "";
     els.cardRarityCustom.value = "";
     setNewSetPanel(false);
@@ -1362,7 +2055,6 @@ button, select { touch-action: manipulation; }
     updateImagePreview();
     clearStatus(els.cardStatus);
     els.shortFeatureActive.checked = false;
-    els.shortFeatureUrl.value = "";
     els.shortFeaturePublished.value = "";
     els.shortFeatureSave.disabled = true;
     clearStatus(els.shortFeatureStatus);
@@ -1370,6 +2062,15 @@ button, select { touch-action: manipulation; }
     clearPriceTarget();
   }
   els.cardResetBtn.addEventListener("click", resetCardForm);
+  if(els.newCardBtn){
+    els.newCardBtn.addEventListener("click", function(){
+      resetCardForm();
+      if(els.cardEditorWindow){
+        els.cardEditorWindow.scrollIntoView({ behavior:"smooth", block:"start" });
+      }
+      setTimeout(function(){ els.cardSet.focus(); }, 0);
+    });
+  }
 
   function clearPriceTarget(){
     selectedCardId = null;
@@ -1409,6 +2110,7 @@ button, select { touch-action: manipulation; }
       return;
     }
 
+    var isCreatingCard = !els.cardId.value;
     els.cardSubmitBtn.disabled = true;
     ADMIN.adminUpsertCard({
       id: els.cardId.value || null,
@@ -1418,7 +2120,8 @@ button, select { touch-action: manipulation; }
       rarity: rarityValue,
       variant: els.cardVariant.value,
       imageUrl: els.cardImageUrl.value,
-      imageSourceNote: els.cardImageNote.value
+      imageSourceNote: els.cardImageNote.value,
+      tagNames: selectedCardTagNames()
     }).then(function(newId){
       els.cardSubmitBtn.disabled = false;
       if(!newId){
@@ -1426,12 +2129,13 @@ button, select { touch-action: manipulation; }
         showStatus(els.cardStatus, "保存に失敗しました（対象のカードが見つかりませんでした）。", true);
         return;
       }
-      showStatus(els.cardStatus, "保存しました。", false);
+      showStatus(els.cardStatus, isCreatingCard ? "カードを新規登録しました。" : "カードを更新しました。", false);
       els.cardId.value = newId;
       els.cardFormTitle.textContent = "カード編集";
       els.cardSubmitBtn.textContent = "更新する";
       setPriceTarget(newId, els.cardName.value);
       els.shortFeatureSave.disabled = false;
+      loadCardTags();
       runAdminSearch();
     }).catch(function(err){
       els.cardSubmitBtn.disabled = false;

@@ -81,18 +81,18 @@
     });
   }
 
-  // 管理者専用: 編集対象カードの詳細取得（api.admin_get_card）
+  // 管理者専用: 編集対象カードの詳細取得（複数タグ対応 v3）
   function adminGetCard(cardId){
-    return client().schema("api").rpc("admin_get_card", { p_card_id: cardId })
+    return client().schema("api").rpc("admin_get_card_v3", { p_card_id: cardId })
       .then(function(res){
         if(res.error) throw res.error;
         return (res.data && res.data[0]) || null;
       });
   }
 
-  // 管理者専用: カード新規登録・更新（api.admin_upsert_card）
+  // 管理者専用: カード新規登録・更新（複数タグ対応 v3）
   function adminUpsertCard(fields){
-    return client().schema("api").rpc("admin_upsert_card", {
+    return client().schema("api").rpc("admin_upsert_card_v3", {
       p_id: fields.id || null,
       p_set_id: fields.setId,
       p_name: fields.name,
@@ -100,10 +100,21 @@
       p_rarity: fields.rarity || null,
       p_variant: fields.variant || "",
       p_image_url: fields.imageUrl || null,
-      p_image_source_note: fields.imageSourceNote || null
+      p_image_source_note: fields.imageSourceNote || null,
+      p_tag_names: Array.isArray(fields.tagNames) ? fields.tagNames : []
     }).then(function(res){
       if(res.error) throw res.error;
       return res.data; // 作成・更新されたカードのid
+    });
+  }
+
+  // 管理者専用: タグを単独追加
+  function adminCreateCardTag(name){
+    return client().schema("api").rpc("admin_create_card_tag", {
+      p_name: name
+    }).then(function(res){
+      if(res.error) throw res.error;
+      return res.data;
     });
   }
 
@@ -284,6 +295,73 @@
     });
   }
 
+
+  // 管理者専用: 既存カードを読み出して、指定項目だけ安全に一括更新する。
+  // name/card_number/image_url 等は各カードの既存値を保持する。
+  // operation:
+  //   set          -> 所属パック変更
+  //   variant      -> バリアント変更
+  //   tag_add      -> タグ追加（既存タグは保持）
+  //   tag_remove   -> タグ削除（その他タグは保持）
+  function adminBulkEditCards(cardIds, operation, value){
+    var ids = Array.isArray(cardIds) ? cardIds.filter(Boolean) : [];
+    if(!ids.length) return Promise.resolve(0);
+
+    function normalizeTags(tags){
+      return Array.isArray(tags)
+        ? tags.map(function(x){ return String(x || "").trim(); }).filter(Boolean)
+        : [];
+    }
+
+    function updateOne(cardId){
+      return adminGetCard(cardId).then(function(card){
+        if(!card) throw new Error("card not found");
+
+        var tags = normalizeTags(card.tag_names);
+        var setId = card.set_id;
+        var variant = card.variant || "";
+
+        if(operation === "set"){
+          setId = value;
+        }else if(operation === "variant"){
+          variant = value == null ? "" : String(value);
+        }else if(operation === "tag_add"){
+          var addName = String(value || "").trim();
+          if(addName && tags.indexOf(addName) === -1) tags.push(addName);
+        }else if(operation === "tag_remove"){
+          var removeName = String(value || "").trim();
+          tags = tags.filter(function(name){ return name !== removeName; });
+        }else{
+          throw new Error("unsupported bulk operation");
+        }
+
+        return adminUpsertCard({
+          id: card.id,
+          setId: setId,
+          name: card.name,
+          cardNumber: card.card_number,
+          rarity: card.rarity,
+          variant: variant,
+          imageUrl: card.image_url,
+          imageSourceNote: card.image_source_note,
+          tagNames: tags
+        });
+      });
+    }
+
+    // 一度に大量の更新を投げず、順番に処理して失敗位置を追いやすくする。
+    var updated = 0;
+    return ids.reduce(function(chain, cardId){
+      return chain.then(function(){
+        return updateOne(cardId).then(function(){
+          updated += 1;
+        });
+      });
+    }, Promise.resolve()).then(function(){
+      return updated;
+    });
+  }
+
   global.ADMIN = {
     login: login,
     logout: logout,
@@ -295,6 +373,8 @@
     adminGetCard: adminGetCard,
     adminUpsertCard: adminUpsertCard,
     adminBulkUpdateRarity: adminBulkUpdateRarity,
+    adminBulkEditCards: adminBulkEditCards,
+    adminCreateCardTag: adminCreateCardTag,
     adminCreateCardSet: adminCreateCardSet,
     adminCreateCardSetV2: adminCreateCardSetV2,
     adminUpdateCardSet: adminUpdateCardSet,

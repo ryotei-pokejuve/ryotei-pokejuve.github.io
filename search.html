@@ -257,6 +257,18 @@
   }
   .illustrator-letter.active{background:var(--accent);color:#fff}
 
+
+  /* ===== 複数タグ検索 ===== */
+  .tag-filter-block{flex:1 1 100%;padding:8px;border:2px dashed rgba(255,255,255,.55)}
+  .tag-filter-title{display:block;font-size:11px;color:#fff;margin-bottom:6px}
+  .tag-filter-list{display:flex;gap:6px;flex-wrap:wrap}
+  .tag-filter-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;background:var(--window-bg);border:2px solid var(--window-border-outer);font-size:11px;color:var(--text-color);cursor:pointer}
+  .tag-filter-chip input{width:auto;margin:0}
+  .tag-filter-mode{margin-top:7px;display:flex;gap:7px;align-items:center;color:#fff;font-size:11px}
+  .tag-filter-mode select{flex:0 1 260px!important}
+  .result-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+  .result-tag{display:inline-block;padding:2px 5px;border:1px solid var(--accent);font-size:9.5px;color:var(--accent);background:#fff}
+
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3405662051867998" crossorigin="anonymous"></script>
 </head>
@@ -280,6 +292,7 @@
           <option value="series">シリーズから検索</option>
           <option value="pack">パックから検索</option>
           <option value="illustrator">イラストレーターから検索</option>
+          <option value="tag">タグから検索</option>
         </select>
       </label>
 
@@ -302,6 +315,20 @@
           <span>イラストレーター</span>
           <select id="illustrator-select"><option value="">選択してください</option></select>
         </label>
+      </div>
+
+      <div id="tag-search-wrap" style="display:none;flex:1 1 420px;">
+        <div class="search-control" style="flex:1 1 100%;">
+          <span>カードタグ（複数選択可）</span>
+          <div id="search-card-tags" class="tag-filter-list"></div>
+          <div class="tag-filter-mode">
+            <span>複数選択：</span>
+            <select id="search-tag-mode">
+              <option value="all">選んだタグをすべて含む</option>
+              <option value="any">選んだタグのどれかを含む</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <div id="series-search-wrap">
@@ -370,6 +397,17 @@
         <option value="BWR">BWR</option>
         <option value="旧裏R">旧裏R</option>
       </select>
+      <div class="tag-filter-block">
+        <span class="tag-filter-title">カードタグ（複数選択可）</span>
+        <div id="filter-card-tags" class="tag-filter-list"></div>
+        <div class="tag-filter-mode">
+          <span>複数選択：</span>
+          <select id="filter-tag-mode">
+            <option value="all">選んだタグをすべて含む</option>
+            <option value="any">選んだタグのどれかを含む</option>
+          </select>
+        </div>
+      </div>
     </div>
     <div id="status-line"></div>
     </div>
@@ -414,10 +452,13 @@
     var state = MARKET.loadSearchState() || { query: "", rarity: "", setId: "", offset: 0, limit: 20, sort: "default", mode: "card", seriesName: "" };
   state.limit = Number(state.limit) || 20;
   state.sort = state.sort || "default";
-  state.mode = ["card","series","pack","illustrator"].indexOf(state.mode) !== -1 ? state.mode : "card";
+  state.mode = ["card","series","pack","illustrator","tag"].indexOf(state.mode) !== -1 ? state.mode : "card";
   state.illustrator = state.illustrator || "";
   state.illustratorLetter = state.illustratorLetter || "";
   state.seriesName = state.seriesName || "";
+  state.tagNames = Array.isArray(state.tagNames) ? state.tagNames : (state.cardSeriesTag ? [state.cardSeriesTag] : []);
+  state.tagMode = state.tagMode === "any" ? "any" : "all";
+  delete state.cardSeriesTag;
   var allCardSets = [];
   var allIllustrators = [];
   var isInitialLoad = true;
@@ -436,9 +477,14 @@
     illustratorLetters: document.getElementById("illustrator-letters"),
     illustratorFilter: document.getElementById("illustrator-filter"),
     illustrator: document.getElementById("illustrator-select"),
+    tagSearchWrap: document.getElementById("tag-search-wrap"),
+    searchCardTags: document.getElementById("search-card-tags"),
+    searchTagMode: document.getElementById("search-tag-mode"),
     filterToggle: document.getElementById("filter-toggle"),
     filterPanel: document.getElementById("filter-panel"),
     rarity: document.getElementById("filter-rarity"),
+    cardTags: document.getElementById("filter-card-tags"),
+    tagMode: document.getElementById("filter-tag-mode"),
     set: document.getElementById("filter-set"),
     status: document.getElementById("status-line"),
     results: document.getElementById("results"),
@@ -610,6 +656,7 @@
     els.illustratorWrap.classList.toggle("open", mode === "illustrator");
     els.seriesSearchWrap.style.display = (mode === "card" || mode === "series" || mode === "illustrator") ? "" : "none";
     els.packSearchWrap.classList.toggle("open", mode === "pack");
+    els.tagSearchWrap.style.display = mode === "tag" ? "flex" : "none";
     if(mode !== "card") els.input.value = "";
     if(mode === "illustrator") rebuildIllustratorSeries(state.seriesName || "");
     else rebuildSeriesOptions(state.seriesName || "");
@@ -619,6 +666,8 @@
   els.illustratorFilter.value = "";
   els.mode.value = state.mode;
   els.rarity.value = state.rarity || "";
+  els.tagMode.value = state.tagMode;
+  els.searchTagMode.value = state.tagMode;
   els.pageSize.value = String(state.limit);
   els.sortOrder.value = state.sort;
 
@@ -649,6 +698,54 @@
     rebuildIllustratorOptions();
   }).catch(function(err){ console.error(err); });
 
+  function selectedTagsFrom(container){
+    if(!container) return [];
+    return Array.prototype.slice.call(container.querySelectorAll('input[type="checkbox"]:checked'))
+      .map(function(cb){ return cb.value; })
+      .filter(Boolean);
+  }
+
+  function selectedSearchTags(){
+    return state.mode === "tag" ? selectedTagsFrom(els.searchCardTags) : selectedTagsFrom(els.cardTags);
+  }
+
+  function renderTagList(container, rows){
+    if(!container) return;
+    var selected = new Set(state.tagNames || []);
+    container.innerHTML = "";
+    (rows || []).forEach(function(row){
+      var name = String((row && row.name) || "").trim();
+      if(!name) return;
+      var label = document.createElement("label");
+      label.className = "tag-filter-chip";
+      var cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.value = name;
+      cb.checked = selected.has(name);
+      var span = document.createElement("span");
+      span.textContent = name + (row.card_count != null ? " (" + row.card_count + ")" : "");
+      label.appendChild(cb);
+      label.appendChild(span);
+      container.appendChild(label);
+    });
+    if(!(rows || []).length){
+      var empty = document.createElement("span");
+      empty.className = "tag-filter-title";
+      empty.textContent = "タグはまだ登録されていません";
+      container.appendChild(empty);
+    }
+  }
+
+  function renderSearchTags(rows){
+    renderTagList(els.cardTags, rows);
+    renderTagList(els.searchCardTags, rows);
+  }
+
+  if(MARKET.listCardTags){
+    MARKET.listCardTags().then(function(rows){ renderSearchTags(rows || []); })
+      .catch(function(err){ console.error(err); });
+  }
+
   MARKET.listCardSets().then(function(sets){
     allCardSets = sets || [];
     appendGroupedSetOptions(els.set, allCardSets);
@@ -662,7 +759,7 @@
   });
 
   els.mode.addEventListener("change", function(){
-    state.mode = ["card","series","pack","illustrator"].indexOf(els.mode.value) !== -1 ? els.mode.value : "card";
+    state.mode = ["card","series","pack","illustrator","tag"].indexOf(els.mode.value) !== -1 ? els.mode.value : "card";
     state.offset = 0;
 
     // 検索方法を切り替えたら、前の検索方法の入力・選択・結果を持ち越さない。
@@ -670,6 +767,13 @@
     state.setId = "";
     state.seriesName = "";
     state.illustrator = "";
+    state.tagNames = [];
+
+    // タグ検索から別の検索方法へ移動した時、画面上のチェックも必ず解除する。
+    Array.prototype.forEach.call(
+      document.querySelectorAll('#search-card-tags input[type="checkbox"], #card-tag-filter-list input[type="checkbox"]'),
+      function(cb){ cb.checked = false; }
+    );
 
     els.input.value = "";
     els.series.value = "";
@@ -718,11 +822,23 @@
 
   els.form.addEventListener("submit", function(e){
     e.preventDefault();
-    state.mode = ["card","series","pack","illustrator"].indexOf(els.mode.value) !== -1 ? els.mode.value : "card";
+    state.mode = ["card","series","pack","illustrator","tag"].indexOf(els.mode.value) !== -1 ? els.mode.value : "card";
     state.query = state.mode === "card" ? els.input.value.trim() : "";
     state.rarity = els.rarity.value;
+    // 検索方法がタグ以外なら、タグ検索UIの選択状態を検索条件へ混ぜない。
+    state.tagNames = state.mode === "tag" ? selectedTagsFrom(els.searchCardTags) : selectedTagsFrom(els.cardTags);
+    state.tagMode = (state.mode === "tag" ? els.searchTagMode.value : els.tagMode.value) === "any" ? "any" : "all";
 
-    if(state.mode === "illustrator"){
+    if(state.mode === "tag"){
+      state.query = "";
+      state.setId = "";
+      state.seriesName = "";
+      state.illustrator = "";
+      if(!state.tagNames.length){
+        els.status.textContent = "タグを1つ以上選択してください。";
+        return;
+      }
+    }else if(state.mode === "illustrator"){
       state.query = "";
       state.setId = "";
       state.illustrator = els.illustrator.value || "";
@@ -831,6 +947,18 @@
     rarityEl.textContent = card.rarity ? "レアリティ：" + card.rarity : "レアリティ：ー";
     a.appendChild(rarityEl);
 
+    if(Array.isArray(card.tag_names) && card.tag_names.length){
+      var tagsEl = document.createElement("div");
+      tagsEl.className = "result-tags";
+      card.tag_names.forEach(function(name){
+        var tagEl = document.createElement("span");
+        tagEl.className = "result-tag";
+        tagEl.textContent = name;
+        tagsEl.appendChild(tagEl);
+      });
+      a.appendChild(tagsEl);
+    }
+
     return a;
   }
 
@@ -850,12 +978,14 @@
     els.empty.style.display = "none";
     els.error.style.display = "none";
 
-    MARKET.searchCardsV4({
+    MARKET.searchCardsV6({
       query: state.query,
       rarity: state.rarity || null,
       setId: state.setId || null,
       seriesName: state.mode === "pack" ? null : (state.seriesName || null),
       illustrator: state.mode === "illustrator" ? (state.illustrator || null) : null,
+      tagNames: state.tagNames || [],
+      tagMode: state.tagMode || "all",
       limit: state.limit,
       sort: state.sort,
       offset: state.offset
