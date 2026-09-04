@@ -295,37 +295,21 @@
     history: {
       title: "HISTORY",
       html: function(){
-        return (
-          '<p class="flavor">つづきから</p>' +
-          '<ul class="log-list">' +
-            '<li class="log-item"><span class="log-ver">Ver 1.00</span><span class="log-date">2026.08.13</span><span>サイトを公開！GBA風トップページを実装しました。</span></li>' +
-            '<li class="log-item"><span class="log-ver">Ver 0.10</span><span class="log-date">2026.08.01</span><span>サイト制作を開始。デザインコンセプトを決定。</span></li>' +
-          '</ul>' +
-          '<p class="flavor" style="margin-top:16px;"></p>'
-        );
+        return '<p class="flavor">つづきから</p><div id="history-dynamic">HISTORYを読み込んでいます……</div>';
+      },
+      onMount: function(){
+        var container = document.getElementById("history-dynamic");
+        if(global.RYOTEI_CONTENT_STORE) global.RYOTEI_CONTENT_STORE.renderHistory(container);
       }
     },
     blog: {
       title: "BLOG",
       html: function(){
-        return (
-          '<p class="flavor">レポート(記事一覧）</p>' +
-          '<article class="blog-post">' +
-            '<h3>はじめまして</h3>' +
-            '<div class="blog-meta">2026.08.13 <span class="blog-tag">お知らせ</span></div>' +
-            '<p>YouTubeに投稿した通常動画、Shorts、ポケカ動画、ライブ配信を一か所から見られる活動サイトを公開しました。動画一覧は各メニューから確認できます。</p>' +
-          '</article>' +
-          '<article class="blog-post">' +
-            '<h3>動画メニューの使い分け</h3>' +
-            '<div class="blog-meta">2026.08.18 <span class="blog-tag">サイト案内</span></div>' +
-            '<p>「動画一覧」はチャンネルの新着順、「Shorts」は短い動画、「ポケカ動画」はカード関連に絞った再生リストです。じっくり見るときは通常動画、短時間で楽しみたいときはShortsがおすすめです。</p>' +
-          '</article>' +
-          '<article class="blog-post">' +
-            '<h3>カード相場検索を追加しました</h3>' +
-            '<div class="blog-meta">2026.08.18 <span class="blog-tag">更新情報</span></div>' +
-            '<p>カード名・型番・レアリティ・収録パックからカードを探し、管理者が登録した直近の参考価格を確認できます。実際の価格は状態や店舗で変わるため、売買時は複数の情報とあわせてご利用ください。</p>' +
-          '</article>'
-        );
+        return '<p class="flavor">レポート / 最新記事</p><div id="blog-dynamic">BLOGを読み込んでいます……</div>';
+      },
+      onMount: function(){
+        var container = document.getElementById("blog-dynamic");
+        if(global.RYOTEI_CONTENT_STORE) global.RYOTEI_CONTENT_STORE.renderBlogPreview(container, 3);
       }
     },
     sns: {

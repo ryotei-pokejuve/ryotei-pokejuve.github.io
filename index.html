@@ -63,7 +63,7 @@
     <section class="message-window win2" aria-labelledby="message-heading" aria-live="polite"><span id="message-heading" class="message-label">MESSAGE</span><p id="message-text">メニューを読み込んでいます。</p><p class="key-hint" aria-hidden="true"><kbd>矢印 SELECT</kbd><kbd>ENTER OPEN</kbd><kbd>ESC MENU</kbd></p><span class="message-caret" aria-hidden="true"></span></section>
     <footer class="site-footer"><a href="about.html">このサイトについて</a><a href="privacy.html">プライバシー</a><a href="terms.html">免責事項</a><a href="contact.html">お問い合わせ</a><span>©2026 りょてい</span></footer>
   </main>
-  <script src="content.js"></script><script src="assets/js/preview-2d-state.js"></script><script src="assets/js/preview-2d.js"></script>
+  <script src="site-content.js"></script><script src="content.js"></script><script src="assets/js/preview-2d-state.js"></script><script src="assets/js/preview-2d.js"></script>
 <script>
 (function(){
   "use strict";
@@ -76,48 +76,8 @@
     return a;
   }
 
-  function renderHistory(){
-    var title = document.getElementById("detail-title");
-    var content = document.getElementById("detail-content");
-    var message = document.getElementById("message-text");
-    if(!title || !content || title.textContent.trim() !== "HISTORY") return;
-    if(content.dataset.historyTimeline === "1") return;
-
-    content.dataset.historyTimeline = "1";
-    content.innerHTML = "";
-
-    var intro = document.createElement("p");
-    intro.textContent = "これまでの活動や、このサイトで作ってきたものをざっくりまとめています。";
-    content.appendChild(intro);
-
-    var list = document.createElement("ul");
-    list.className = "history-list";
-
-    [
-      "ポケモンカードの開封・引退品を中心にYouTubeで動画投稿を開始。",
-      "サイトを作り、投稿動画・Shorts・ライブ配信などをまとめて見られるようにしました。",
-      "ポケモンカードのデータベースを整備し、カード名・シリーズ・パックから探せるカード図鑑を追加。",
-      "カード画像や収録情報、レアリティなどのデータを少しずつ補完・整理。",
-      "ショート動画で紹介したカードをまとめ、カードラッシュ・晴れる屋2・メルカリの参考価格を掲載するPRICEページを追加。",
-      "管理画面からショート掲載カードや価格を編集できる仕組みを追加。",
-      "サイト全体をゲーム端末風の2D MODEへリニューアル。",
-      "今後は3D MODEなど、新しい表示や機能も追加予定。"
-    ].forEach(function(text){
-      var li = document.createElement("li");
-      li.textContent = text;
-      list.appendChild(li);
-    });
-
-    content.appendChild(list);
-
-    if(message){
-      message.textContent = "HISTORY：これまでの活動とサイトの進化をまとめています。";
-    }
-  }
-
   function renderCustomPanels(){
     renderCardMarketLinks();
-    renderHistory();
   }
 
   function renderCardMarketLinks(){
