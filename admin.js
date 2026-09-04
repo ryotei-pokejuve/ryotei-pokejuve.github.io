@@ -119,6 +119,18 @@
   }
 
 
+  // 管理者専用: 既存タグ名を変更
+  function adminUpdateCardTag(tagId, name){
+    return client().schema("api").rpc("admin_update_card_tag", {
+      p_tag_id: tagId,
+      p_name: name
+    }).then(function(res){
+      if(res.error) throw res.error;
+      return res.data;
+    });
+  }
+
+
   // 管理者専用: 新しいパックを登録（api.admin_create_card_set）
   function adminCreateCardSet(fields){
     return client().schema("api").rpc("admin_create_card_set", {
@@ -375,6 +387,7 @@
     adminBulkUpdateRarity: adminBulkUpdateRarity,
     adminBulkEditCards: adminBulkEditCards,
     adminCreateCardTag: adminCreateCardTag,
+    adminUpdateCardTag: adminUpdateCardTag,
     adminCreateCardSet: adminCreateCardSet,
     adminCreateCardSetV2: adminCreateCardSetV2,
     adminUpdateCardSet: adminUpdateCardSet,

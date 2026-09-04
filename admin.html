@@ -355,6 +355,20 @@ button, select { touch-action: manipulation; }
   #card-new-tag-name{flex:1 1 180px}
   @media(max-width:720px){#card-tag-list{display:grid;grid-template-columns:1fr 1fr}.card-tag-chip{min-height:44px}.card-tag-add-row,.card-existing-tag-row{display:grid!important;grid-template-columns:1fr!important}}
 
+  /* ===== タグ単独管理 ===== */
+  .tag-manager-list{display:grid;gap:8px;margin-top:10px}
+  .tag-manager-row{
+    display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;
+    padding:8px;border:2px solid var(--window-border-outer);background:#fff;
+  }
+  .tag-manager-row input{margin:0}
+  .tag-manager-count{font-size:11px;color:var(--text-sub);white-space:nowrap}
+  .tag-manager-row .btn{margin:0;min-height:40px;padding:7px 12px}
+  @media(max-width:720px){
+    .tag-manager-row{grid-template-columns:1fr}
+    .tag-manager-row .btn{width:100%}
+  }
+
 </style>
 </head>
 <body>
@@ -538,6 +552,33 @@ button, select { touch-action: manipulation; }
         <select id="membership-set" disabled><option value="">パックを選択</option></select>
         <button class="btn" id="membership-save" type="button" disabled>カードの所属だけ変更</button>
         <div id="membership-status" class="status-msg"></div>
+      </div>
+    </div>
+
+    <div class="pixel-window" id="tag-manager-window">
+      <h2>タグ管理</h2>
+      <div style="font-size:12px;color:var(--text-sub);margin-bottom:12px;">
+        カードを選択しなくても、タグだけを新規追加・名前変更できます。タグ名を変更しても、カードとの紐付けはそのまま維持されます。
+      </div>
+
+      <div style="padding:10px;border:2px dashed var(--accent);margin-bottom:14px;">
+        <strong style="font-size:13px;">タグを単独追加</strong>
+        <label for="tag-manager-new-name">新しいタグ名</label>
+        <div class="inline-actions">
+          <input id="tag-manager-new-name" type="text" maxlength="80" placeholder="例: スター / クリスタルタイプ / δ種">
+          <button class="btn" id="tag-manager-create" type="button">＋ タグを追加</button>
+        </div>
+        <div id="tag-manager-create-status" class="status-msg"></div>
+      </div>
+
+      <div style="padding:10px;border:2px dashed var(--accent);">
+        <strong style="font-size:13px;">既存タグを編集</strong>
+        <div style="font-size:11px;color:var(--text-sub);margin-top:4px;">
+          タグ名を書き換えて「名前を保存」を押してください。右側の件数は現在そのタグが付いているカード数です。
+        </div>
+        <div id="tag-manager-list" class="tag-manager-list"></div>
+        <div id="tag-manager-empty" style="display:none;font-size:12px;color:var(--text-sub);margin-top:8px;">タグがまだありません。</div>
+        <div id="tag-manager-edit-status" class="status-msg"></div>
       </div>
     </div>
 
@@ -790,6 +831,12 @@ button, select { touch-action: manipulation; }
     cardNewTagName: document.getElementById("card-new-tag-name"),
     cardNewTagAdd: document.getElementById("card-new-tag-add"),
     cardTagStatus: document.getElementById("card-tag-status"),
+    tagManagerNewName: document.getElementById("tag-manager-new-name"),
+    tagManagerCreate: document.getElementById("tag-manager-create"),
+    tagManagerCreateStatus: document.getElementById("tag-manager-create-status"),
+    tagManagerList: document.getElementById("tag-manager-list"),
+    tagManagerEmpty: document.getElementById("tag-manager-empty"),
+    tagManagerEditStatus: document.getElementById("tag-manager-edit-status"),
     cardImageUrl: document.getElementById("card-image-url"),
     imagePreview: document.getElementById("image-preview"),
     cardImageNote: document.getElementById("card-image-note"),
@@ -1269,6 +1316,68 @@ button, select { touch-action: manipulation; }
       });
       if(currentBulkTag) els.bulkTag.value = currentBulkTag;
     }
+
+    renderTagManager();
+  }
+
+  function renderTagManager(){
+    if(!els.tagManagerList) return;
+    els.tagManagerList.innerHTML = "";
+    if(els.tagManagerEmpty) els.tagManagerEmpty.style.display = (allCardTags || []).length ? "none" : "block";
+
+    (allCardTags || []).forEach(function(tag){
+      var id = tag && tag.id;
+      var name = String((tag && tag.name) || "").trim();
+      if(id == null || !name) return;
+
+      var row = document.createElement("div");
+      row.className = "tag-manager-row";
+
+      var input = document.createElement("input");
+      input.type = "text";
+      input.maxLength = 80;
+      input.value = name;
+      input.setAttribute("aria-label", "タグ名 " + name);
+
+      var count = document.createElement("span");
+      count.className = "tag-manager-count";
+      count.textContent = String(tag.card_count == null ? 0 : tag.card_count) + "枚";
+
+      var save = document.createElement("button");
+      save.type = "button";
+      save.className = "btn secondary";
+      save.textContent = "名前を保存";
+
+      save.addEventListener("click", function(){
+        clearStatus(els.tagManagerEditStatus);
+        var nextName = String(input.value || "").trim();
+        if(!nextName){
+          showStatus(els.tagManagerEditStatus, "タグ名を入力してください。", true);
+          input.focus();
+          return;
+        }
+        if(nextName === name){
+          showStatus(els.tagManagerEditStatus, "タグ名は変更されていません。", false);
+          return;
+        }
+
+        save.disabled = true;
+        ADMIN.adminUpdateCardTag(id, nextName).then(function(){
+          return loadCardTags();
+        }).then(function(){
+          showStatus(els.tagManagerEditStatus, "タグ「" + name + "」を「" + nextName + "」へ変更しました。", false);
+        }).catch(function(err){
+          showStatus(els.tagManagerEditStatus, friendlyError(err), true);
+        }).finally(function(){
+          save.disabled = false;
+        });
+      });
+
+      row.appendChild(input);
+      row.appendChild(count);
+      row.appendChild(save);
+      els.tagManagerList.appendChild(row);
+    });
   }
 
   function loadCardTags(selectedNames){
@@ -1333,6 +1442,39 @@ button, select { touch-action: manipulation; }
       }).finally(function(){
         els.cardNewTagAdd.disabled = false;
       });
+    });
+  }
+
+
+  // ---- タグ単独管理 ----
+  if(els.tagManagerCreate){
+    els.tagManagerCreate.addEventListener("click", function(){
+      clearStatus(els.tagManagerCreateStatus);
+      var name = String(els.tagManagerNewName.value || "").trim();
+      if(!name){
+        showStatus(els.tagManagerCreateStatus, "追加するタグ名を入力してください。", true);
+        els.tagManagerNewName.focus();
+        return;
+      }
+
+      els.tagManagerCreate.disabled = true;
+      ADMIN.adminCreateCardTag(name).then(function(){
+        els.tagManagerNewName.value = "";
+        return loadCardTags();
+      }).then(function(){
+        showStatus(els.tagManagerCreateStatus, "タグ「" + name + "」を追加しました。", false);
+      }).catch(function(err){
+        showStatus(els.tagManagerCreateStatus, friendlyError(err), true);
+      }).finally(function(){
+        els.tagManagerCreate.disabled = false;
+      });
+    });
+
+    els.tagManagerNewName.addEventListener("keydown", function(ev){
+      if(ev.key === "Enter"){
+        ev.preventDefault();
+        els.tagManagerCreate.click();
+      }
     });
   }
 
