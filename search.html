@@ -771,7 +771,7 @@
 
     // タグ検索から別の検索方法へ移動した時、画面上のチェックも必ず解除する。
     Array.prototype.forEach.call(
-      document.querySelectorAll('#search-card-tags input[type="checkbox"], #card-tag-filter-list input[type="checkbox"]'),
+      document.querySelectorAll('#search-card-tags input[type="checkbox"], #filter-card-tags input[type="checkbox"]'),
       function(cb){ cb.checked = false; }
     );
 
