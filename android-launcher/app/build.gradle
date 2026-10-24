@@ -1,0 +1,41 @@
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "io.github.ryotei.launcher"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "io.github.ryotei.launcher"
+        minSdk 26
+        targetSdk 34
+        versionCode Integer.parseInt(System.getenv("VERSION_CODE") ?: "1")
+        versionName "1.0." + (System.getenv("VERSION_CODE") ?: "0")
+    }
+
+    // 署名鍵はリポジトリに置かない。CIが環境変数で渡す（無ければAndroid標準のデバッグ鍵）
+    def ks = System.getenv("LAUNCHER_KEYSTORE")
+    signingConfigs {
+        shared {
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv("LAUNCHER_KEYSTORE_PASSWORD")
+                keyAlias "ryotei"
+                keyPassword System.getenv("LAUNCHER_KEYSTORE_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig ks ? signingConfigs.shared : signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
