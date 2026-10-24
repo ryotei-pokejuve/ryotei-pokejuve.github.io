@@ -75,6 +75,8 @@ public final class PreviewBridge implements Host {
         engine.touch(2, x1, y1, t + 400);
     }
 
+    public void touch(int action, int x, int y, long t) { engine.touch(action, x, y, t); }
+
     public void back() { engine.back(); }
 
     public void resume() { engine.onResume(); }
