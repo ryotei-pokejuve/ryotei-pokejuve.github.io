@@ -13,6 +13,7 @@ interface Host {
     int SFX_START = 6;
     int SFX_ERROR = 7;
     int SFX_LEVEL = 8;
+    int SFX_DOOR = 9;
 
     /** ラベル順に並んだランチャー対象アプリ。読み込み中は空。 */
     List<AppEntry> apps();

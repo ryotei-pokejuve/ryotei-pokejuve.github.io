@@ -79,6 +79,22 @@ public final class PreviewBridge implements Host {
 
     public void back() { engine.back(); }
 
+    /** 村人の画面上の中心座標（台本から話しかけるため）。 */
+    public int[] npcCenter() {
+        Overworld w = worldOf();
+        return new int[]{w.offX + w.npc.x * 16 + 8, w.offY + w.npc.y * 16 + 8};
+    }
+
+    private Overworld worldOf() {
+        try {
+            java.lang.reflect.Field f = Engine.class.getDeclaredField("world");
+            f.setAccessible(true);
+            return (Overworld) f.get(engine);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void resume() { engine.onResume(); }
 
     @Override public List<AppEntry> apps() { return apps; }

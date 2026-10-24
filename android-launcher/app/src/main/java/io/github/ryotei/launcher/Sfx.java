@@ -17,6 +17,7 @@ final class Sfx {
             {{659, 60}, {988, 60}, {1319, 140}},            // START
             {{220, 90}, {196, 120}},                        // ERROR
             {{1047, 70}, {1319, 70}, {1568, 70}, {2093, 200}}, // LEVEL
+            {{262, 50}, {196, 50}, {131, 110}},             // DOOR
     };
 
     private final AudioTrack[] tracks = new AudioTrack[PATTERNS.length];

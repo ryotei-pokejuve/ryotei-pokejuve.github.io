@@ -5,83 +5,29 @@ import android.graphics.Canvas;
 
 import java.util.Random;
 
-/** 背景。FIELDは16x16タイルの草むら（2コマで揺れる）、CYBERは電脳グリッド＋走るパケット。 */
+/** 背景の部品。草むらなどの16x16タイル（フィールド用）と、電脳グリッド＋走るパケット（チップフォルダ用）。 */
 final class Scenery {
-    private static final int GRASS = 0, TALL = 1, FLOWER = 2, TREE_TOP = 3, TREE_BOTTOM = 4, PATH = 5, ROCK = 6;
+    static final int GRASS = 0, TALL = 1, FLOWER = 2, TREE_TOP = 3, TREE_BOTTOM = 4, PATH = 5, ROCK = 6;
 
-    private Bitmap frame0, frame1;
-    private Theme builtFor;
+    private Bitmap grid;
     private int builtW, builtH;
 
-    /** 背景を描く。必要ならキャッシュを作り直す。 */
-    void draw(Pix p, Theme th, int w, int h, long t) {
-        if (frame0 == null || builtFor != th || builtW != w || builtH != h) build(p, th, w, h);
-        Bitmap b = th.cyber || (t / 600) % 2 == 0 ? frame0 : frame1;
-        p.image(b, 0, 0, w, h);
-        if (th.cyber) packets(p, w, h, t);
-    }
-
-    private void build(Pix p, Theme th, int w, int h) {
-        builtFor = th;
-        builtW = w;
-        builtH = h;
-        frame0 = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        frame1 = th.cyber ? frame0 : Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        Canvas old = p.c;
-        if (th.cyber) {
-            p.c = new Canvas(frame0);
+    /** 電脳グリッドの背景を描く。 */
+    void drawCyber(Pix p, int w, int h, long t) {
+        if (grid == null || builtW != w || builtH != h) {
+            builtW = w;
+            builtH = h;
+            grid = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            Canvas old = p.c;
+            p.c = new Canvas(grid);
             grid(p, w, h);
-        } else {
-            int[][] map = fieldMap(w, h);
-            p.c = new Canvas(frame0);
-            field(p, map, 0);
-            p.c = new Canvas(frame1);
-            field(p, map, 1);
+            p.c = old;
         }
-        p.c = old;
+        p.image(grid, 0, 0, w, h);
+        packets(p, w, h, t);
     }
 
     // ---- FIELD ----
-
-    private static int[][] fieldMap(int w, int h) {
-        int cols = (w + 15) / 16, rows = (h + 15) / 16;
-        int[][] m = new int[rows][cols];
-        Random r = new Random(20261024L);
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < cols; x++) {
-                int v = r.nextInt(100);
-                m[y][x] = v < 7 ? FLOWER : v < 9 ? ROCK : GRASS;
-            }
-        }
-        // 草むらの塊
-        for (int k = 0; k < Math.max(3, rows * cols / 60); k++) {
-            int cx = r.nextInt(cols), cy = r.nextInt(rows);
-            int rw = 2 + r.nextInt(3), rh = 2 + r.nextInt(2);
-            for (int y = cy; y < Math.min(rows, cy + rh); y++)
-                for (int x = cx; x < Math.min(cols, cx + rw); x++) m[y][x] = TALL;
-        }
-        // 横切る小道
-        int py = rows / 2 + r.nextInt(Math.max(1, rows / 4));
-        for (int x = 0; x < cols; x++) {
-            if (py >= 0 && py < rows) m[py][x] = PATH;
-            if (r.nextInt(4) == 0) py += r.nextBoolean() ? 1 : -1;
-            if (py >= 0 && py < rows) m[py][x] = PATH;
-        }
-        // 両端の木
-        for (int y = 0; y + 1 < rows; y += 2) {
-            m[y][0] = TREE_TOP;
-            m[y + 1][0] = TREE_BOTTOM;
-            m[y][cols - 1] = TREE_TOP;
-            m[y + 1][cols - 1] = TREE_BOTTOM;
-        }
-        return m;
-    }
-
-    private static void field(Pix p, int[][] m, int frame) {
-        for (int y = 0; y < m.length; y++) {
-            for (int x = 0; x < m[y].length; x++) tile(p, m[y][x], x * 16, y * 16, frame, (x * 7 + y * 13) % 4);
-        }
-    }
 
     private static final int G = 0xFF88D068, GD = 0xFF60A848, GL = 0xFFB0E888;
 
@@ -97,7 +43,7 @@ final class Scenery {
         p.rect(x + (v * 5 + 6) % 14, y + (v * 3 + 1) % 14, 1, 1, GL);
     }
 
-    private static void tile(Pix p, int type, int x, int y, int frame, int v) {
+    static void tile(Pix p, int type, int x, int y, int frame, int v) {
         switch (type) {
             case TALL: {
                 p.rect(x, y, 16, 16, 0xFF58A840);

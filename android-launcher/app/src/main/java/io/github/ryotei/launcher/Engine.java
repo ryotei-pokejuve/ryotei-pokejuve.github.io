@@ -10,17 +10,27 @@ import java.util.List;
 
 /**
  * ランチャー本体。GBAくらいの低解像度キャンバスに全部を描き、タッチを「ゲームの操作」として扱う。
+ * ホームはRPGのフィールド（お気に入りアプリ＝いえ）、メニューとアプリ一覧は電脳風のチップフォルダ。
  * Android固有の処理は Host 越しに呼ぶので、このクラスは android.graphics 以外に依存しない。
  */
 final class Engine {
     static final int BOOT = 0, HOME = 1, APPS = 2;
     static final int SLOTS = 6;
 
-    private static final int M_APPS = 1, M_THEME = 2, M_SOUND = 3, M_OP = 4, M_HOMESET = 5, M_SETTINGS = 6,
-            M_REPORT = 7, M_CLOSE = 8, C_OPEN = 20, C_SWAP = 21, C_REMOVE = 22, C_INFO = 23, C_ADD = 24,
-            C_UNINSTALL = 25, C_CANCEL = 26;
+    private static final int M_APPS = 1, M_SOUND = 3, M_OP = 4, M_HOMESET = 5, M_SETTINGS = 6, M_SAVE = 7,
+            M_CLOSE = 8, C_OPEN = 20, C_SWAP = 21, C_REMOVE = 22, C_INFO = 23, C_ADD = 24, C_UNINSTALL = 25,
+            C_CANCEL = 26;
+    private static final int ACT_NONE = 0, ACT_ENTER = 1, ACT_LOT = 2, ACT_TALK = 3;
     private static final String[] TABS = {"すべて", "よくつかう", "さいきん"};
     private static final String[] WEEK = {"日", "月", "火", "水", "木", "金", "土"};
+    private static final String[] TIPS = {
+            "うえに スワイプすると\nチップフォルダが ひらくよ！",
+            "いえを ながおしすると\nたてかえたり できるんだって！",
+            "あきちの たてふだを しらべると\nあたらしい いえが たつよ！",
+            "きみ じしんを タップすると\nメニューが ひらくよ！",
+            "したに スワイプすると\nおしらせが みられるよ！",
+            "いえに たくさん はいると\nレベルが あがるらしいよ！",
+    };
     private static final long LONG_PRESS = 450;
     private static final int SLOP = 6;
     private static final int ROW = 20;
@@ -28,7 +38,8 @@ final class Engine {
     private final Host host;
     private final Pix p;
     private final Scenery scenery = new Scenery();
-    Theme th;
+    private final Overworld world = new Overworld();
+    private Theme th = Theme.FIELD;
     private int vw = 270, vh = 520;
     int screen;
     private long t;
@@ -41,12 +52,19 @@ final class Engine {
     private List<AppEntry> recent = Collections.emptyList();
     private boolean listsDirty = true;
 
-    // ホーム
+    // ホーム（フィールド）
     private final String[] slots = new String[SLOTS];
-    private int homeCursor = 0;
+    private final AppEntry[] slotApps = new AppEntry[SLOTS];
+    private int houseHover = -1;
     private String replaceKey;
+    private int action = ACT_NONE, actionSlot = -1;
+    private int tipIndex;
+    private int enterSlot = -1;
+    private long enterStart;
+    private int openDoor = -1;
+    private long doorCloseAt;
 
-    // アプリ一覧画面
+    // チップフォルダ
     private int tab = 0;
     private float scroll, scrollVel;
     private int listCursor = 0;
@@ -55,6 +73,7 @@ final class Engine {
     // メニュー
     private static final class Menu {
         boolean context;
+        String title;
         String[] labels;
         int[] ids;
         int x, y, w, h;
@@ -67,7 +86,7 @@ final class Engine {
 
     // メッセージ
     private String msg = "";
-    private long msgStart;
+    private long msgStart = -1;
     private boolean msgInstant;
 
     // タッチ
@@ -81,15 +100,19 @@ final class Engine {
     private int nextScreen = -1;
     private long transStart;
     private AppEntry pendingLaunch;
-    private long launchAt, flashStart = -10000;
-    private boolean returningFromApp;
+    private long launchAt;
+    private long plugStart = -10000;
+    private AppEntry plugApp;
+    private int returnMode; // 0=なし 1=いえから 2=チップフォルダから
     private String levelUpMsg;
-    private long reportAt = -1;
+    private long saveAt = -1;
+    private float fade; // 0=なし 1=真っ暗
+    private int fadeDir; // 1=暗くする -1=明るくする
+    private long fadeStart = -1;
 
     Engine(Host host, Pix pix) {
         this.host = host;
         this.p = pix;
-        th = Theme.byName(host.getString("theme", "FIELD"));
         for (int i = 0; i < SLOTS; i++) slots[i] = host.getString("slot" + i, "");
         screen = host.getInt("opening", 1) == 1 ? BOOT : HOME;
         if (screen == HOME) say(greeting(), true);
@@ -98,6 +121,7 @@ final class Engine {
     void resize(int w, int h) {
         vw = w;
         vh = h;
+        world.layout(vw, vh, hudBox()[1] + hudBox()[3] + 2, msgBox()[1] - 2);
     }
 
     // ================================================================ ライフサイクル
@@ -105,23 +129,35 @@ final class Engine {
     void onResume() {
         menu = null;
         down = false;
-        if (returningFromApp) {
-            returningFromApp = false;
-            if (screen == APPS && pickSlot < 0) screen = HOME;
-            if (levelUpMsg != null) {
-                say(levelUpMsg, false);
-                host.sfx(Host.SFX_LEVEL);
-                levelUpMsg = null;
-            } else {
-                say(th.cyber ? "おかえり！ RYOTEIくん。\nつぎは どこへ いく？" : "おかえり！ RYOTEI。\nつぎは なにを する？", false);
-            }
-        } else if (screen == HOME && replaceKey == null) {
-            say(greeting(), true);
+        if (returnMode == 0) {
+            if (screen == HOME && replaceKey == null && enterSlot < 0) say(greeting(), true);
+            return;
+        }
+        if (returnMode == 1 && enterSlot >= 0) {
+            int i = enterSlot;
+            world.player.place(world.doorX[i], world.frontY(i), 0);
+            world.player.hidden = false;
+            openDoor = i;
+            doorCloseAt = -1; // 次のフレームで決める
+            startFade(-1);
+            enterSlot = -1;
+        }
+        returnMode = 0;
+        screen = HOME;
+        nextScreen = -1;
+        pickSlot = -1;
+        if (levelUpMsg != null) {
+            say(levelUpMsg, false);
+            host.sfx(Host.SFX_LEVEL);
+            levelUpMsg = null;
+        } else {
+            say("おかえり！ RYOTEI。\nつぎは どこへ いく？", false);
         }
     }
 
     /** ホーム画面表示中にもう一度ホームボタンが押された。 */
     void homePressed() {
+        if (enterSlot >= 0 || pendingLaunch != null) return;
         menu = null;
         replaceKey = null;
         if (screen == BOOT) {
@@ -135,27 +171,26 @@ final class Engine {
         }
     }
 
-    /** 戻る操作を処理したらtrue。 */
+    /** 戻る操作。ランチャーなのでアプリは終了しない。 */
     boolean back() {
-        if (nextScreen >= 0 || pendingLaunch != null) return true;
+        if (busy()) return true;
         if (menu != null) {
             closeMenu();
-            return true;
-        }
-        if (screen == APPS) {
+        } else if (screen == APPS) {
             pickSlot = -1;
             host.sfx(Host.SFX_CANCEL);
             go(HOME);
             say(greeting(), true);
-            return true;
-        }
-        if (replaceKey != null) {
+        } else if (replaceKey != null) {
             replaceKey = null;
             host.sfx(Host.SFX_CANCEL);
             say(greeting(), true);
-            return true;
         }
         return true;
+    }
+
+    private boolean busy() {
+        return nextScreen >= 0 || pendingLaunch != null || enterSlot >= 0 || fadeStart >= 0 || fade > 0;
     }
 
     // ================================================================ 1フレーム
@@ -164,40 +199,64 @@ final class Engine {
         t = now;
         long dt = lastFrame == 0 ? 16 : Math.min(100, now - lastFrame);
         lastFrame = now;
+        if (msgStart < 0) msgStart = t;
+        if (fadeStart == -2) fadeStart = t;
+        if (openDoor >= 0 && doorCloseAt == -1) doorCloseAt = t + 450;
         p.c = canvas;
         syncApps();
         update(dt);
 
-        scenery.draw(p, th, vw, vh, t);
-        if (screen == BOOT) drawBoot();
-        else if (screen == HOME) drawHome();
-        else drawApps();
+        if (screen == BOOT) {
+            drawBoot();
+        } else if (screen == HOME) {
+            drawHome();
+        } else {
+            drawApps();
+        }
         if (menu != null) drawMenu(menu);
         drawEffects();
     }
 
     private void update(long dt) {
         if (nextScreen >= 0) {
-            float k = (t - transStart) / 260f;
+            float k = (t - transStart) / 300f;
             if (k >= 0.5f && screen != nextScreen) screen = nextScreen;
             if (k >= 1f) nextScreen = -1;
+        }
+        if (fadeStart >= 0) {
+            float k = Math.min(1f, (t - fadeStart) / 300f);
+            fade = fadeDir > 0 ? k : 1 - k;
+            if (k >= 1f) fadeStart = -1;
+        }
+        if (openDoor >= 0 && enterSlot < 0 && doorCloseAt > 0 && t >= doorCloseAt) openDoor = -1;
+        if (screen == HOME) {
+            world.update(t);
+            if (action != ACT_NONE && !world.player.busy()) arrive();
+            if (enterSlot >= 0) updateEnter();
         }
         if (pendingLaunch != null && t >= launchAt) {
             AppEntry app = pendingLaunch;
             pendingLaunch = null;
             countLaunch(app);
-            if (host.launch(app)) {
-                returningFromApp = true;
-            } else {
+            if (!host.launch(app)) {
                 levelUpMsg = null;
+                returnMode = 0;
                 host.sfx(Host.SFX_ERROR);
+                if (enterSlot >= 0) {
+                    world.player.place(world.doorX[enterSlot], world.frontY(enterSlot), 0);
+                    world.player.hidden = false;
+                    openDoor = enterSlot;
+                    doorCloseAt = t + 450;
+                    enterSlot = -1;
+                    startFade(-1);
+                }
                 say("あれ？ その アプリは\nひらけなかった…", false);
             }
         }
-        if (reportAt >= 0 && t >= reportAt) {
-            reportAt = -1;
+        if (saveAt >= 0 && t >= saveAt) {
+            saveAt = -1;
             host.sfx(Host.SFX_SAVE);
-            say(th.cyber ? "データの バックアップ\nかんりょう！" : "RYOTEIは レポートに\nしっかり かきこんだ！", false);
+            say("RYOTEIは レポートに\nしっかり かきこんだ！", false);
         }
         if (down && !dragging && !longFired && t - downT > LONG_PRESS) {
             longFired = true;
@@ -211,21 +270,29 @@ final class Engine {
         scroll = Math.max(0, Math.min(scroll, maxScroll()));
     }
 
+    private void startFade(int dir) {
+        fadeDir = dir;
+        fadeStart = -2; // 次のフレームの時刻から始める
+        fade = dir > 0 ? 0 : 1;
+    }
+
     // ================================================================ アプリ一覧の同期
 
     private void syncApps() {
         int v = host.appsVersion();
-        if (v == seenVersion) {
-            if (listsDirty) rebuildLists();
-            return;
+        if (v != seenVersion) {
+            seenVersion = v;
+            all = host.apps();
+            byKey.clear();
+            for (AppEntry a : all) byKey.put(a.key, a);
+            if (host.getString("slotinit", "").isEmpty() && !all.isEmpty()) defaultSlots();
+            listsDirty = true;
         }
-        seenVersion = v;
-        all = host.apps();
-        byKey.clear();
-        for (AppEntry a : all) byKey.put(a.key, a);
-        if (host.getString("slotinit", "").isEmpty() && !all.isEmpty()) defaultSlots();
-        listsDirty = true;
-        rebuildLists();
+        if (listsDirty) rebuildLists();
+        for (int i = 0; i < SLOTS; i++) {
+            String k = slots[i];
+            slotApps[i] = k == null || k.isEmpty() ? null : byKey.get(k);
+        }
     }
 
     private void defaultSlots() {
@@ -235,7 +302,7 @@ final class Engine {
                 "com.android.vending", "com.google.android.apps.maps"};
         int n = 0;
         for (String pkg : wanted) {
-            if (n >= SLOTS) break;
+            if (n >= SLOTS - 1) break; // 1軒はあき地にしておく
             for (AppEntry a : all) {
                 if (a.pkg.equals(pkg)) {
                     slots[n++] = a.key;
@@ -276,30 +343,13 @@ final class Engine {
         return Math.min(100, (int) Math.sqrt(count) + 1);
     }
 
-    static float expFraction(int count) {
-        int lv = level(count);
-        if (lv >= 100) return 1f;
-        int lo = (lv - 1) * (lv - 1), hi = lv * lv;
-        return (count - lo) / (float) (hi - lo);
-    }
-
     private void countLaunch(AppEntry a) {
         int before = count(a);
         host.putInt("n:" + a.key, before + 1);
         host.putLong("t:" + a.key, host.now());
         listsDirty = true;
         int lv = level(before + 1);
-        if (lv > level(before) && lv > 1) {
-            String name = p.fit(a.label, 150);
-            levelUpMsg = th.cyber ? name + "の レベルが\n" + lv + "に アップ！" : name + "の レベルが\n" + lv + "に あがった！";
-        } else {
-            levelUpMsg = null;
-        }
-    }
-
-    private AppEntry slotApp(int i) {
-        String k = slots[i];
-        return k == null || k.isEmpty() ? null : byKey.get(k);
+        levelUpMsg = lv > level(before) && lv > 1 ? p.fit(a.label, 150) + "の レベルが\n" + lv + "に あがった！" : null;
     }
 
     private int slotOf(AppEntry a) {
@@ -310,32 +360,32 @@ final class Engine {
     private void setSlot(int i, String key) {
         slots[i] = key == null ? "" : key;
         host.putString("slot" + i, slots[i]);
+        slotApps[i] = slots[i].isEmpty() ? null : byKey.get(slots[i]);
     }
 
     // ================================================================ メッセージ
 
     void say(String text, boolean instant) {
         msg = text;
-        msgStart = t;
+        msgStart = -1;
         msgInstant = instant;
     }
 
     private String greeting() {
         int lv = host.batteryLevel();
-        if (lv >= 0 && lv <= 15 && !host.charging())
-            return th.cyber ? "けいこく！ バッテリーが\nのこり わずか！" : "でんちが のこり すくない！\nはやく じゅうでん しよう！";
-        if (host.charging())
-            return th.cyber ? "じゅうでん ちゅう…\nエネルギー チャージ！" : "じゅうでん ちゅう…\nHPが すこしずつ かいふく！";
+        if (lv >= 0 && lv <= 15 && !host.charging()) return "でんちが のこり すくない！\nはやく じゅうでん しよう！";
+        if (host.charging()) return "じゅうでん ちゅう…\nHPが すこしずつ かいふく！";
+        int h = hour();
+        if (h >= 5 && h <= 10) return "おはよう！ RYOTEI。\nきょうは どこへ いく？";
+        if (h >= 11 && h <= 16) return "RYOTEIは あたりを\nみわたした。 どこへ いく？";
+        if (h >= 17 && h <= 20) return "ゆうがたに なってきた。\nどこかに よっていく？";
+        return "よふかしは ほどほどに…\nそろそろ やすもう。";
+    }
+
+    private int hour() {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(host.now());
-        int h = cal.get(Calendar.HOUR_OF_DAY);
-        if (h >= 5 && h <= 10)
-            return th.cyber ? "おはよう、RYOTEIくん！\nきょうも ネットに ダイブだ！" : "おはよう！ RYOTEI。\nきょうは なにを する？";
-        if (h >= 11 && h <= 16)
-            return th.cyber ? "システム オールグリーン！\nどこに プラグインする？" : "RYOTEIは あたりを\nみわたした。 なにを する？";
-        if (h >= 17 && h <= 21)
-            return th.cyber ? "こんばんは、RYOTEIくん！\nネットの パトロールに いこう！" : "こんばんは！ RYOTEI。\nきょうも おつかれさま！";
-        return th.cyber ? "もう こんな じかん…\nはやく ねないと だめだよ！" : "よふかしは ほどほどに…\nそろそろ やすもう。";
+        return cal.get(Calendar.HOUR_OF_DAY);
     }
 
     private List<String> wrap(String text, int maxW) {
@@ -364,13 +414,44 @@ final class Engine {
         down = false;
     }
 
-    private void launch(AppEntry a) {
+    /** フィールドでいえの前に着いたら、ドアを開けて中に入り、暗転してアプリを起動する。 */
+    private void enter(int i) {
+        AppEntry a = slotApps[i];
+        if (a == null) return;
+        enterSlot = i;
+        enterStart = t;
+        openDoor = i;
+        world.player.dir = 1;
+        host.sfx(Host.SFX_DOOR);
+        say("RYOTEIは\n" + p.fit(a.label, 150) + "に はいった！", true);
+    }
+
+    private void updateEnter() {
+        long e = t - enterStart;
+        Overworld.Actor pl = world.player;
+        if (e >= 180 && !pl.moving && pl.y == world.frontY(enterSlot) && !pl.hidden) {
+            pl.stepMs = 220;
+            pl.forceStep(pl.x, pl.y - 1, t);
+        }
+        if (e >= 420 && !pl.hidden) {
+            pl.hidden = true;
+            startFade(1);
+        }
+        if (e >= 760 && pendingLaunch == null && returnMode == 0) {
+            pendingLaunch = slotApps[enterSlot];
+            launchAt = t;
+            returnMode = 1;
+        }
+    }
+
+    /** チップフォルダからの起動。電脳風の演出をはさむ。 */
+    private void plugIn(AppEntry a) {
         host.sfx(Host.SFX_LAUNCH);
-        String name = p.fit(a.label, th.cyber ? 140 : 160);
-        say(th.cyber ? "プラグイン！\n" + name + " トランスミッション！" : "RYOTEIは\n" + name + "を つかった！", true);
+        plugApp = a;
+        plugStart = t;
         pendingLaunch = a;
-        launchAt = t + 280;
-        flashStart = t;
+        launchAt = t + 520;
+        returnMode = 2;
     }
 
     private void openApps(int pick) {
@@ -380,32 +461,63 @@ final class Engine {
         go(APPS);
     }
 
-    private void addToParty(AppEntry a) {
+    private void addToHome(AppEntry a) {
         for (int i = 0; i < SLOTS; i++) {
-            if (slotApp(i) == null) {
-                setSlot(i, a.key);
-                host.sfx(Host.SFX_OK);
-                if (screen == APPS) go(HOME);
-                homeCursor = i;
-                say(p.fit(a.label, 150) + "を\nてもちに くわえた！", false);
+            if (slotApps[i] == null) {
+                build(i, a);
                 return;
             }
         }
         replaceKey = a.key;
         host.sfx(Host.SFX_MENU);
         if (screen == APPS) go(HOME);
-        say("てもちが いっぱいだ！\nどれと いれかえる？", false);
+        say("あきちが ない！\nどの いえと たてかえる？", false);
+    }
+
+    private void build(int i, AppEntry a) {
+        int old = slotOf(a);
+        if (old >= 0 && old != i) setSlot(old, slots[i]);
+        setSlot(i, a.key);
+        host.sfx(Host.SFX_LEVEL);
+        if (screen == APPS) go(HOME);
+        say(p.fit(a.label, 150) + "の\nいえが たった！", false);
+    }
+
+    /** 主人公が目的地に着いた。 */
+    private void arrive() {
+        int act = action, i = actionSlot;
+        action = ACT_NONE;
+        Overworld.Actor pl = world.player;
+        if (act == ACT_ENTER || act == ACT_LOT) {
+            if (pl.x != world.doorX[i] || pl.y != world.frontY(i)) return;
+            pl.dir = 1;
+            if (act == ACT_ENTER) {
+                enter(i);
+            } else {
+                host.sfx(Host.SFX_OK);
+                say("あきちだ。 たてふだに\n「いえを たてよう！」と ある。", true);
+                openApps(i);
+            }
+        } else if (act == ACT_TALK) {
+            Overworld.Actor npc = world.npc;
+            if (Math.abs(npc.x - pl.x) + Math.abs(npc.y - pl.y) != 1) return;
+            pl.face(npc.x, npc.y);
+            npc.face(pl.x, pl.y);
+            world.npcFrozenUntil = t + 2500;
+            host.sfx(Host.SFX_OK);
+            say(TIPS[tipIndex++ % TIPS.length], false);
+        }
     }
 
     // ================================================================ タッチ
 
     /** action: 0=down 1=move 2=up 3=cancel。座標は低解像度キャンバス上の値。 */
-    void touch(int action, int x, int y, long time) {
-        if (nextScreen >= 0 || pendingLaunch != null) {
+    void touch(int act, int x, int y, long time) {
+        if (busy()) {
             down = false;
             return;
         }
-        switch (action) {
+        switch (act) {
             case 0:
                 down = true;
                 dragging = false;
@@ -427,6 +539,7 @@ final class Engine {
                     if (!dragging && (Math.abs(x - downX) > SLOP || Math.abs(y - downY) > SLOP)) {
                         dragging = true;
                         axis = Math.abs(x - downX) > Math.abs(y - downY) ? 2 : 1;
+                        houseHover = -1;
                     }
                     if (scrollbarDrag) {
                         scrollToBar(y);
@@ -443,6 +556,7 @@ final class Engine {
             case 2:
                 if (!down) return;
                 down = false;
+                houseHover = -1;
                 if (longFired) return;
                 if (menu != null) {
                     int hit = menuHit(menu, x, y);
@@ -463,6 +577,7 @@ final class Engine {
             default:
                 down = false;
                 scrollbarDrag = false;
+                houseHover = -1;
         }
     }
 
@@ -472,11 +587,8 @@ final class Engine {
             return;
         }
         if (screen == HOME) {
-            int s = slotHit(x, y);
-            if (s >= 0 && s != homeCursor) {
-                homeCursor = s;
-                host.sfx(Host.SFX_CURSOR);
-            }
+            houseHover = inMap(y) ? world.houseAt(world.toTileX(x), world.toTileY(y)) : -1;
+            if (houseHover >= 0) host.sfx(Host.SFX_CURSOR);
         } else if (screen == APPS) {
             int[] l = listBox();
             if (x >= l[0] + l[2] - 16 && y >= l[1] && y < l[1] + l[3] && maxScroll() > 0) {
@@ -503,6 +615,10 @@ final class Engine {
         }
     }
 
+    private boolean inMap(int y) {
+        return y >= hudBox()[1] + hudBox()[3] && y < msgBox()[1];
+    }
+
     private void tap(int x, int y) {
         if (screen == BOOT) {
             host.sfx(Host.SFX_START);
@@ -511,28 +627,9 @@ final class Engine {
             return;
         }
         if (screen == HOME) {
-            int[] m = msgBox();
-            if (inside(x, y, m)) {
-                msgInstant = true;
-                return;
-            }
-            int s = slotHit(x, y);
-            if (s >= 0) {
-                slotTap(s);
-                return;
-            }
-            int[] b = buttons();
-            if (inside(x, y, b[0], b[1], b[2], b[3])) {
-                openApps(-1);
-            } else if (inside(x, y, b[4], b[5], b[6], b[7])) {
-                openMenu();
-            } else if (inside(x, y, hudBox())) {
-                host.sfx(Host.SFX_OK);
-                host.openClock();
-            }
+            tapHome(x, y);
             return;
         }
-        // APPS
         int[] hd = headerBox();
         if (inside(x, y, hd)) {
             if (y < hd[1] + 24) {
@@ -548,21 +645,103 @@ final class Engine {
         if (r >= 0) rowTap(r);
     }
 
+    private void tapHome(int x, int y) {
+        if (inside(x, y, msgBox())) {
+            msgInstant = true;
+            return;
+        }
+        int[] b = buttons();
+        if (inside(x, y, b[0], b[1], b[2], b[3])) {
+            openMenu();
+            return;
+        }
+        if (inside(x, y, b[4], b[5], b[6], b[7])) {
+            openApps(-1);
+            return;
+        }
+        if (inside(x, y, hudBox())) {
+            host.sfx(Host.SFX_OK);
+            host.openClock();
+            return;
+        }
+        if (!inMap(y)) return;
+        int tx = world.toTileX(x), ty = world.toTileY(y);
+        Overworld.Actor pl = world.player, npc = world.npc;
+        int house = world.houseAt(tx, ty);
+        if (house >= 0) {
+            if (replaceKey != null) {
+                AppEntry a = byKey.get(replaceKey);
+                replaceKey = null;
+                if (a != null) build(house, a);
+                return;
+            }
+            if (goTo(world.doorX[house], world.frontY(house))) {
+                action = slotApps[house] != null ? ACT_ENTER : ACT_LOT;
+                actionSlot = house;
+            }
+            return;
+        }
+        if (tx == pl.x && ty == pl.y && !pl.moving) {
+            openMenu();
+            return;
+        }
+        if (tx == npc.x && ty == npc.y) {
+            int[][] around = {{npc.x, npc.y + 1}, {npc.x, npc.y - 1}, {npc.x - 1, npc.y}, {npc.x + 1, npc.y}};
+            int[] best = null;
+            int bestD = Integer.MAX_VALUE;
+            for (int[] a : around) {
+                if (world.solid(a[0], a[1])) continue;
+                int d = Math.abs(a[0] - pl.x) + Math.abs(a[1] - pl.y);
+                if (d < bestD) {
+                    bestD = d;
+                    best = a;
+                }
+            }
+            if (best != null && goTo(best[0], best[1])) {
+                action = ACT_TALK;
+                world.npcFrozenUntil = t + 4000;
+            }
+            return;
+        }
+        int tile = world.tileAt(tx, ty);
+        if (tile == Scenery.TREE_TOP || tile == Scenery.TREE_BOTTOM) {
+            say("りっぱな きだ。\nかぜで はっぱが ゆれている。", false);
+            return;
+        }
+        if (tile == Scenery.ROCK) {
+            say("おおきな いわだ。\nびくとも しない。", false);
+            return;
+        }
+        action = ACT_NONE;
+        goTo(tx, ty);
+    }
+
+    private boolean goTo(int tx, int ty) {
+        Overworld.Actor pl = world.player;
+        if (pl.moving) {
+            // 歩いている途中なら、いまの1歩を終えてから向かう
+            pl.path.clear();
+        }
+        if (world.walk(pl, tx, ty, world.npc)) return true;
+        host.sfx(Host.SFX_ERROR);
+        say("そこへは いけない みたいだ。", true);
+        return false;
+    }
+
     private void longPress(int x, int y) {
         if (menu != null) return;
         if (screen == HOME) {
-            int s = slotHit(x, y);
-            if (s >= 0) {
-                AppEntry a = slotApp(s);
-                if (a == null) return;
-                homeCursor = s;
-                Menu m = contextMenu(new String[]{"ひらく", "いれかえる", "はずす", "アプリじょうほう", "やめる"},
+            if (!inMap(y)) return;
+            int house = world.houseAt(world.toTileX(x), world.toTileY(y));
+            houseHover = -1;
+            if (house >= 0 && slotApps[house] != null) {
+                AppEntry a = slotApps[house];
+                Menu m = contextMenu(a.label, new String[]{"はいる", "たてかえる", "とりこわす", "アプリじょうほう", "やめる"},
                         new int[]{C_OPEN, C_SWAP, C_REMOVE, C_INFO, C_CANCEL});
                 m.app = a;
-                m.slot = s;
+                m.slot = house;
                 showMenu(m);
-                say(p.fit(a.label, 150) + "を\nどうする？", true);
-            } else if (!inside(x, y, msgBox())) {
+            } else if (house < 0) {
                 openMenu();
             }
         } else if (screen == APPS) {
@@ -570,34 +749,13 @@ final class Engine {
             if (r < 0) return;
             listCursor = r;
             AppEntry a = list().get(r);
-            boolean inParty = slotOf(a) >= 0;
-            Menu m = contextMenu(
-                    new String[]{"ひらく", inParty ? "てもちから はずす" : "てもちに いれる", "アプリじょうほう", "アンインストール", "やめる"},
-                    new int[]{C_OPEN, inParty ? C_REMOVE : C_ADD, C_INFO, C_UNINSTALL, C_CANCEL});
+            boolean onHome = slotOf(a) >= 0;
+            Menu m = contextMenu(a.label,
+                    new String[]{"プラグイン", onHome ? "ホームから はずす" : "ホームに たてる", "アプリじょうほう", "アンインストール", "やめる"},
+                    new int[]{C_OPEN, onHome ? C_REMOVE : C_ADD, C_INFO, C_UNINSTALL, C_CANCEL});
             m.app = a;
             m.slot = slotOf(a);
             showMenu(m);
-        }
-    }
-
-    private void slotTap(int i) {
-        if (replaceKey != null) {
-            AppEntry a = byKey.get(replaceKey);
-            int old = -1;
-            for (int k = 0; k < SLOTS; k++) if (replaceKey.equals(slots[k])) old = k;
-            if (old >= 0) setSlot(old, slots[i]);
-            setSlot(i, replaceKey);
-            replaceKey = null;
-            homeCursor = i;
-            host.sfx(Host.SFX_OK);
-            say((a == null ? "アプリ" : p.fit(a.label, 150)) + "を\nてもちに くわえた！", false);
-            return;
-        }
-        AppEntry a = slotApp(i);
-        if (a == null) {
-            openApps(i);
-        } else {
-            launch(a);
         }
     }
 
@@ -607,16 +765,11 @@ final class Engine {
         AppEntry a = l.get(r);
         listCursor = r;
         if (pickSlot >= 0) {
-            int old = slotOf(a);
-            if (old >= 0 && old != pickSlot) setSlot(old, slots[pickSlot]);
-            setSlot(pickSlot, a.key);
-            homeCursor = pickSlot;
+            int i = pickSlot;
             pickSlot = -1;
-            host.sfx(Host.SFX_OK);
-            go(HOME);
-            say(p.fit(a.label, 150) + "を\nてもちに くわえた！", false);
+            build(i, a);
         } else {
-            launch(a);
+            plugIn(a);
         }
     }
 
@@ -634,37 +787,37 @@ final class Engine {
         scroll = Math.max(0, Math.min(1, k)) * maxScroll();
     }
 
-    // ================================================================ メニュー
+    // ================================================================ メニュー（電脳風）
 
     private void openMenu() {
-        String[] labels = {"アプリ", "テーマ：" + th.name, "サウンド：" + (host.getInt("sound", 1) == 1 ? "ON" : "OFF"),
+        String[] labels = {"チップフォルダ", "サウンド：" + (host.getInt("sound", 1) == 1 ? "ON" : "OFF"),
                 "オープニング：" + (host.getInt("opening", 1) == 1 ? "ON" : "OFF"), "ホームアプリ", "たんまつせってい",
-                th.cyber ? "バックアップ" : "レポート", "とじる"};
-        int[] ids = {M_APPS, M_THEME, M_SOUND, M_OP, M_HOMESET, M_SETTINGS, M_REPORT, M_CLOSE};
+                "レポート", "とじる"};
+        int[] ids = {M_APPS, M_SOUND, M_OP, M_HOMESET, M_SETTINGS, M_SAVE, M_CLOSE};
         Menu m = new Menu();
+        m.title = "MENU";
         m.labels = labels;
         m.ids = ids;
-        m.w = Math.min(vw - 12, 172);
-        m.h = labels.length * 18 + 14;
+        m.w = Math.min(vw - 12, 176);
+        m.h = labels.length * 18 + 34;
         m.x = vw - 6 - m.w;
-        m.y = 70;
-        boolean reopen = menu != null && !menu.context;
-        m.hover = reopen ? menu.hover : 0;
+        m.y = hudBox()[1] + hudBox()[3] + 6;
+        m.hover = menu != null && !menu.context ? menu.hover : 0;
         showMenu(m);
-        if (!reopen) say(th.cyber ? "コマンドを えらんでね。" : "メニューを ひらいた。", true);
     }
 
-    private Menu contextMenu(String[] labels, int[] ids) {
+    private Menu contextMenu(String title, String[] labels, int[] ids) {
         Menu m = new Menu();
         m.context = true;
         m.labels = labels;
         m.ids = ids;
         int w = 0;
         for (String s : labels) w = Math.max(w, p.width(s));
-        m.w = Math.min(vw - 12, w + 34);
-        m.h = labels.length * 18 + 14;
+        m.w = Math.min(vw - 12, Math.max(w + 34, 150));
+        m.title = p.fit(title, m.w - 20);
+        m.h = labels.length * 18 + 34;
         m.x = vw - 6 - m.w;
-        m.y = msgBox()[1] - 4 - m.h;
+        m.y = Math.max(hudBox()[1] + hudBox()[3] + 4, msgBox()[1] - 4 - m.h);
         m.hover = 0;
         return m;
     }
@@ -675,16 +828,14 @@ final class Engine {
     }
 
     private void closeMenu() {
-        boolean context = menu != null && menu.context;
         menu = null;
         host.sfx(Host.SFX_CANCEL);
-        if (screen == HOME && context) say(greeting(), true);
-        else if (screen == HOME) say(greeting(), true);
     }
 
     private int menuHit(Menu m, int x, int y) {
-        if (x < m.x || x >= m.x + m.w || y < m.y + 7 || y >= m.y + 7 + m.labels.length * 18) return -1;
-        return (y - m.y - 7) / 18;
+        int top = m.y + 27;
+        if (x < m.x || x >= m.x + m.w || y < top || y >= top + m.labels.length * 18) return -1;
+        return (y - top) / 18;
     }
 
     private void menuSelect(Menu m, int id) {
@@ -694,23 +845,14 @@ final class Engine {
                 menu = null;
                 openApps(-1);
                 return;
-            case M_THEME:
-                th = th.cyber ? Theme.FIELD : Theme.CYBER;
-                host.putString("theme", th.name);
-                host.sfx(Host.SFX_OK);
-                openMenu();
-                say(th.cyber ? "CYBER モードに きりかえ！" : "FIELD モードに きりかえた！", false);
-                return;
             case M_SOUND: {
-                int on = host.getInt("sound", 1) == 1 ? 0 : 1;
-                host.putInt("sound", on);
+                host.putInt("sound", host.getInt("sound", 1) == 1 ? 0 : 1);
                 host.sfx(Host.SFX_OK);
                 openMenu();
                 return;
             }
             case M_OP: {
-                int on = host.getInt("opening", 1) == 1 ? 0 : 1;
-                host.putInt("opening", on);
+                host.putInt("opening", host.getInt("opening", 1) == 1 ? 0 : 1);
                 host.sfx(Host.SFX_OK);
                 openMenu();
                 return;
@@ -725,15 +867,19 @@ final class Engine {
                 host.sfx(Host.SFX_OK);
                 host.openSettings();
                 return;
-            case M_REPORT:
+            case M_SAVE:
                 menu = null;
                 host.sfx(Host.SFX_OK);
-                say(th.cyber ? "データを バックアップ ちゅう…\nでんげんを きらないでね。" : "レポートを かきこんでいます…\nでんげんを きらないで ください。", false);
-                reportAt = t + 1400;
+                say("レポートを かきこんでいます…\nでんげんを きらないで ください。", false);
+                saveAt = t + 1400;
                 return;
             case C_OPEN:
                 menu = null;
-                launch(a);
+                if (screen == APPS) plugIn(a);
+                else if (m.slot >= 0 && goTo(world.doorX[m.slot], world.frontY(m.slot))) {
+                    action = ACT_ENTER;
+                    actionSlot = m.slot;
+                }
                 return;
             case C_SWAP:
                 menu = null;
@@ -743,11 +889,11 @@ final class Engine {
                 menu = null;
                 if (m.slot >= 0) setSlot(m.slot, "");
                 host.sfx(Host.SFX_CANCEL);
-                say(p.fit(a.label, 150) + "を\nてもちから はずした。", false);
+                if (screen == HOME) say(p.fit(a.label, 150) + "の いえを\nとりこわした。 あきちに なった。", false);
                 return;
             case C_ADD:
                 menu = null;
-                addToParty(a);
+                addToHome(a);
                 return;
             case C_INFO:
                 menu = null;
@@ -767,45 +913,29 @@ final class Engine {
     // ================================================================ レイアウト
 
     private int[] hudBox() {
-        return new int[]{6, 6, vw - 12, 58};
+        return new int[]{6, 6, vw - 12 - 60, 46};
+    }
+
+    private int[] buttons() {
+        int x = vw - 6 - 56;
+        return new int[]{x, 6, 56, 22, x, 30, 56, 22};
     }
 
     private int[] msgBox() {
         return new int[]{6, vh - 6 - 52, vw - 12, 52};
     }
 
-    private int[] buttons() {
-        int y = msgBox()[1] - 30, w = (vw - 18) / 2;
-        return new int[]{6, y, w, 24, 12 + w, y, vw - 18 - w, 24};
-    }
-
-    private int slotH() {
-        int top = 70, bottom = buttons()[1] - 6;
-        return Math.max(30, Math.min(52, (bottom - top - 4 * (SLOTS - 1)) / SLOTS));
-    }
-
-    private int slotY(int i) {
-        return 70 + i * (slotH() + 4);
-    }
-
-    private int slotHit(int x, int y) {
-        if (x < 6 || x >= vw - 6) return -1;
-        int h = slotH();
-        for (int i = 0; i < SLOTS; i++) if (y >= slotY(i) && y < slotY(i) + h) return i;
-        return -1;
-    }
-
     private int[] headerBox() {
         return new int[]{6, 6, vw - 12, 48};
     }
 
-    private int[] descBox() {
-        return new int[]{6, vh - 6 - 52, vw - 12, 52};
+    private int[] previewBox() {
+        return new int[]{6, 58, vw - 12, 92};
     }
 
     private int[] listBox() {
-        int top = 60, bottom = descBox()[1] - 6;
-        return new int[]{6, top, vw - 12, bottom - top};
+        int top = 154;
+        return new int[]{6, top, vw - 12, vh - 6 - top};
     }
 
     private int listInnerTop() {
@@ -837,6 +967,7 @@ final class Engine {
 
     // ================================================================ 描画：部品
 
+    /** 今の th に合わせたウィンドウ。FIELDは白い角丸、CYBERは角を落とした電脳パネル。 */
     private void window(int x, int y, int w, int h) {
         if (!th.cyber) {
             p.round(x, y, w, h, th.winOuter);
@@ -855,22 +986,6 @@ final class Engine {
         window(b[0], b[1], b[2], b[3]);
     }
 
-    private void panel(int x, int y, int w, int h, boolean sel, boolean empty) {
-        int edge = sel ? th.selEdge : empty ? th.emptyEdge : th.panelEdge;
-        int fill = sel ? th.selFill : empty ? th.emptyFill : th.panelFill;
-        int hi = sel ? th.selHi : empty ? th.emptyFill : th.panelHi;
-        if (!th.cyber) {
-            p.round(x, y, w, h, edge);
-            p.round(x + 1, y + 1, w - 2, h - 2, fill);
-            p.rect(x + 3, y + 2, w - 6, 1, hi);
-        } else {
-            p.chamfer(x, y, w, h, 4, edge);
-            p.chamfer(x + 1, y + 1, w - 2, h - 2, 3, fill);
-            p.rect(x + 2, y + 5, 2, h - 10, edge);
-            if (!empty) p.rect(x + w - 30, y + 2, 22, 1, hi);
-        }
-    }
-
     private void bar(int x, int y, int w, int h, float frac, int color) {
         p.rect(x, y, w, h, th.barFrame);
         p.rect(x + 1, y + 1, w - 2, h - 2, th.barBack);
@@ -884,31 +999,21 @@ final class Engine {
         return 0xFF000000 | (r << 16) | (g << 8) | b;
     }
 
-    private void blinkDown(int x, int y, int color) {
-        if ((t / 400) % 2 == 0) p.arrowDown(x, y, color);
-        else p.arrowDown(x, y + 1, color);
-    }
-
     // ================================================================ 描画：画面
 
     private void drawBoot() {
-        if (!th.cyber) {
-            int[] bands = {0xFF0C3020, 0xFF124028, 0xFF185034, 0xFF206440, 0xFF2C784C, 0xFF3A8C5A};
-            int bh = Math.max(1, vh / (bands.length * 2));
-            for (int i = 0; i < bands.length; i++) p.rect(0, i * bh, vw, bh, bands[i]);
-            for (int i = 0; i < bands.length; i++) p.rect(0, vh - (i + 1) * bh, vw, bh, bands[i]);
-            p.rect(0, bands.length * bh, vw, vh - 2 * bands.length * bh, 0xFF46A066);
-        } else {
-            p.rect(0, 0, vw, vh, 0x99000814);
-        }
+        th = Theme.FIELD;
+        int[] bands = {0xFF0C3020, 0xFF124028, 0xFF185034, 0xFF206440, 0xFF2C784C, 0xFF3A8C5A};
+        int bh = Math.max(1, vh / (bands.length * 2));
+        for (int i = 0; i < bands.length; i++) p.rect(0, i * bh, vw, bh, bands[i]);
+        for (int i = 0; i < bands.length; i++) p.rect(0, vh - (i + 1) * bh, vw, bh, bands[i]);
+        p.rect(0, bands.length * bh, vw, vh - 2 * bands.length * bh, 0xFF46A066);
         int cy = vh * 28 / 100;
-        int logo = th.cyber ? 0xFF48E0F8 : 0xFFF8F8F8, logoShadow = th.cyber ? 0xFF0C3868 : 0xFF103820;
-        int jitter = th.cyber && (t / 90) % 23 == 0 ? 2 : 0;
+        int shadow = 0xFF103820;
         String title = "RYOTEI";
-        p.big(title, (vw - p.bigWidth(title, 4)) / 2 + jitter, cy, 4, logo, logoShadow);
-        String sub = th.cyber ? "NET LAUNCHER" : "LAUNCHER";
-        p.big(sub, (vw - p.bigWidth(sub, 2)) / 2, cy + 76, 2, th.cyber ? 0xFFF8D030 : 0xFFF8D058, logoShadow);
-        // きらきら
+        p.big(title, (vw - p.bigWidth(title, 4)) / 2, cy, 4, 0xFFF8F8F8, shadow);
+        String sub = "LAUNCHER";
+        p.big(sub, (vw - p.bigWidth(sub, 2)) / 2, cy + 76, 2, 0xFFF8D058, shadow);
         for (int k = 0; k < 6; k++) {
             long ph = (t / 120 + k * 5) % 14;
             if (ph > 4) continue;
@@ -917,76 +1022,35 @@ final class Engine {
             p.rect(sx - s, sy, s * 2 + 1, 1, 0xFFF8F8F8);
             p.rect(sx, sy - s, 1, s * 2 + 1, 0xFFF8F8F8);
         }
+        // 主人公が足踏みしている
+        Overworld.Actor hero = world.player;
+        int f = (int) ((t / 250) % 4);
+        p.image(hero.frames[0][f == 1 ? 1 : f == 3 ? 2 : 0], vw / 2 - 16, vh * 50 / 100, 32, 40);
         if ((t / 500) % 2 == 0) {
             String ps = "PRESS START";
-            p.big(ps, (vw - p.bigWidth(ps, 2)) / 2, vh * 64 / 100, 2, 0xFFF8F8F8, logoShadow);
+            p.big(ps, (vw - p.bigWidth(ps, 2)) / 2, vh * 66 / 100, 2, 0xFFF8F8F8, shadow);
         }
-        p.textCenter("©2026 RYOTEI", vw / 2, vh - 30, th.cyber ? 0xFF6CA0C8 : 0xFFD0F0D8, logoShadow);
+        p.textCenter("©2026 RYOTEI", vw / 2, vh - 30, 0xFFD0F0D8, shadow);
     }
 
     private void drawHome() {
+        th = Theme.FIELD;
+        world.draw(p, t, slotApps, houseHover, openDoor);
+        int h = hour();
+        if (h >= 19 || h <= 4) p.rect(0, 0, vw, vh, 0x48101848);
+        else if (h >= 17) p.rect(0, 0, vw, vh, 0x30F07830);
         drawHud();
-        int h = slotH();
-        int iconSize = h >= 44 ? 32 : 16;
-        for (int i = 0; i < SLOTS; i++) {
-            int y = slotY(i), x = 6, w = vw - 12;
-            AppEntry a = slotApp(i);
-            boolean sel = i == homeCursor;
-            panel(x, y, w, h, sel, a == null);
-            if (a == null) {
-                String s = replaceKey != null ? "－ ここに いれる －" : "－ あき －";
-                p.textCenter(s, x + w / 2, y + (h - Pix.LINE) / 2, th.panelText & 0xB0FFFFFF, 0);
-                if (sel && replaceKey != null) p.arrowRight(x + 8, y + h / 2 - 3, th.panelText);
-                continue;
-            }
-            int n = count(a), lv = level(n);
-            int ix = x + 8, iy = y + (h - iconSize) / 2;
-            if (th.cyber) {
-                p.rect(ix - 2, iy - 2, iconSize + 4, iconSize + 4, th.panelEdge);
-                p.rect(ix - 1, iy - 1, iconSize + 2, iconSize + 2, 0xFF061428);
-            }
-            p.image(iconSize == 32 ? a.icon32 : a.icon16, ix, iy, iconSize, iconSize);
-            int tx = ix + iconSize + 8;
-            String lvText = "Lv" + lv;
-            int lvW = p.width(lvText);
-            int nameY = h >= 44 ? y + 6 : y + (h - Pix.LINE) / 2 - 2;
-            p.text(p.fit(a.label, w - (tx - x) - lvW - 14), tx, nameY, th.panelText, th.panelShadow);
-            p.text(lvText, x + w - 8 - lvW, nameY, th.cyber ? th.chip : th.panelText, th.panelShadow);
-            int barY = h >= 44 ? y + h - 13 : y + h - 6;
-            int barW = x + w - 10 - tx;
-            if (h >= 44) {
-                p.text(th.cyber ? "DL" : "EXP", tx, barY - 4, th.cyber ? th.hpLabelText : th.hpLabelText, th.panelShadow);
-                int lw = p.width(th.cyber ? "DL" : "EXP") + 4;
-                bar(tx + lw, barY + 1, barW - lw, 5, expFraction(n), th.exp);
-            } else {
-                bar(tx, barY, barW, 3, expFraction(n), th.exp);
-            }
-            if (replaceKey != null && sel) p.arrowRight(x + 2, y + h / 2 - 3, th.panelText);
-        }
         int[] b = buttons();
-        button(b[0], b[1], b[2], b[3], th.cyber ? "チップフォルダ" : "バッグ", true);
-        button(b[4], b[5], b[6], b[7], th.cyber ? "コマンド" : "メニュー", false);
+        smallButton(b[0], b[1], b[2], b[3], "MENU");
+        smallButton(b[4], b[5], b[6], b[7], "APPS");
         drawMessage(msgBox());
     }
 
-    private void button(int x, int y, int w, int h, String label, boolean up) {
-        if (!th.cyber) {
-            p.round(x, y, w, h, th.winOuter);
-            p.round(x + 1, y + 1, w - 2, h - 2, th.winFill);
-            p.rect(x + 2, y + h - 3, w - 4, 1, th.shadow);
-        } else {
-            p.chamfer(x, y, w, h, 4, th.winOuter);
-            p.chamfer(x + 1, y + 1, w - 2, h - 2, 3, th.winFill);
-        }
-        int tw = p.width(label) + 10;
-        int tx = x + (w - tw) / 2;
-        if (up) p.arrowUp(tx, y + h / 2 - 2, th.cyber ? th.accent : th.accent);
-        else {
-            p.rect(tx, y + h / 2 - 3, 7, 1, th.cyber ? th.accent : th.accent);
-            p.rect(tx, y + h / 2, 7, 1, th.cyber ? th.accent : th.accent);
-            p.rect(tx, y + h / 2 + 3, 7, 1, th.cyber ? th.accent : th.accent);
-        }
-        p.text(label, tx + 10, y + (h - Pix.LINE) / 2, th.text, th.shadow);
+    private void smallButton(int x, int y, int w, int h, String label) {
+        p.round(x, y, w, h, th.winOuter);
+        p.round(x + 1, y + 1, w - 2, h - 2, th.winFill);
+        p.rect(x + 2, y + h - 3, w - 4, 1, th.shadow);
+        p.textCenter(label, x + w / 2, y + (h - Pix.LINE) / 2, th.text, th.shadow);
     }
 
     private void drawHud() {
@@ -996,29 +1060,25 @@ final class Engine {
         cal.setTimeInMillis(host.now());
         int hh = cal.get(Calendar.HOUR_OF_DAY), mm = cal.get(Calendar.MINUTE);
         String clock = (hh < 10 ? "0" : "") + hh + ((t / 500) % 2 == 0 ? ":" : " ") + (mm < 10 ? "0" : "") + mm;
-        p.big(clock, b[0] + 12, b[1] + 10, 2, th.text, th.shadow);
-        int right = b[0] + b[2] - 10;
+        p.big(clock, b[0] + 9, b[1] + 5, 2, th.text, th.shadow);
+        int right = b[0] + b[2] - 8;
         String date = (cal.get(Calendar.MONTH) + 1) + "/" + cal.get(Calendar.DAY_OF_MONTH) + "(" + WEEK[cal.get(Calendar.DAY_OF_WEEK) - 1] + ")";
-        p.textRight(date, right, b[1] + 8, th.text, th.shadow);
+        p.textRight(date, right, b[1] + 6, th.text, th.shadow);
         int lv = host.batteryLevel();
-        boolean charging = host.charging();
         int pct = Math.max(0, lv);
         String num = lv < 0 ? "--" : String.valueOf(pct);
-        int numW = p.width("100");
-        int barRight = right - numW - 4;
-        int labelX = Math.max(b[0] + 104, barRight - 96);
-        // HPラベル（黒地に黄色の文字）
-        p.round(labelX, b[1] + 31, 21, 15, th.hpLabel);
-        p.text("HP", labelX + 3, b[1] + 31, th.hpLabelText, 0);
+        int barRight = right - p.width("100") - 3;
+        int labelX = Math.max(b[0] + 96, barRight - 84);
+        p.round(labelX, b[1] + 25, 21, 15, th.hpLabel);
+        p.text("HP", labelX + 3, b[1] + 25, th.hpLabelText, 0);
         int color = pct > 50 ? th.hpGreen : pct > 20 ? th.hpYellow : th.hpRed;
-        float frac = pct / 100f;
-        bar(labelX + 24, b[1] + 35, barRight - labelX - 24, 6, frac, color);
-        if (charging) {
-            int bx = labelX + 25, bw = barRight - labelX - 26;
+        bar(labelX + 23, b[1] + 29, barRight - labelX - 23, 6, pct / 100f, color);
+        if (host.charging()) {
+            int bx = labelX + 24, bw = barRight - labelX - 25;
             int sx = (int) (t / 20 % (bw + 12)) - 6;
-            p.rect(bx + Math.max(0, sx), b[1] + 36, Math.max(0, Math.min(4, bw - Math.max(0, sx))), 4, 0xFFF8F8F8);
+            p.rect(bx + Math.max(0, sx), b[1] + 30, Math.max(0, Math.min(4, bw - Math.max(0, sx))), 4, 0xFFF8F8F8);
         }
-        p.textRight(num, right, b[1] + 30, th.text, th.shadow);
+        p.textRight(num, right, b[1] + 25, th.text, th.shadow);
     }
 
     private void drawMessage(int[] b) {
@@ -1026,36 +1086,38 @@ final class Engine {
         int maxW = b[2] - 28;
         List<String> lines = wrap(msg, maxW);
         int shown = msgInstant ? Integer.MAX_VALUE : (int) ((t - msgStart) / 18);
-        int used = 0;
+        int used = 0, total = 0;
         for (int i = 0; i < Math.min(2, lines.size()); i++) {
             String line = lines.get(i);
+            total += line.length();
             int n = Math.max(0, Math.min(line.length(), shown - used));
             used += line.length();
             if (n > 0) p.text(line.substring(0, n), b[0] + 12, b[1] + 9 + i * 18, th.text, th.shadow);
         }
-        int total = 0;
-        for (int i = 0; i < Math.min(2, lines.size()); i++) total += lines.get(i).length();
-        if (shown >= total) blinkDown(b[0] + b[2] - 18, b[1] + b[3] - 13, th.cyber ? th.accent : th.accent);
+        if (shown >= total) {
+            int bob = (int) ((t / 400) % 2);
+            p.arrowDown(b[0] + b[2] - 18, b[1] + b[3] - 13 + bob, th.accent);
+        }
     }
 
     private void drawApps() {
+        th = Theme.CYBER;
+        scenery.drawCyber(p, vw, vh, t);
         List<AppEntry> l = list();
         int[] hd = headerBox();
         window(hd);
         p.arrowLeft(hd[0] + 10, hd[1] + 12, th.accent);
         p.text("もどる", hd[0] + 18, hd[1] + 8, th.text, th.shadow);
-        String title = pickSlot >= 0 ? "どれを いれる？" : th.cyber ? "チップフォルダ" : "バッグ";
+        String title = pickSlot >= 0 ? "どれを たてる？" : "チップフォルダ";
         p.textCenter(title, hd[0] + hd[2] / 2 + 8, hd[1] + 8, th.text, th.shadow);
-        p.textRight(String.valueOf(l.size()), hd[0] + hd[2] - 10, hd[1] + 8, th.dim, th.cyber ? 0 : th.shadow);
+        p.textRight(String.valueOf(l.size()), hd[0] + hd[2] - 10, hd[1] + 8, th.dim, 0);
         int tw = (hd[2] - 16) / TABS.length;
         for (int i = 0; i < TABS.length; i++) {
             int tx = hd[0] + 8 + i * tw;
-            if (i == tab) {
-                if (th.cyber) p.chamfer(tx + 1, hd[1] + 26, tw - 2, 17, 3, th.tabSel);
-                else p.round(tx + 1, hd[1] + 26, tw - 2, 17, th.tabSel);
-            }
-            p.textCenter(TABS[i], tx + tw / 2, hd[1] + 27, i == tab ? th.tabSelText : th.dim, i == tab || th.cyber ? 0 : th.shadow);
+            if (i == tab) p.chamfer(tx + 1, hd[1] + 26, tw - 2, 17, 3, th.tabSel);
+            p.textCenter(TABS[i], tx + tw / 2, hd[1] + 27, i == tab ? th.tabSelText : th.dim, 0);
         }
+        drawPreview(l);
 
         int[] lb = listBox();
         window(lb);
@@ -1064,7 +1126,7 @@ final class Engine {
         if (host.appsLoading() && all.isEmpty()) {
             p.textCenter("よみこみちゅう…", vw / 2, top + ih / 2 - 8, th.dim, 0);
         } else if (l.isEmpty()) {
-            p.textCenter(tab == 0 ? "アプリが みつからない…" : "まだ なにも ない…", vw / 2, top + ih / 2 - 8, th.dim, 0);
+            p.textCenter(tab == 0 ? "チップが みつからない…" : "まだ なにも ない…", vw / 2, top + ih / 2 - 8, th.dim, 0);
         } else {
             p.c.save();
             p.c.clipRect(left, top, right, top + ih);
@@ -1074,93 +1136,87 @@ final class Engine {
                 AppEntry a = l.get(i);
                 int y = top + i * ROW - Math.round(scroll);
                 boolean sel = i == listCursor;
-                int textColor = th.text, shadow = th.shadow;
+                int textColor = sel ? th.rowSelText : th.text, shadow = sel ? 0 : th.shadow;
                 if (sel) {
-                    if (th.cyber) {
-                        p.rect(left, y, right - left, ROW, th.rowSel);
-                        textColor = th.rowSelText;
-                        shadow = 0;
-                    } else {
-                        p.rect(left + 1, y + 1, right - left - 2, ROW - 2, th.rowSel);
-                    }
-                    p.arrowRight(left + 3, y + 7, th.cyber ? th.rowSelText : th.cursor);
+                    p.rect(left, y, right - left, ROW, th.rowSel);
+                    p.arrowRight(left + 3, y + 7, th.rowSelText);
                 }
                 p.image(a.icon16, left + 12, y + 2, 16, 16);
-                int n = count(a);
-                String tail;
-                int tailW;
-                if (th.cyber) {
-                    tail = a.code;
-                    tailW = 16;
-                } else {
-                    tail = (slotOf(a) >= 0 ? "★" : "") + (n > 0 ? "×" + n : "");
-                    tailW = p.width(tail);
-                }
-                p.text(p.fit(a.label, right - left - 40 - tailW - 6), left + 32, y + 2, textColor, shadow);
-                if (th.cyber) {
-                    p.rect(right - 19, y + 2, 17, 16, th.chip);
-                    p.textCenter(tail, right - 10, y + 2, th.chipText, 0);
-                    if (slotOf(a) >= 0) p.rect(right - 22, y + 8, 2, 4, sel ? th.rowSelText : th.accent);
-                } else if (!tail.isEmpty()) {
-                    p.textRight(tail, right - 4, y + 2, textColor, shadow);
-                }
+                p.text(p.fit(a.label, right - left - 40 - 24), left + 32, y + 2, textColor, shadow);
+                p.rect(right - 19, y + 2, 17, 16, th.chip);
+                p.textCenter(a.code, right - 10, y + 2, th.chipText, 0);
+                if (slotOf(a) >= 0) p.rect(right - 23, y + 8, 2, 4, sel ? th.rowSelText : th.accent);
             }
             p.c.restore();
-            // スクロールバー
             int max = maxScroll();
-            int sx = lb[0] + lb[2] - 12, sy = top, sh = ih;
-            p.rect(sx, sy, 4, sh, th.cyber ? 0xFF0A1C34 : 0xFFD8D8D0);
+            int sx = lb[0] + lb[2] - 12;
+            p.rect(sx, top, 4, ih, 0xFF0A1C34);
             if (max > 0) {
-                int thumb = Math.max(14, sh * ih / (l.size() * ROW));
-                int ty = sy + Math.round((sh - thumb) * (scroll / max));
-                p.rect(sx, ty, 4, thumb, th.accent);
+                int thumb = Math.max(14, ih * ih / (l.size() * ROW));
+                p.rect(sx, top + Math.round((ih - thumb) * (scroll / max)), 4, thumb, th.accent);
             }
-        }
-
-        int[] db = descBox();
-        window(db);
-        if (!l.isEmpty() && listCursor < l.size()) {
-            AppEntry a = l.get(listCursor);
-            int n = count(a);
-            p.text(p.fit(a.label, db[2] - 24), db[0] + 12, db[1] + 9, th.text, th.shadow);
-            String info;
-            if (pickSlot >= 0) info = "タップで てもちに いれる";
-            else if (th.cyber) info = "CODE " + a.code + "・Lv" + level(n) + "・" + n + "かい";
-            else info = n == 0 ? "まだ つかったことがない" : "Lv" + level(n) + "・" + n + "かい つかった";
-            p.text(p.fit(info, db[2] - 24), db[0] + 12, db[1] + 27, th.dim, th.cyber ? 0 : th.shadow);
-        } else {
-            p.text("ながおしで メニュー", db[0] + 12, db[1] + 9, th.dim, 0);
         }
     }
 
+    /** 選んでいるアプリを大きなチップのカードで見せる。 */
+    private void drawPreview(List<AppEntry> l) {
+        int[] b = previewBox();
+        window(b);
+        int cx = b[0] + 10, cy = b[1] + 9;
+        p.chamfer(cx, cy, 62, 74, 4, th.chip);
+        p.chamfer(cx + 2, cy + 2, 58, 70, 3, 0xFF183868);
+        p.rect(cx + 6, cy + 5, 50, 50, 0xFF061428);
+        if (l.isEmpty() || listCursor >= l.size()) {
+            p.text("ながおしで メニュー", cx + 72, cy + 2, th.dim, 0);
+            return;
+        }
+        AppEntry a = l.get(listCursor);
+        p.image(a.icon16, cx + 7, cy + 6, 48, 48);
+        p.rect(cx + 4, cy + 57, 16, 15, th.chip);
+        p.textCenter(a.code, cx + 12, cy + 56, th.chipText, 0);
+        int n = count(a);
+        int tx = cx + 72, w = b[0] + b[2] - 10 - tx;
+        p.text(p.fit(a.label, w), tx, cy + 1, th.text, th.shadow);
+        p.text("CODE " + a.code + "  Lv" + level(n), tx, cy + 19, th.chip, th.shadow);
+        p.text(n + "かい プラグイン", tx, cy + 37, th.dim, 0);
+        String hint = pickSlot >= 0 ? "タップで たてる" : slotOf(a) >= 0 ? "ホームに いえ あり" : "ながおしで メニュー";
+        p.text(p.fit(hint, w), tx, cy + 55, th.dim, 0);
+    }
+
     private void drawMenu(Menu m) {
+        th = Theme.CYBER;
         window(m.x, m.y, m.w, m.h);
+        p.rect(m.x + 6, m.y + 6, m.w - 12, 17, th.winFrame);
+        p.text(m.title, m.x + 12, m.y + 6, th.chip, th.shadow);
         for (int i = 0; i < m.labels.length; i++) {
-            int y = m.y + 7 + i * 18;
-            if (i == m.hover) {
-                if (th.cyber) p.rect(m.x + 4, y, m.w - 8, 18, th.rowSel);
-                p.arrowRight(m.x + 9, y + 5, th.cyber ? th.rowSelText : th.cursor);
+            int y = m.y + 27 + i * 18;
+            boolean sel = i == m.hover;
+            if (sel) {
+                p.rect(m.x + 4, y, m.w - 8, 18, th.rowSel);
+                p.arrowRight(m.x + 9, y + 5, th.rowSelText);
             }
-            boolean selCyber = th.cyber && i == m.hover;
-            p.text(m.labels[i], m.x + 18, y + 1, selCyber ? th.rowSelText : th.text, selCyber ? 0 : th.shadow);
+            p.text(m.labels[i], m.x + 18, y + 1, sel ? th.rowSelText : th.text, sel ? 0 : th.shadow);
         }
     }
 
     private void drawEffects() {
-        long fl = t - flashStart;
-        if (fl >= 0 && fl < 360) {
-            int a = (int) (255 * (1 - fl / 360f) * 0.85f);
-            int base = th.cyber ? 0x60E0FF : 0xFFFFFF;
-            p.rect(0, 0, vw, vh, (a << 24) | base);
-            if (th.cyber) {
-                for (int y = (int) (fl / 4) % 12; y < vh; y += 12) p.rect(0, y, vw, 2, 0xC0FFFFFF);
-            }
+        long pl = t - plugStart;
+        if (plugApp != null && pl >= 0 && pl < 700) {
+            th = Theme.CYBER;
+            int a = (int) (200 * Math.max(0, 1 - pl / 700f));
+            p.rect(0, 0, vw, vh, (a << 24) | 0x60E0FF);
+            for (int y = (int) (pl / 4) % 12; y < vh; y += 12) p.rect(0, y, vw, 2, 0x90FFFFFF);
+            int w = vw - 40, h = 52, x = 20, y = vh / 2 - h / 2;
+            window(x, y, w, h);
+            p.textCenter("プラグイン！", vw / 2, y + 9, th.chip, th.shadow);
+            p.textCenter(p.fit(plugApp.label, w - 120) + " トランスミッション！", vw / 2, y + 27, th.text, th.shadow);
         }
+        if (fade > 0) p.rect(0, 0, vw, vh, ((int) (255 * Math.min(1, fade)) << 24) | 0x000000);
         if (nextScreen >= 0) {
-            float k = (t - transStart) / 260f;
+            float k = (t - transStart) / 300f;
             float cover = k < 0.5f ? k * 2 : (1 - k) * 2;
             int sh = Math.round(8 * Math.max(0, Math.min(1, cover)));
-            int color = th.cyber ? 0xFF020814 : 0xFF101010;
+            int color = nextScreen == APPS || screen == APPS ? 0xFF48E0F8 : 0xFF101010;
             for (int y = 0; y < vh; y += 8) p.rect(0, y, vw, sh, color);
         }
     }

@@ -41,25 +41,24 @@ public final class Video {
         Typeface tf = Typeface.createFromFile(args[0]);
         File out = new File(args[1]);
         out.mkdirs();
-        long end = Long.parseLong(args.length > 2 ? args[2] : "27000");
+        long end = Long.parseLong(args.length > 2 ? args[2] : "35000");
 
         // ---- 台本 ----
-        tap(2200, 135, 300);                 // PRESS START
-        tap(5600, 135, 150);                 // YouTubeを起動
-        evs.add(new Ev(7000, 9, 0, 0));      // ホームに戻ってくる
-        swipe(9600, 135, 420, 135, 250, 180); // 上スワイプでバッグ
-        swipe(11000, 135, 380, 135, 160, 120); // 一覧をフリック
-        swipe(12600, 200, 300, 60, 300, 200); // 横スワイプでタブ切替
-        evs.add(new Ev(14000, 8, 0, 0));     // 戻る
-        hold(15000, 135, 95, 700);           // てもちを長押し
-        tap(16800, 60, 300);                 // 外をタップで閉じる
-        tap(17600, 200, 494);                // メニュー
-        tap(18600, 160, 104);                // テーマ切替 → CYBER
-        tap(20000, 40, 330);                 // 閉じる
-        tap(20800, 135, 95);                 // Chromeを起動
-        evs.add(new Ev(22200, 9, 0, 0));     // 戻る
-        swipe(23800, 135, 420, 135, 250, 180); // チップフォルダ
-        swipe(25200, 135, 380, 135, 200, 140);
+        tap(2200, 135, 300);                   // PRESS START
+        tap(4600, 87, 213);                    // 草むらの方へ歩く
+        tap(6800, 207, 130);                   // YouTubeのいえに入る
+        evs.add(new Ev(10200, 9, 0, 0));       // ホームに戻ってくる
+        evs.add(new Ev(12600, 7, 0, 0));       // 村人に話しかける
+        tap(16200, 207, 420);                  // あき地の立て札
+        tap(19800, 100, 251);                  // チップを選んでいえを建てる
+        swipe(22600, 135, 420, 135, 250, 180); // 上スワイプでチップフォルダ
+        swipe(24000, 135, 460, 135, 220, 120); // フリック
+        tap(25600, 100, 251);                  // プラグイン
+        evs.add(new Ev(27000, 9, 0, 0));       // 戻る
+        tap(28800, 236, 17);                   // MENU
+        tap(30600, 40, 300);                   // 閉じる
+        hold(31600, 63, 130, 700);             // いえを長押し
+        tap(33600, 40, 300);                   // 閉じる
 
         PreviewBridge b = new PreviewBridge(tf, "FIELD", VW, VH);
         Bitmap fb = Bitmap.createBitmap(VW, VH, Bitmap.Config.ARGB_8888);
@@ -73,7 +72,14 @@ public final class Video {
                 long et = e.t + 1000;
                 if (e.a == 8) b.back();
                 else if (e.a == 9) b.resume();
-                else {
+                else if (e.a == 7) {
+                    int[] n = b.npcCenter();
+                    b.touch(0, n[0], n[1], et);
+                    b.touch(2, n[0], n[1], et + 90);
+                    fingerX = n[0];
+                    fingerY = n[1];
+                    fingerUntil = t + 200;
+                } else {
                     b.touch(e.a, e.x, e.y, et);
                     fingerX = e.x;
                     fingerY = e.y;
