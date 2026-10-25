@@ -101,6 +101,7 @@ public final class PreviewBridge implements Host {
     @Override public void uninstall(AppEntry app) {}
     @Override public void openSettings() {}
     @Override public void openHomeSettings() {}
+    @Override public boolean openOtherHome() { return true; }
     @Override public void openClock() {}
     @Override public boolean expandNotifications() { return true; }
     @Override public String getString(String k, String d) { Object v = prefs.get(k); return v == null ? d : (String) v; }

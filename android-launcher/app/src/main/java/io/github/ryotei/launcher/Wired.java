@@ -4,7 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
+import java.util.function.ToIntFunction;
 
 /**
  * もうひとつの世界「WIRED」。藍色の暗がりの真ん中に古いCRTモニターがあり、そのまわりを
@@ -336,5 +338,124 @@ final class Wired {
         frame(p, bx, by, bw, 8, LINE);
         p.rect(bx + 2, by + 2, Math.round((bw - 4) * progress), 4, progress < 1 ? PURPLE : CYAN);
         glitch(p, w, h, t, progress * 0.6f);
+    }
+
+    // ================================================================ ディレクトリ：モニターの壁と周波数ダイヤル
+
+    /** ダイヤルのチャンネル。0は全部、最後は頭文字が英字・かな以外のもの。 */
+    static final String[] CHANNELS = {"ALL", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
+            "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "あ", "か", "さ", "た", "な", "は", "ま", "や", "ら", "わ", "#"};
+    private static final String[] KANA_ROWS = {"ぁあぃいぅうぇえぉおゔ", "かがきぎくぐけげこごゕゖ", "さざしじすずせぜそぞ",
+            "ただちぢっつづてでとど", "なにぬねの", "はばぱひびぴふぶぷへべぺほぼぽ", "まみむめも", "ゃやゅゆょよ", "らりるれろ", "ゎわゐゑをん"};
+    static final int WALL_COLS = 3, CELL_H = 98, DIAL_STEP = 26;
+
+    static int channelOf(AppEntry a) {
+        String c = a.code;
+        char ch = c.isEmpty() ? '*' : c.charAt(0);
+        if (ch >= 'A' && ch <= 'Z') return 1 + (ch - 'A');
+        for (int i = 0; i < KANA_ROWS.length; i++) if (KANA_ROWS[i].indexOf(ch) >= 0) return 27 + i;
+        return CHANNELS.length - 1;
+    }
+
+    /** チャンネル番号を周波数っぽく見せる。 */
+    static String frequency(int ch) {
+        int f = 760 + ch * 5;
+        return (f / 10) + "." + (f % 10) + "MHz";
+    }
+
+    /** 古いモニターが3列に積まれた壁。画面の中央に近いほど映りがはっきりする。 */
+    void drawWall(Pix p, int x, int y, int w, int h, List<AppEntry> l, float scroll, int cursor, long t, long tuneStart,
+                  ToIntFunction<AppEntry> count) {
+        int cellW = w / WALL_COLS;
+        int first = Math.max(0, (int) (scroll / CELL_H) * WALL_COLS);
+        int last = Math.min(l.size() - 1, (int) ((scroll + h) / CELL_H + 1) * WALL_COLS + WALL_COLS - 1);
+        p.c.save();
+        p.c.clipRect(x, y, x + w, y + h);
+        for (int i = first; i <= last; i++) {
+            int col = i % WALL_COLS, row = i / WALL_COLS;
+            int mx = x + col * cellW + (cellW - 78) / 2, my = y + row * CELL_H - Math.round(scroll) + 6;
+            float centre = Math.abs(my + 34 - (y + h / 2f)) / (h / 2f);
+            float fuzz = Math.min(0.9f, Math.max(0, centre - 0.25f));
+            long tune = t - tuneStart;
+            if (tune < 420) fuzz = Math.max(fuzz, 1f - tune / 420f + (i % 5) * 0.05f);
+            if (i == cursor) fuzz = 0;
+            wallMonitor(p, mx, my, l.get(i), i == cursor, fuzz, t + i * 131L, count.applyAsInt(l.get(i)));
+        }
+        p.c.restore();
+    }
+
+    /** 壁のモニターの位置（タップ判定とズーム演出用）。 */
+    static int[] wallRect(int x, int y, int w, int index, float scroll) {
+        int cellW = w / WALL_COLS;
+        int col = index % WALL_COLS, row = index / WALL_COLS;
+        return new int[]{x + col * cellW + (cellW - 78) / 2, y + row * CELL_H - Math.round(scroll) + 6, 78, 68};
+    }
+
+    private void wallMonitor(Pix p, int x, int y, AppEntry a, boolean sel, float fuzz, long t, int count) {
+        p.rect(x - 1, y - 1, 80, 70, 0xFF050410);
+        p.rect(x, y, 78, 68, sel ? 0xFF2A2840 : 0xFF181626);
+        p.rect(x, y, 78, 1, 0xFF3A3850);
+        int sx = x + 6, sy = y + 5, sw = 66, sh = 44;
+        p.rect(sx, sy, sw, sh, 0xFF082E36);
+        p.image(mono(a), sx + sw / 2 - 16, sy + sh / 2 - 16, 32, 32);
+        for (int yy = sy; yy < sy + sh; yy += 2) p.rect(sx, yy, sw, 1, 0x38000000);
+        if (fuzz > 0) {
+            Random r = new Random(t / 70);
+            int n = (int) (sw * sh / 3 * fuzz);
+            for (int i = 0; i < n; i++) {
+                int g = 30 + r.nextInt(170);
+                p.rect(sx + r.nextInt(sw - 1), sy + r.nextInt(sh), 2, 1, 0xFF000000 | (g / 4 << 16) | (g << 8) | (g * 9 / 10));
+            }
+        }
+        p.rect(sx, sy + (int) ((t / 40) % sh), sw, 1, 0x407CF4E8);
+        String id = nodeId(a, count);
+        p.text(id, x + 6, y + 50, sel ? CYAN : 0xFF4A4868, 0);
+        p.rect(x + 70, y + 56, 3, 2, sel || (t / 500) % 2 == 0 ? CYAN : 0xFF2A4A50);
+        String name = p.fit(a.label, 84);
+        p.textCenter(name, x + 39, y + 71, sel ? TEXT : SUB, 0);
+        if (sel) brackets(p, x + 39, y + 34, 40, t);
+    }
+
+    /** ラジオのような周波数ダイヤル。pos は中央に来ているチャンネル（小数で途中も表す）。 */
+    void drawDial(Pix p, int x, int y, int w, int h, float pos, int[] counts, int total, long t) {
+        p.rect(x, y, w, h, 0xE007061A);
+        frame(p, x, y, w, h, LINE);
+        int cx = x + w / 2;
+        p.c.save();
+        p.c.clipRect(x + 2, y + 2, x + w - 2, y + h - 2);
+        for (int i = 0; i < CHANNELS.length; i++) {
+            float off = (i - pos) * DIAL_STEP;
+            int lx = cx + Math.round(off);
+            if (lx < x - 20 || lx > x + w + 20) continue;
+            float near = 1 - Math.min(1, Math.abs(off) / (w / 2f));
+            boolean empty = i > 0 && counts[i] == 0;
+            int a = empty ? 50 : (int) (70 + 185 * near);
+            int color = Math.abs(off) < DIAL_STEP / 2f ? CYAN : (a << 24) | (empty ? 0x3A2C70 : 0xE8F8F8);
+            p.rect(lx, y + 6, 1, Math.abs(off) < DIAL_STEP / 2f ? 8 : 5, (a << 24) | 0x7CF4E8);
+            p.rect(lx + DIAL_STEP / 2, y + 6, 1, 3, 0x407CF4E8);
+            String s = CHANNELS[i];
+            p.text(s, lx - p.width(s) / 2, y + 16, color, 0);
+        }
+        p.c.restore();
+        p.arrowDown(cx - 3, y + 2, CYAN);
+        int ch = Math.max(0, Math.min(CHANNELS.length - 1, Math.round(pos)));
+        String info = "CH" + (ch < 10 ? "0" : "") + ch + "  " + frequency(ch);
+        p.text(info, x + 8, y + 40, SUB, 0);
+        String n = (ch == 0 ? total : counts[ch]) + " nodes";
+        p.text(n, x + w - 8 - p.width(n), y + 40, ch > 0 && counts[ch] == 0 ? RED : CYAN, 0);
+    }
+
+    /** モニターに吸い込まれていく演出。k は 0〜1。 */
+    void zoom(Pix p, int vw, int vh, int[] from, AppEntry a, float k, long t) {
+        float e = k * k;
+        int x = Math.round(from[0] + (0 - from[0]) * e), y = Math.round(from[1] + (0 - from[1]) * e);
+        int w = Math.round(from[2] + (vw - from[2]) * e), h = Math.round(from[3] + (vh - from[3]) * e);
+        p.rect(x, y, w, h, 0xFF082E36);
+        int size = Math.max(32, Math.min(w, h) / 2);
+        p.image(mono(a), x + w / 2 - size / 2, y + h / 2 - size / 2, size, size);
+        for (int yy = y; yy < y + h; yy += 3) p.rect(x, yy, w, 1, 0x40000000);
+        frame(p, x, y, w, h, CYAN);
+        if (k > 0.5f) noise(p, vw, vh, t, (k - 0.5f) * 2);
+        glitch(p, vw, vh, t, k);
     }
 }

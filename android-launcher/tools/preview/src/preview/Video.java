@@ -62,20 +62,19 @@ public final class Video {
 
     static void wiredScript() {
         tap(4300, 135, 300);                   // 起動ログのあとタップ
-        tapNode(6000, 1);                      // YouTubeのノードを選ぶ
-        tapNode(7400, 1);                      // もう一度で接続
-        evs.add(new Ev(9400, 9, 0, 0));        // 戻ってくる
-        // しばらく触らずにいると声がする
-        tapNode(20000, 5);                     // からっぽのノード
-        tapNode(21300, 5);                     // もう一度でディレクトリから選ぶ
-        tap(23000, 100, 251);                  // LINEをつなぐ
-        tapNode(25000, 10);                    // ROOT
-        tapNode(26300, 10);                    // ディレクトリへ
-        swipe(27900, 135, 460, 135, 220, 120); // フリック
-        tap(29400, 100, 251);                  // 接続
-        evs.add(new Ev(30800, 9, 0, 0));       // 戻る
-        tap(32400, 185, 34);                   // [MENU]
-        tap(34400, 40, 450);                   // 閉じる
+        tapNode(6000, 10);                     // モニター（ROOT）を選ぶ
+        tapNode(7200, 10);                     // もう一度でディレクトリ
+        swipe(9200, 135, 400, 135, 250, 600);  // モニターの壁をゆっくり送る
+        swipe(11200, 135, 250, 135, 420, 500); // 戻す
+        tap(13200, 213, 520);                  // ダイヤルのCをタップ
+        swipe(15000, 220, 520, 116, 520, 700); // ダイヤルを回して G へ
+        swipe(17400, 200, 250, 60, 250, 200);  // 壁を横にはらって次のチャンネル（H：信号なし）
+        swipe(19400, 60, 520, 241, 520, 900);  // ダイヤルを大きく戻す
+        tap(22200, 135, 520);                  // いまのチャンネルで止める
+        tap(23600, 135, 100);                  // モニターをタップしてズームして接続
+        evs.add(new Ev(25200, 9, 0, 0));       // 戻ってくる
+        tap(26800, 185, 34);                   // [MENU]
+        tap(29200, 40, 470);                   // 閉じる
     }
 
     public static void main(String[] args) throws Exception {
@@ -83,7 +82,7 @@ public final class Video {
         File out = new File(args[1]);
         out.mkdirs();
         String endArg = args.length > 2 ? args[2] : "";
-        long end = !endArg.isEmpty() ? Long.parseLong(endArg) : "WIRED".equals(args.length > 3 ? args[3] : "") ? 36000 : 30000;
+        long end = !endArg.isEmpty() ? Long.parseLong(endArg) : "WIRED".equals(args.length > 3 ? args[3] : "") ? 30500 : 30000;
 
         String world = args.length > 3 ? args[3] : "GBA";
         if ("WIRED".equals(world)) wiredScript();

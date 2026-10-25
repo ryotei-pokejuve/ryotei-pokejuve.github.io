@@ -126,6 +126,24 @@ final class AndroidHost implements Host {
     }
 
     @Override
+    public boolean openOtherHome() {
+        PackageManager pm = activity.getPackageManager();
+        Intent home = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME);
+        ResolveInfo pick = null;
+        for (ResolveInfo ri : pm.queryIntentActivities(home, 0)) {
+            if (ri.activityInfo == null || activity.getPackageName().equals(ri.activityInfo.packageName)) continue;
+            // 設定アプリの「ホーム選択の待ち画面」などは除き、システムのホームを優先する
+            if ("com.android.settings".equals(ri.activityInfo.packageName)) continue;
+            boolean system = (ri.activityInfo.applicationInfo.flags & android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0;
+            if (pick == null || system) pick = ri;
+            if (system) break;
+        }
+        if (pick == null) return false;
+        return start(new Intent(home).setComponent(new ComponentName(pick.activityInfo.packageName, pick.activityInfo.name))
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+    }
+
+    @Override
     public void openClock() {
         start(new Intent(AlarmClock.ACTION_SHOW_ALARMS));
     }

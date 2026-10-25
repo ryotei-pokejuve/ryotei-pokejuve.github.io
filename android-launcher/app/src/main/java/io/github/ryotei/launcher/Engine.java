@@ -21,7 +21,7 @@ final class Engine {
     static final int SLOTS = 10;
 
     private static final int M_APPS = 1, M_SOUND = 3, M_OP = 4, M_HOMESET = 5, M_SETTINGS = 6, M_SAVE = 7,
-            M_CLOSE = 8, M_WORLD = 9, C_OPEN = 20, C_SWAP = 21, C_REMOVE = 22, C_INFO = 23, C_ADD = 24, C_UNINSTALL = 25,
+            M_CLOSE = 8, M_WORLD = 9, M_OTHER_HOME = 10, C_OPEN = 20, C_SWAP = 21, C_REMOVE = 22, C_INFO = 23, C_ADD = 24, C_UNINSTALL = 25,
             C_CANCEL = 26;
     private static final String[] TABS = {"すべて", "よくつかう", "さいきん"};
     private static final String[] WIRED_TABS = {"all", "freq", "recent"};
@@ -70,6 +70,14 @@ final class Engine {
     private float scroll, scrollVel;
     private int listCursor = 0;
     private int pickSlot = -1;
+    // WIREDのディレクトリ：周波数ダイヤル
+    private int channel;
+    private float dialPos;
+    private boolean dialDrag;
+    private long tuneStart = -10000;
+    private List<AppEntry> filtered = Collections.emptyList();
+    private String filteredKey = "";
+    private int[] zoomFrom;
 
     // メニュー
     private static final class Menu {
@@ -336,7 +344,36 @@ final class Engine {
     }
 
     private List<AppEntry> list() {
-        return tab == 1 ? frequent : tab == 2 ? recent : all;
+        List<AppEntry> base = tab == 1 ? frequent : tab == 2 ? recent : all;
+        if (!wired || channel == 0) return base;
+        String key = tab + ":" + channel + ":" + seenVersion + ":" + System.identityHashCode(base);
+        if (!key.equals(filteredKey)) {
+            ArrayList<AppEntry> f = new ArrayList<>();
+            for (AppEntry a : base) if (Wired.channelOf(a) == channel) f.add(a);
+            filtered = f;
+            filteredKey = key;
+        }
+        return filtered;
+    }
+
+    /** チャンネルごとのアプリ数（ダイヤルで空のチャンネルを暗くするため）。 */
+    private int[] channelCounts() {
+        List<AppEntry> base = tab == 1 ? frequent : tab == 2 ? recent : all;
+        int[] c = new int[Wired.CHANNELS.length];
+        for (AppEntry a : base) c[Wired.channelOf(a)]++;
+        return c;
+    }
+
+    private void setChannel(int ch) {
+        ch = Math.max(0, Math.min(Wired.CHANNELS.length - 1, ch));
+        dialPos = ch;
+        if (ch == channel) return;
+        channel = ch;
+        tuneStart = t;
+        scroll = 0;
+        scrollVel = 0;
+        listCursor = 0;
+        host.sfx(Host.SFX_CURSOR);
     }
 
     private int count(AppEntry a) {
@@ -481,6 +518,9 @@ final class Engine {
 
     /** チップフォルダからの起動。電脳風の演出をはさむ。 */
     private void plugIn(AppEntry a) {
+        int idx = list().indexOf(a);
+        int[] wb = wallBox();
+        zoomFrom = idx >= 0 ? Wired.wallRect(wb[0], wb[1], wb[2], idx, scroll) : new int[]{vw / 2 - 39, vh / 2 - 34, 78, 68};
         host.sfx(Host.SFX_LAUNCH);
         plugApp = a;
         plugStart = t;
@@ -551,7 +591,9 @@ final class Engine {
                         dragging = true;
                         axis = Math.abs(x - downX) > Math.abs(y - downY) ? 2 : 1;
                     }
-                    if (scrollbarDrag) {
+                    if (dialDrag) {
+                        dialPos = Math.max(0, Math.min(Wired.CHANNELS.length - 1, dialPos - (x - lastX) / (float) Wired.DIAL_STEP));
+                    } else if (scrollbarDrag) {
                         scrollToBar(y);
                     } else if (dragging && screen == HOME && wired && axis == 2) {
                         net.spin(x - lastX);
@@ -575,6 +617,12 @@ final class Engine {
                     else closeMenu();
                     return;
                 }
+                if (dialDrag) {
+                    dialDrag = false;
+                    int[] d = dialBox();
+                    setChannel(dragging ? Math.round(dialPos) : Math.round(dialPos + (x - (d[0] + d[2] / 2)) / (float) Wired.DIAL_STEP));
+                    return;
+                }
                 if (scrollbarDrag) {
                     scrollbarDrag = false;
                     return;
@@ -588,6 +636,7 @@ final class Engine {
             default:
                 down = false;
                 scrollbarDrag = false;
+                dialDrag = false;
         }
     }
 
@@ -596,9 +645,13 @@ final class Engine {
             menu.hover = menuHit(menu, x, y);
             return;
         }
+        if (screen == APPS && wired && inside(x, y, dialBox())) {
+            dialDrag = true;
+            return;
+        }
         if (screen == APPS) {
             int[] l = listBox();
-            if (x >= l[0] + l[2] - 16 && y >= l[1] && y < l[1] + l[3] && maxScroll() > 0) {
+            if (!wired && x >= l[0] + l[2] - 16 && y >= l[1] && y < l[1] + l[3] && maxScroll() > 0) {
                 scrollbarDrag = true;
                 scrollToBar(y);
                 return;
@@ -617,6 +670,8 @@ final class Engine {
             else host.expandNotifications();
         } else if (screen == APPS && axis == 1) {
             scrollVel = time - lastT > 80 ? 0 : -vel;
+        } else if (screen == APPS && wired && axis == 2 && Math.abs(dx) > 40) {
+            setChannel(channel + (dx < 0 ? 1 : -1));
         } else if (screen == APPS && axis == 2 && Math.abs(dx) > 40) {
             setTab((tab + (dx < 0 ? 1 : TABS.length - 1)) % TABS.length);
         }
@@ -760,9 +815,9 @@ final class Engine {
 
     private void openMenu() {
         String[] labels = {w("チップフォルダ", "ディレクトリ"), "せかい：" + (wired ? "WIRED" : "GBA"), "サウンド：" + (host.getInt("sound", 1) == 1 ? "ON" : "OFF"),
-                "オープニング：" + (host.getInt("opening", 1) == 1 ? "ON" : "OFF"), "ホームアプリ", "たんまつせってい",
+                "オープニング：" + (host.getInt("opening", 1) == 1 ? "ON" : "OFF"), "いつもの ホームへ", "ホームアプリ", "たんまつせってい",
                 "レポート", "とじる"};
-        int[] ids = {M_APPS, M_WORLD, M_SOUND, M_OP, M_HOMESET, M_SETTINGS, M_SAVE, M_CLOSE};
+        int[] ids = {M_APPS, M_WORLD, M_SOUND, M_OP, M_OTHER_HOME, M_HOMESET, M_SETTINGS, M_SAVE, M_CLOSE};
         Menu m = new Menu();
         m.title = w("MENU", "> menu");
         m.labels = labels;
@@ -830,6 +885,11 @@ final class Engine {
                 host.putInt("opening", host.getInt("opening", 1) == 1 ? 0 : 1);
                 host.sfx(Host.SFX_OK);
                 openMenu();
+                return;
+            case M_OTHER_HOME:
+                menu = null;
+                host.sfx(Host.SFX_OK);
+                if (!host.openOtherHome()) say(w("ほかの ホームアプリが みつからない…", "> ほかの ホームが みつからない。"), false);
                 return;
             case M_HOMESET:
                 menu = null;
@@ -920,6 +980,15 @@ final class Engine {
         return new int[]{6, top, vw - 12, vh - 6 - top};
     }
 
+    private int[] wallBox() {
+        int top = 60;
+        return new int[]{6, top, vw - 12, dialBox()[1] - 6 - top};
+    }
+
+    private int[] dialBox() {
+        return new int[]{6, vh - 6 - 62, vw - 12, 62};
+    }
+
     private int listInnerTop() {
         return listBox()[1] + 7;
     }
@@ -929,10 +998,27 @@ final class Engine {
     }
 
     private int maxScroll() {
+        if (wired) {
+            int rows = (list().size() + Wired.WALL_COLS - 1) / Wired.WALL_COLS;
+            return Math.max(0, rows * Wired.CELL_H + 8 - wallBox()[3]);
+        }
         return Math.max(0, list().size() * ROW - listInnerH());
     }
 
     private int rowHit(int x, int y) {
+        if (wired) {
+            int[] wb = wallBox();
+            if (!inside(x, y, wb)) return -1;
+            int n = list().size();
+            int row = (int) ((y - wb[1] + scroll) / Wired.CELL_H);
+            for (int c = 0; c < Wired.WALL_COLS; c++) {
+                int i = row * Wired.WALL_COLS + c;
+                if (i >= n) break;
+                int[] m = Wired.wallRect(wb[0], wb[1], wb[2], i, scroll);
+                if (x >= m[0] - 4 && x < m[0] + m[2] + 4) return i;
+            }
+            return -1;
+        }
         int[] l = listBox();
         if (x < l[0] || x >= l[0] + l[2] - 16 || y < listInnerTop() || y >= listInnerTop() + listInnerH()) return -1;
         int r = (int) ((y - listInnerTop() + scroll) / ROW);
@@ -1235,7 +1321,56 @@ final class Engine {
         p.text(p.fit(hint, w), tx, cy + 55, th.dim, 0);
     }
 
+    private void drawWiredApps() {
+        th = Theme.WIRED;
+        net.background(p, vw, vh, t);
+        List<AppEntry> l = list();
+        int[] hd = headerBox();
+        window(hd);
+        p.arrowLeft(hd[0] + 10, hd[1] + 12, th.accent);
+        p.text("もどる", hd[0] + 18, hd[1] + 8, th.text, 0);
+        String title = pickSlot >= 0 ? "> select node" : "/wired/" + (channel == 0 ? "root" : "ch" + (channel < 10 ? "0" : "") + channel);
+        p.textCenter(title, hd[0] + hd[2] / 2 + 12, hd[1] + 8, th.text, 0);
+        p.textRight(String.valueOf(l.size()), hd[0] + hd[2] - 10, hd[1] + 8, th.dim, 0);
+        int tw = (hd[2] - 16) / WIRED_TABS.length;
+        for (int i = 0; i < WIRED_TABS.length; i++) {
+            int tx = hd[0] + 8 + i * tw;
+            if (i == tab) p.rect(tx + 1, hd[1] + 26, tw - 2, 17, th.tabSel);
+            p.textCenter(WIRED_TABS[i], tx + tw / 2, hd[1] + 27, i == tab ? th.tabSelText : th.dim, 0);
+        }
+        int[] wb = wallBox();
+        if (host.appsLoading() && all.isEmpty()) {
+            Wired.ghost(p, "> loading...", wb[0] + 20, wb[1] + wb[3] / 2, th.dim);
+        } else if (l.isEmpty()) {
+            Wired.noise(p, vw, vh, t, 0.08f);
+            String ns = "- no signal -";
+            Wired.ghost(p, ns, vw / 2 - p.width(ns) / 2, wb[1] + wb[3] / 2 - 8, Wired.RED);
+        } else {
+            net.drawWall(p, wb[0], wb[1], wb[2], wb[3], l, scroll, listCursor, t, tuneStart, this::count);
+            int max = maxScroll();
+            if (max > 0) {
+                int sx = wb[0] + wb[2] - 3, thumb = Math.max(14, wb[3] * wb[3] / (wb[3] + max));
+                p.rect(sx, wb[1], 2, wb[3], 0xFF0A1020);
+                p.rect(sx, wb[1] + Math.round((wb[3] - thumb) * (scroll / max)), 2, thumb, th.accent);
+            }
+        }
+        if (dialDrag) {
+            float settle = dialPos;
+            int[] d = dialBox();
+            net.drawDial(p, d[0], d[1], d[2], d[3], settle, channelCounts(), list().size(), t);
+        } else {
+            dialPos += (channel - dialPos) * 0.35f;
+            int[] d = dialBox();
+            net.drawDial(p, d[0], d[1], d[2], d[3], dialPos, channelCounts(), (tab == 1 ? frequent : tab == 2 ? recent : all).size(), t);
+        }
+        Wired.glitch(p, vw, vh, t, 0);
+    }
+
     private void drawApps() {
+        if (wired) {
+            drawWiredApps();
+            return;
+        }
         th = wired ? Theme.WIRED : Theme.CYBER;
         if (wired) net.background(p, vw, vh, t);
         else scenery.drawCyber(p, vw, vh, t);
@@ -1358,8 +1493,7 @@ final class Engine {
     private void drawEffects() {
         long pl = t - plugStart;
         if (wired && plugApp != null && pl >= 0 && pl < 700 && screen == APPS) {
-            net.connecting(p, vw, vh, t, Wired.nodeId(plugApp, count(plugApp)), plugApp.label, Math.min(1f, pl / 500f));
-            if (pl > 450) Wired.noise(p, vw, vh, t, (pl - 450) / 250f);
+            net.zoom(p, vw, vh, zoomFrom, plugApp, Math.min(1f, pl / 520f), t);
         } else if (plugApp != null && pl >= 0 && pl < 700) {
             th = Theme.CYBER;
             int a = (int) (200 * Math.max(0, 1 - pl / 700f));

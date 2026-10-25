@@ -33,6 +33,9 @@ interface Host {
 
     void openHomeSettings();
 
+    /** 標準のホームは変えずに、端末にもとからあるホームアプリをその場で開く。見つからなければfalse。 */
+    boolean openOtherHome();
+
     void openClock();
 
     boolean expandNotifications();
