@@ -1495,7 +1495,7 @@ final class Engine {
         String line1, line2;
         if (query.isEmpty()) {
             line1 = "なにを さがすの？";
-            line2 = "なまえを うって";
+            line2 = "ここを おすと うてる";
         } else if (l.isEmpty()) {
             line1 = "…ない。";
             line2 = "べつの ことばで";

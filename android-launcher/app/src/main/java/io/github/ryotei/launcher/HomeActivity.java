@@ -114,16 +114,17 @@ public final class HomeActivity extends Activity {
     private void showKeyboard(boolean show) {
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         if (show) {
+            // 一度閉じたキーボードは控えめな呼び方だと出てこないので、入力欄をつなぎ直してから強めに出す
+            input.clearFocus();
             input.requestFocus();
-            // タップの処理中に呼ぶと無視されることがあるので、入力欄がつながるのを少し待ってから出す
+            input.setSelection(input.length());
+            imm.restartInput(input);
             input.postDelayed(() -> {
                 input.requestFocus();
                 if (android.os.Build.VERSION.SDK_INT >= 30 && input.getWindowInsetsController() != null) {
                     input.getWindowInsetsController().show(android.view.WindowInsets.Type.ime());
                 }
-                if (!imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)) {
-                    imm.showSoftInput(input, InputMethodManager.SHOW_FORCED);
-                }
+                imm.showSoftInput(input, InputMethodManager.SHOW_FORCED);
             }, 120);
         } else {
             imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
