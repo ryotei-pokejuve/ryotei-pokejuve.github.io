@@ -75,8 +75,8 @@ public final class Video {
         type(13400, "カメラ");
         tap(15200, 49, 205);                  // 見つかったモニターをタップ
         evs.add(new Ev(16800, 9, 0, 0));       // 戻ってくる
-        tapNode(18600, 10);                    // 回る軌道の中のリテ
-        tap(19800, 185, 34);                   // [MENU]
+        tap(20400, 240, 80);                   // ▶ で LAYER 02 へ
+        tap(22600, 240, 80);                   // LAYER 03 へ
     }
 
     public static void main(String[] args) throws Exception {
@@ -85,7 +85,7 @@ public final class Video {
         File out = new File(args[1]);
         out.mkdirs();
         String endArg = args.length > 2 ? args[2] : "";
-        long end = !endArg.isEmpty() ? Long.parseLong(endArg) : "WIRED".equals(args.length > 3 ? args[3] : "") ? 21500 : 30000;
+        long end = !endArg.isEmpty() ? Long.parseLong(endArg) : "WIRED".equals(args.length > 3 ? args[3] : "") ? 25000 : 30000;
 
         String world = args.length > 3 ? args[3] : "GBA";
         if ("WIRED".equals(world)) wiredScript();

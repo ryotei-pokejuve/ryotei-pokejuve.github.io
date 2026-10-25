@@ -18,8 +18,10 @@ final class Wired {
     static final int CYAN = 0xFF7CF4E8, BLUE = 0xFF5A64E0, PURPLE = 0xFF9C7CF0, TEXT = 0xFFE8F8F8, SUB = 0xFF7A86B0,
             LINE = 0xFF3A2C70, VOID = 0xFF07061A, RED = 0xFFFF4868;
     private static final long TURN_MS = 90000;
-    private static final double[] TILT = {Math.toRadians(-24), Math.toRadians(22)};
-    static final int PILL_W = 58, PILL_H = 18, MON_W = 100, MON_H = 76;
+    private final double[] tilt = {Math.toRadians(-24), Math.toRadians(22)};
+    /** レイヤーごとのタイトルの言葉。 */
+    static final String[] LAYER_WORDS = {"CONNECT", "SIGNAL", "MEMORY", "DREAM", "ORIGIN"};
+    static final int PILL_W = 74, PILL_H = 18, MON_W = 100, MON_H = 76;
 
     private Bitmap bg;
     private int bgW, bgH;
@@ -35,6 +37,13 @@ final class Wired {
         cy = y + h / 2;
         rx = Math.max(60, w / 2 - PILL_W / 2 + 4);
         ry = Math.max(30, Math.min(h / 2 - PILL_H, rx * 85 / 100));
+    }
+
+    /** レイヤーが変わると、ワイヤー（軌道）の傾きも変わる。 */
+    void setLayer(int layer) {
+        tilt[0] = Math.toRadians(-24 + layer * 9);
+        tilt[1] = Math.toRadians(22 - layer * 7);
+        spin = layer * 0.7;
     }
 
     /** 横にドラッグして軌道を回す。 */
@@ -57,13 +66,13 @@ final class Wired {
 
     int nodeX(int i, long t) {
         if (i == ROOT) return cx;
-        double a = angle(i, t), ex = Math.cos(a) * rx, ey = Math.sin(a) * ry, tl = TILT[i % 2];
+        double a = angle(i, t), ex = Math.cos(a) * rx, ey = Math.sin(a) * ry, tl = tilt[i % 2];
         return cx + (int) Math.round(ex * Math.cos(tl) - ey * Math.sin(tl));
     }
 
     int nodeY(int i, long t) {
         if (i == ROOT) return cy;
-        double a = angle(i, t), ex = Math.cos(a) * rx, ey = Math.sin(a) * ry, tl = TILT[i % 2];
+        double a = angle(i, t), ex = Math.cos(a) * rx, ey = Math.sin(a) * ry, tl = tilt[i % 2];
         return cy + (int) Math.round(ex * Math.sin(tl) + ey * Math.cos(tl));
     }
 
@@ -150,7 +159,7 @@ final class Wired {
     void drawOrbits(Pix p, long t, AppEntry[] apps, int[] counts, int cursor, int connecting) {
         // 軌道の線
         for (int o = 0; o < 2; o++) {
-            double tl = TILT[o];
+            double tl = tilt[o];
             for (int s = 0; s < 360; s += 2) {
                 double a = Math.toRadians(s), ex = Math.cos(a) * rx, ey = Math.sin(a) * ry;
                 int x = cx + (int) Math.round(ex * Math.cos(tl) - ey * Math.sin(tl));
@@ -183,8 +192,10 @@ final class Wired {
         int body = sel ? 0xFFB49CF8 : scale(0xFF7C5CD8, shade), hi = sel ? 0xFFF0E8FF : scale(0xFFB8A0F8, shade);
         int edge = sel || busy ? CYAN : scale(0xFF2A1C58, 100);
         capsule(p, x, y, PILL_W, PILL_H, edge, body, hi);
-        String id = nodeId(a, count);
-        p.textCenter(id, x + PILL_W / 2, y + 1, sel ? 0xFF140C30 : scale(0xFFF0ECFF, shade + 10), 0);
+        int color = sel ? 0xFF140C30 : scale(0xFFF0ECFF, shade + 10);
+        int inner = PILL_W - 10;
+        if (p.width(a.label) <= inner) p.textCenter(a.label, x + PILL_W / 2, y + 1, color, 0);
+        else p.marquee(a.label, x + 5, y + 1, inner, color, 0, t + i * 977L);
         if (sel) {
             // ぼんやり光る
             p.rect(x + 4, y - 2, PILL_W - 8, 1, 0x707CF4E8);
@@ -237,15 +248,18 @@ final class Wired {
         if (rootSel) brackets(p, cx, cy + 4, MON_W / 2 + 4, t);
     }
 
-    /** 選んだアプリの大きな名札（ID と英字の名前）。 */
-    void label(Pix p, int y, String id, String name, long t) {
-        int w = p.bigWidth(id, 2) + 20, x = cx - w / 2;
+    /** 選んだものの大きな名札。title は大きく（入らなければ流して）、sub はその下に小さく。 */
+    void label(Pix p, int y, String title, String sub, long t) {
+        int maxW = Math.max(60, rx * 2 + 20);
+        boolean big = p.bigWidth(title, 2) <= maxW;
+        int w = (big ? p.bigWidth(title, 2) : Math.min(p.width(title), maxW)) + 20, x = cx - w / 2;
         capsule(p, x, y, w, 40, CYAN, 0xFF8C6CE8, 0xFFD8C8FF);
-        p.big(id, x + 10, y + 2, 2, 0xFFF8F8FF, 0xFF2A1C58);
-        String rec = name.toUpperCase() + " REC.";
+        if (big) p.big(title, x + 10, y + 2, 2, 0xFFF8F8FF, 0xFF2A1C58);
+        else p.marquee(title, x + 10, y + 12, w - 20, 0xFFF8F8FF, 0xFF2A1C58, t);
+        String rec = sub.toUpperCase() + " REC.";
         int ty = y + 44;
         p.rect(cx - 90, ty + 8, 180, 1, 0x607CF4E8);
-        int maxW = Math.max(60, rx * 2 + 20), rw = Math.min(p.width(rec), maxW) + 12;
+        int rw = Math.min(p.width(rec), maxW) + 12;
         p.rect(cx - rw / 2, ty, rw, 16, 0xE007061A);
         p.marquee(rec, cx - (rw - 12) / 2, ty, maxW, CYAN, 0, t);
     }
@@ -414,8 +428,7 @@ final class Wired {
             }
         }
         p.rect(sx, sy + (int) ((t / 40) % sh), sw, 1, 0x407CF4E8);
-        String id = nodeId(a, count);
-        p.text(id, x + 6, y + 50, sel ? CYAN : 0xFF4A4868, 0);
+        p.text("Lv" + Engine.level(count), x + 6, y + 50, sel ? CYAN : 0xFF4A4868, 0);
         p.rect(x + 70, y + 56, 3, 2, sel || (t / 500) % 2 == 0 ? CYAN : 0xFF2A4A50);
         if (sel) p.marquee(a.label, x + 39 - Math.min(42, p.width(a.label) / 2), y + 71, 84, TEXT, 0, t);
         else p.textCenter(p.fit(a.label, 84), x + 39, y + 71, SUB, 0);

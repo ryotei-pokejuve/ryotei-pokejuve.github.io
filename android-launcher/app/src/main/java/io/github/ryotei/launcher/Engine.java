@@ -20,6 +20,8 @@ final class Engine {
     static final int BOOT = 0, HOME = 1, APPS = 2;
     /** お気に入りのまちの数（ネットシティは含まない）。 */
     static final int SLOTS = 10;
+    /** WIREDのレイヤーの数。LAYER 01 はGBAのタウンマップと同じお気に入り。 */
+    static final int LAYERS = 5;
 
     private static final int M_APPS = 1, M_SOUND = 3, M_OP = 4, M_HOMESET = 5, M_SETTINGS = 6, M_SAVE = 7,
             M_CLOSE = 8, M_WORLD = 9, M_OTHER_HOME = 10, C_OPEN = 20, C_SWAP = 21, C_REMOVE = 22, C_INFO = 23, C_ADD = 24, C_UNINSTALL = 25,
@@ -40,6 +42,8 @@ final class Engine {
     private final TownMap map = new TownMap();
     private final Wired net = new Wired();
     private boolean wired;
+    private int layer;
+    private long layerFx = -10000;
     private long lastTouch;
     private final Bitmap[][] hero = Sprites.actor(Sprites.HERO);
     private final Bitmap heroHead = Sprites.head(Sprites.HERO);
@@ -132,9 +136,10 @@ final class Engine {
         this.p = pix;
         riteSrc = host.loadImage("images/rite_full.png");
         riteBustSrc = host.loadImage("images/rite_bust.png");
-        for (int i = 0; i < SLOTS; i++) slots[i] = host.getString("slot" + i, "");
         wired = "wired".equals(host.getString("world", "gba"));
-        here = Math.max(0, Math.min(TownMap.NET, host.getInt("here", TownMap.NET)));
+        layer = wired ? Math.max(0, Math.min(LAYERS - 1, host.getInt("layer", 0))) : 0;
+        net.setLayer(layer);
+        loadSlots();
         cursor = here;
         screen = host.getInt("opening", 1) == 1 ? BOOT : HOME;
         if (screen == HOME) say(greeting(), true);
@@ -190,6 +195,37 @@ final class Engine {
         return b.toString();
     }
 
+    /** お気に入りの保存場所。レイヤーごとに別。 */
+    private String slotKey(int i) {
+        return layer == 0 ? "slot" + i : "L" + layer + "slot" + i;
+    }
+
+    private String hereKey() {
+        return layer == 0 ? "here" : "L" + layer + "here";
+    }
+
+    private void loadSlots() {
+        for (int i = 0; i < SLOTS; i++) {
+            slots[i] = host.getString(slotKey(i), "");
+            slotApps[i] = slots[i].isEmpty() ? null : byKey.get(slots[i]);
+        }
+        here = Math.max(0, Math.min(TownMap.NET, host.getInt(hereKey(), TownMap.NET)));
+        cursor = here;
+    }
+
+    /** WIREDで別のレイヤーへ。 */
+    private void changeLayer(int d) {
+        layer = (layer + d + LAYERS) % LAYERS;
+        host.putInt("layer", layer);
+        net.setLayer(layer);
+        loadSlots();
+        cursor = TownMap.NET;
+        replaceKey = null;
+        layerFx = t;
+        host.sfx(Host.SFX_MENU);
+        say("> LAYER 0" + (layer + 1) + "「" + Wired.LAYER_WORDS[layer] + "」\n> ここにも アプリを つなげる。", false);
+    }
+
     /** GBAとWIREDで言い回しを変える。 */
     private String w(String gba, String wiredText) {
         return wired ? wiredText : gba;
@@ -213,7 +249,7 @@ final class Engine {
         if (returnMode == 1 && flySlot >= 0) {
             here = flySlot;
             cursor = flySlot;
-            host.putInt("here", here);
+            host.putInt(hereKey(), here);
             flySlot = -1;
             startFade(-1);
         }
@@ -387,7 +423,7 @@ final class Engine {
                 }
             }
         }
-        for (int i = 0; i < SLOTS; i++) host.putString("slot" + i, slots[i] == null ? "" : slots[i]);
+        for (int i = 0; i < SLOTS; i++) host.putString(slotKey(i), slots[i] == null ? "" : slots[i]);
         host.putString("slotinit", "1");
     }
 
@@ -471,7 +507,7 @@ final class Engine {
         int lv = level(before + 1);
         if (lv > level(before) && lv > 1) {
             String name = p.fit(a.label, 150);
-            if (wired) levelUpMsg = "> " + Wired.nodeId(a, before + 1) + " どうきレベル " + lv + "\n> つながりが ふかくなった。";
+            if (wired) levelUpMsg = "> " + a.label + " どうきレベル " + lv + "\n> つながりが ふかくなった。";
             else levelUpMsg = lv == 5 && slotOf(a) >= 0 ? name + "タウンが\n" + name + "シティに なった！"
                     : name + "の レベルが\n" + lv + "に あがった！";
         } else {
@@ -486,7 +522,7 @@ final class Engine {
 
     private void setSlot(int i, String key) {
         slots[i] = key == null ? "" : key;
-        host.putString("slot" + i, slots[i]);
+        host.putString(slotKey(i), slots[i]);
         slotApps[i] = slots[i].isEmpty() ? null : byKey.get(slots[i]);
         levels[i] = slotApps[i] == null ? 0 : level(count(slotApps[i]));
     }
@@ -527,7 +563,7 @@ final class Engine {
             if (i == TownMap.NET && net.hasFigure()) say("> リテ「…よんだ？」\n> もういちど おすと さがす", instant);
             else if (i == TownMap.NET) say("> ROOT / すべての いりぐち\n> もういちど おすと ひらく", instant);
             else if (slotApps[i] == null) say("> からっぽの ノード\n> もういちど おすと つなぐ", instant);
-            else say("> " + slotApps[i].label + " / " + Wired.nodeId(slotApps[i], count(slotApps[i]))
+            else say("> " + slotApps[i].label + "  Lv" + levels[i] + "・" + count(slotApps[i]) + "かい"
                     + "\n> もういちど おすと せつぞく", instant);
             return;
         }
@@ -581,7 +617,7 @@ final class Engine {
         flyStart = t;
         cursor = i;
         host.sfx(Host.SFX_FLY);
-        say(w("RYOTEIは " + townName(i, 130) + "へ\nとんでいった！", "> " + Wired.nodeId(a, count(a)) + " に せつぞくちゅう…\n> うごかないで。"), true);
+        say(w("RYOTEIは " + townName(i, 130) + "へ\nとんでいった！", "> " + a.label + " に せつぞくちゅう…\n> うごかないで。"), true);
     }
 
     /** チップフォルダからの起動。電脳風の演出をはさむ。 */
@@ -626,7 +662,7 @@ final class Engine {
         cursor = i;
         host.sfx(Host.SFX_LEVEL);
         if (screen == APPS) go(HOME);
-        say(w(townName(i, 200) + "が\nタウンマップに のった！", "> あたらしい ノード " + Wired.nodeId(a, count(a)) + "\n> " + a.label + " と つながった。"), false);
+        say(w(townName(i, 200) + "が\nタウンマップに のった！", "> LAYER 0" + (layer + 1) + " に\n> " + a.label + " が つながった。"), false);
     }
 
     // ================================================================ タッチ
@@ -810,6 +846,10 @@ final class Engine {
             host.openClock();
             return;
         }
+        if (wired && y >= 46 && y < 104) {
+            changeLayer(x < vw / 2 ? -1 : 1);
+            return;
+        }
         int town = homeHit(x, y);
         if (town < 0) return;
         if (replaceKey != null && town != TownMap.NET) {
@@ -963,6 +1003,9 @@ final class Engine {
             case M_WORLD:
                 wired = !wired;
                 host.putString("world", wired ? "wired" : "gba");
+                layer = wired ? Math.max(0, Math.min(LAYERS - 1, host.getInt("layer", 0))) : 0;
+                net.setLayer(layer);
+                loadSlots();
                 host.sfx(Host.SFX_OK);
                 openMenu();
                 say(w("GBA の せかいに もどってきた。\nタウンマップを ひろげた。", "> WIRED に せつぞくした。\n> ここでは なにもかもが つながっている。"), false);
@@ -1370,8 +1413,13 @@ final class Engine {
         p.text("[MENU]", b[0], b[1] + 2, Wired.CYAN, 0);
         p.text("[DIR]", b[4], b[5] + 2, Wired.CYAN, 0);
         // タイトル：LAYER 01: CONNECT_
-        Wired.ghost(p, "LAYER 01:", vw / 2 - p.width("LAYER 01:") / 2, 50, Wired.CYAN);
-        String word = "CONNECT";
+        String layerText = "LAYER 0" + (layer + 1) + ":";
+        Wired.ghost(p, layerText, vw / 2 - p.width(layerText) / 2, 50, Wired.CYAN);
+        int bob = (int) ((t / 400) % 2);
+        p.big("<", 10 - bob, 62, 2, Wired.PURPLE, 0x502A1C58);
+        p.big(">", vw - 10 - p.bigWidth(">", 2) + bob, 62, 2, Wired.PURPLE, 0x502A1C58);
+        for (int i = 0; i < LAYERS; i++) p.rect(vw / 2 - LAYERS * 4 + i * 8, 100, 5, 2, i == layer ? Wired.CYAN : Wired.LINE);
+        String word = Wired.LAYER_WORDS[layer];
         int bw = p.bigWidth(word + "_", 2);
         p.big(word, vw / 2 - bw / 2 + 2, 67, 2, 0x507CF4E8, 0);
         p.big(word, vw / 2 - bw / 2, 66, 2, 0xFFD8FFF8, 0);
@@ -1383,7 +1431,7 @@ final class Engine {
         net.drawOrbits(p, t, slotApps, counts, sel, flySlot);
         int labelY = msgBox()[1] - 66;
         if (sel >= 0 && sel < SLOTS && slotApps[sel] != null) {
-            net.label(p, labelY, Wired.nodeId(slotApps[sel], counts[sel]), slotApps[sel].label, t);
+            net.label(p, labelY, slotApps[sel].label, "Lv" + levels[sel] + " / access " + counts[sel], t);
         } else if (sel == Wired.ROOT && net.hasFigure()) {
             net.label(p, labelY, "RITE", "navigator", t);
         } else if (sel == Wired.ROOT) {
@@ -1404,10 +1452,15 @@ final class Engine {
         }
         if (replaceKey != null) p.textCenter("> つなぎかえる ものを えらんで", vw / 2, 92, Wired.PURPLE, 0);
         Wired.glitch(p, vw, vh, t, 0);
+        if (t - layerFx < 450) {
+            float k = 1 - (t - layerFx) / 450f;
+            Wired.noise(p, vw, vh, t, k * 0.7f);
+            Wired.glitch(p, vw, vh, t, k);
+        }
         if (flySlot >= 0) {
             AppEntry a = slotApps[flySlot];
             float k = Math.min(1f, (t - flyStart) / (float) FLY_MS);
-            if (a != null) net.connecting(p, vw, vh, t, Wired.nodeId(a, count(a)), a.label, k);
+            if (a != null) net.connecting(p, vw, vh, t, "L0" + (layer + 1), a.label, k);
         }
         drawMessage(msgBox());
     }
