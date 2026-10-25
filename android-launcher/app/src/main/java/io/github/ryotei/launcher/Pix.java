@@ -114,6 +114,15 @@ final class Pix {
         c.drawBitmap(b, src, dst, blit);
     }
 
+    /** 画像の一部（sx,sy,sw,sh）を等倍で (x,y) に描く。alpha は 0〜255。 */
+    void imagePart(Bitmap b, int sx, int sy, int sw, int sh, int x, int y, int alpha) {
+        src.set(sx, sy, sx + sw, sy + sh);
+        dst.set(x, y, x + sw, y + sh);
+        blit.setAlpha(alpha);
+        c.drawBitmap(b, src, dst, blit);
+        blit.setAlpha(255);
+    }
+
     /** ▶ 型のカーソル（幅4・高さ7）。 */
     void arrowRight(int x, int y, int color) {
         for (int i = 0; i < 4; i++) {

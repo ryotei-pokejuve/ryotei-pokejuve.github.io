@@ -21,7 +21,9 @@ public final class Video {
 
     static final class Ev {
         final long t; final int a, x, y;
-        Ev(long t, int a, int x, int y) { this.t = t; this.a = a; this.x = x; this.y = y; }
+        final String text;
+        Ev(long t, int a, int x, int y) { this(t, a, x, y, null); }
+        Ev(long t, int a, int x, int y, String text) { this.t = t; this.a = a; this.x = x; this.y = y; this.text = text; }
     }
 
     static final List<Ev> evs = new ArrayList<>();
@@ -60,29 +62,28 @@ public final class Video {
 
     }
 
+    static void type(long t, String text) { evs.add(new Ev(t, 5, 0, 0, text)); }
+
     static void wiredScript() {
         tap(4300, 135, 300);                   // 起動ログのあとタップ
-        tapNode(6000, 10);                     // モニター（ROOT）を選ぶ
-        tapNode(7200, 10);                     // もう一度でディレクトリ
-        swipe(9200, 135, 400, 135, 250, 600);  // モニターの壁をゆっくり送る
-        swipe(11200, 135, 250, 135, 420, 500); // 戻す
-        tap(13200, 213, 520);                  // ダイヤルのCをタップ
-        swipe(15000, 220, 520, 116, 520, 700); // ダイヤルを回して G へ
-        swipe(17400, 200, 250, 60, 250, 200);  // 壁を横にはらって次のチャンネル（H：信号なし）
-        swipe(19400, 60, 520, 241, 520, 900);  // ダイヤルを大きく戻す
-        tap(22200, 135, 520);                  // いまのチャンネルで止める
-        tap(23600, 135, 100);                  // モニターをタップしてズームして接続
-        evs.add(new Ev(25200, 9, 0, 0));       // 戻ってくる
-        tap(26800, 185, 34);                   // [MENU]
-        tap(29200, 40, 470);                   // 閉じる
+        tapNode(6400, 1);                      // YouTubeのカプセルを選ぶ
+        tapNode(8400, 10);                     // リテを選ぶ
+        tapNode(10400, 10);                    // もう一度で検索
+        type(12000, "か");                     // キーボードで入力していく
+        type(12600, "かめ");
+        type(13400, "カメラ");
+        tap(15200, 49, 205);                  // 見つかったモニターをタップ
+        evs.add(new Ev(16800, 9, 0, 0));       // 戻ってくる
+        tapNode(18600, 10);                    // 回る軌道の中のリテ
     }
 
     public static void main(String[] args) throws Exception {
         Typeface tf = Typeface.createFromFile(args[0]);
+        PreviewBridge.assets = new File(args[0]).getParentFile().getParentFile();
         File out = new File(args[1]);
         out.mkdirs();
         String endArg = args.length > 2 ? args[2] : "";
-        long end = !endArg.isEmpty() ? Long.parseLong(endArg) : "WIRED".equals(args.length > 3 ? args[3] : "") ? 30500 : 30000;
+        long end = !endArg.isEmpty() ? Long.parseLong(endArg) : "WIRED".equals(args.length > 3 ? args[3] : "") ? 21500 : 30000;
 
         String world = args.length > 3 ? args[3] : "GBA";
         if ("WIRED".equals(world)) wiredScript();
@@ -98,7 +99,8 @@ public final class Video {
             while (ei < evs.size() && evs.get(ei).t <= t) {
                 Ev e = evs.get(ei++);
                 long et = e.t + 1000;
-                if (e.a == 8) b.back();
+                if (e.a == 5) b.setQuery(e.text);
+                else if (e.a == 8) b.back();
                 else if (e.a == 9) b.resume();
                 else if (e.a == 7 || e.a == 6) {
                     int[] n = b.nodeCenter(e.x, et);

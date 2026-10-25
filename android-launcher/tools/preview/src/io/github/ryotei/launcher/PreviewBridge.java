@@ -102,6 +102,17 @@ public final class PreviewBridge implements Host {
     @Override public void openSettings() {}
     @Override public void openHomeSettings() {}
     @Override public boolean openOtherHome() { return true; }
+    /** assets フォルダの場所（Video が設定する）。 */
+    public static java.io.File assets;
+    @Override public Bitmap loadImage(String path) {
+        try {
+            return Bitmap.fromImage(javax.imageio.ImageIO.read(new java.io.File(assets, path)));
+        } catch (java.io.IOException e) {
+            return null;
+        }
+    }
+    @Override public void showKeyboard(boolean show) {}
+    public void setQuery(String q) { engine.setQuery(q); }
     @Override public void openClock() {}
     @Override public boolean expandNotifications() { return true; }
     @Override public String getString(String k, String d) { Object v = prefs.get(k); return v == null ? d : (String) v; }

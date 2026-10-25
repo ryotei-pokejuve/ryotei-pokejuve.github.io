@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 public final class Paint {
     private static final Graphics2D SCRATCH = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics();
     int color = 0xFF000000;
+    int alpha = 255;
     float size = 12;
     Typeface typeface;
 
@@ -17,6 +18,8 @@ public final class Paint {
     public void setFilterBitmap(boolean b) {}
 
     public void setColor(int c) { color = c; }
+
+    public void setAlpha(int a) { alpha = a; }
 
     public void setTextSize(float s) { size = s; }
 

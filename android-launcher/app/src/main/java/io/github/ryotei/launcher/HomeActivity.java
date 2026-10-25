@@ -9,6 +9,14 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 
 /** ホームアプリとして起動されるActivity。画面は GameView ひとつだけ。 */
 public final class HomeActivity extends Activity {
@@ -16,6 +24,7 @@ public final class HomeActivity extends Activity {
     private Engine engine;
     private GameView view;
     private boolean resumed;
+    private EditText input;
 
     private final BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
         @Override
@@ -44,7 +53,36 @@ public final class HomeActivity extends Activity {
         Typeface font = Typeface.createFromAsset(getAssets(), "fonts/DotGothic16-Regular.ttf");
         engine = new Engine(host, new Pix(font));
         view = new GameView(this, engine);
-        setContentView(view);
+        // 検索の文字はこの見えない入力欄で受け取り、表示はEngineが自前で描く
+        input = new EditText(this);
+        input.setAlpha(0f);
+        input.setFocusableInTouchMode(true);
+        input.setSingleLine(true);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        input.setImeOptions(EditorInfo.IME_ACTION_SEARCH | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                engine.setQuery(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+        input.setOnEditorActionListener((v, actionId, event) -> {
+            showKeyboard(false);
+            return true;
+        });
+        FrameLayout root = new FrameLayout(this);
+        root.addView(view, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        root.addView(input, new FrameLayout.LayoutParams(1, 1, Gravity.BOTTOM));
+        setContentView(root);
+        host.keyboard = this::showKeyboard;
 
         registerReceiver(batteryReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         IntentFilter pf = new IntentFilter();
@@ -55,6 +93,19 @@ public final class HomeActivity extends Activity {
         pf.addDataScheme("package");
         registerReceiver(packageReceiver, pf);
         host.reload();
+    }
+
+    private void showKeyboard(boolean show) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        if (show) {
+            input.setText("");
+            input.requestFocus();
+            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+        } else {
+            imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
+            input.clearFocus();
+            view.requestFocus();
+        }
     }
 
     @Override

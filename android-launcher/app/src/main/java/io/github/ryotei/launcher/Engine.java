@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * ランチャー本体。GBAくらいの低解像度キャンバスに全部を描き、タッチを「ゲームの操作」として扱う。
@@ -78,6 +79,11 @@ final class Engine {
     private List<AppEntry> filtered = Collections.emptyList();
     private String filteredKey = "";
     private int[] zoomFrom;
+    // リテと検索
+    private final Bitmap riteSrc, riteBustSrc;
+    private Bitmap riteBust;
+    private boolean searchMode;
+    private String query = "";
 
     // メニュー
     private static final class Menu {
@@ -122,6 +128,8 @@ final class Engine {
     Engine(Host host, Pix pix) {
         this.host = host;
         this.p = pix;
+        riteSrc = host.loadImage("images/rite_full.png");
+        riteBustSrc = host.loadImage("images/rite_bust.png");
         for (int i = 0; i < SLOTS; i++) slots[i] = host.getString("slot" + i, "");
         wired = "wired".equals(host.getString("world", "gba"));
         here = Math.max(0, Math.min(TownMap.NET, host.getInt("here", TownMap.NET)));
@@ -136,6 +144,47 @@ final class Engine {
         int[] f = mapFrame();
         map.layout(f[0] + 6, f[1] + 6, f[2] - 12, f[3] - 12);
         net.layout(6, 104, vw - 12, msgBox()[1] - 70 - 104);
+        net.setFigure(riteSrc);
+        if (riteBustSrc != null) {
+            int bh = 86, bw = riteBustSrc.getWidth() * bh / riteBustSrc.getHeight();
+            riteBust = Bitmap.createScaledBitmap(riteBustSrc, bw, bh, true);
+        }
+    }
+
+    /** 検索の入力が変わった（Androidのキーボードから届く）。 */
+    void setQuery(String q) {
+        query = q == null ? "" : q;
+        scroll = 0;
+        scrollVel = 0;
+        listCursor = 0;
+    }
+
+    private void openSearch() {
+        searchMode = true;
+        query = "";
+        pickSlot = -1;
+        tab = 0;
+        listCursor = 0;
+        scroll = 0;
+        host.sfx(Host.SFX_MENU);
+        go(APPS);
+        host.showKeyboard(true);
+    }
+
+    private void closeSearch() {
+        if (!searchMode) return;
+        searchMode = false;
+        query = "";
+        host.showKeyboard(false);
+    }
+
+    private static String norm(String s) {
+        StringBuilder b = new StringBuilder();
+        for (char c : s.toLowerCase(Locale.ROOT).toCharArray()) {
+            if (c >= 'ァ' && c <= 'ヶ') c = (char) (c - 0x60);
+            if (c != ' ' && c != '　') b.append(c);
+        }
+        return b.toString();
     }
 
     /** GBAとWIREDで言い回しを変える。 */
@@ -163,6 +212,7 @@ final class Engine {
         screen = HOME;
         nextScreen = -1;
         pickSlot = -1;
+        closeSearch();
         if (levelUpMsg != null) {
             say(levelUpMsg, false);
             host.sfx(Host.SFX_LEVEL);
@@ -182,6 +232,7 @@ final class Engine {
             say(greeting(), true);
         } else if (screen == APPS) {
             pickSlot = -1;
+            closeSearch();
             host.sfx(Host.SFX_CANCEL);
             go(HOME);
             say(greeting(), true);
@@ -198,6 +249,7 @@ final class Engine {
             closeMenu();
         } else if (screen == APPS) {
             pickSlot = -1;
+            closeSearch();
             host.sfx(Host.SFX_CANCEL);
             go(HOME);
             say(greeting(), true);
@@ -345,11 +397,15 @@ final class Engine {
 
     private List<AppEntry> list() {
         List<AppEntry> base = tab == 1 ? frequent : tab == 2 ? recent : all;
-        if (!wired || channel == 0) return base;
-        String key = tab + ":" + channel + ":" + seenVersion + ":" + System.identityHashCode(base);
+        boolean searching = wired && searchMode && !query.isEmpty();
+        if (!wired || (channel == 0 && !searching) || (searchMode && !searching)) return base;
+        String key = tab + ":" + (searching ? "q" + query : String.valueOf(channel)) + ":" + seenVersion + ":" + System.identityHashCode(base);
         if (!key.equals(filteredKey)) {
             ArrayList<AppEntry> f = new ArrayList<>();
-            for (AppEntry a : base) if (Wired.channelOf(a) == channel) f.add(a);
+            String q = norm(query);
+            for (AppEntry a : base) {
+                if (searching ? norm(a.label).contains(q) || a.pkg.toLowerCase(Locale.ROOT).contains(q) : Wired.channelOf(a) == channel) f.add(a);
+            }
             filtered = f;
             filteredKey = key;
         }
@@ -451,13 +507,15 @@ final class Engine {
         if (lv >= 0 && lv <= 15 && !host.charging()) return "> でんげんが よわっている。\n> このままだと せつだんされる。";
         int h = hour();
         if (h >= 22 || h <= 4) return "> よるの WIRED は しずか。\n> だれかの こえが きこえる きがする。";
+        if (net.hasFigure()) return "> リテ「…おかえり。」\n> きょうは どこに つなぐ？";
         return "> WIRED に せつぞくした。\n> ノードを えらんで。";
     }
 
     /** カーソルを合わせたまち（ノード）の説明。 */
     private void describe(int i, boolean instant) {
         if (wired) {
-            if (i == TownMap.NET) say("> ROOT / すべての いりぐち\n> もういちど タップで ひらく", instant);
+            if (i == TownMap.NET && net.hasFigure()) say("> リテ「…よんだ？」\n> もういちど タップで さがしもの", instant);
+            else if (i == TownMap.NET) say("> ROOT / すべての いりぐち\n> もういちど タップで ひらく", instant);
             else if (slotApps[i] == null) say("> からっぽの ノード\n> もういちど タップで つなぐ", instant);
             else say("> " + p.fit(slotApps[i].label, 120) + " / " + Wired.nodeId(slotApps[i], count(slotApps[i]))
                     + "\n> もういちど タップで せつぞく", instant);
@@ -518,6 +576,7 @@ final class Engine {
 
     /** チップフォルダからの起動。電脳風の演出をはさむ。 */
     private void plugIn(AppEntry a) {
+        if (searchMode) host.showKeyboard(false);
         int idx = list().indexOf(a);
         int[] wb = wallBox();
         zoomFrom = idx >= 0 ? Wired.wallRect(wb[0], wb[1], wb[2], idx, scroll) : new int[]{vw / 2 - 39, vh / 2 - 34, 78, 68};
@@ -530,6 +589,7 @@ final class Engine {
     }
 
     private void openApps(int pick) {
+        closeSearch();
         pickSlot = pick;
         listCursor = Math.min(listCursor, Math.max(0, list().size() - 1));
         host.sfx(Host.SFX_MENU);
@@ -645,7 +705,7 @@ final class Engine {
             menu.hover = menuHit(menu, x, y);
             return;
         }
-        if (screen == APPS && wired && inside(x, y, dialBox())) {
+        if (screen == APPS && wired && !searchMode && inside(x, y, dialBox())) {
             dialDrag = true;
             return;
         }
@@ -670,7 +730,7 @@ final class Engine {
             else host.expandNotifications();
         } else if (screen == APPS && axis == 1) {
             scrollVel = time - lastT > 80 ? 0 : -vel;
-        } else if (screen == APPS && wired && axis == 2 && Math.abs(dx) > 40) {
+        } else if (screen == APPS && wired && !searchMode && axis == 2 && Math.abs(dx) > 40) {
             setChannel(channel + (dx < 0 ? 1 : -1));
         } else if (screen == APPS && axis == 2 && Math.abs(dx) > 40) {
             setTab((tab + (dx < 0 ? 1 : TABS.length - 1)) % TABS.length);
@@ -736,7 +796,9 @@ final class Engine {
             describe(town, false);
             return;
         }
-        if (town == TownMap.NET) {
+        if (town == TownMap.NET && wired && net.hasFigure()) {
+            openSearch();
+        } else if (town == TownMap.NET) {
             openApps(-1);
         } else if (slotApps[town] == null) {
             host.sfx(Host.SFX_OK);
@@ -981,8 +1043,13 @@ final class Engine {
     }
 
     private int[] wallBox() {
+        if (searchMode) return new int[]{6, 158, vw - 12, vh - 6 - 158};
         int top = 60;
         return new int[]{6, top, vw - 12, dialBox()[1] - 6 - top};
+    }
+
+    private int[] searchBox() {
+        return new int[]{6, 58, vw - 12, 96};
     }
 
     private int[] dialBox() {
@@ -1274,6 +1341,8 @@ final class Engine {
         int labelY = msgBox()[1] - 66;
         if (sel >= 0 && sel < SLOTS && slotApps[sel] != null) {
             net.label(p, labelY, Wired.nodeId(slotApps[sel], counts[sel]), slotApps[sel].label, t);
+        } else if (sel == Wired.ROOT && net.hasFigure()) {
+            net.label(p, labelY, "RITE", "navigator", t);
         } else if (sel == Wired.ROOT) {
             net.label(p, labelY, "Root000", "ALL NODES", t);
         }
@@ -1329,7 +1398,7 @@ final class Engine {
         window(hd);
         p.arrowLeft(hd[0] + 10, hd[1] + 12, th.accent);
         p.text("もどる", hd[0] + 18, hd[1] + 8, th.text, 0);
-        String title = pickSlot >= 0 ? "> select node" : "/wired/" + (channel == 0 ? "root" : "ch" + (channel < 10 ? "0" : "") + channel);
+        String title = searchMode ? "> search" : pickSlot >= 0 ? "> select node" : "/wired/" + (channel == 0 ? "root" : "ch" + (channel < 10 ? "0" : "") + channel);
         p.textCenter(title, hd[0] + hd[2] / 2 + 12, hd[1] + 8, th.text, 0);
         p.textRight(String.valueOf(l.size()), hd[0] + hd[2] - 10, hd[1] + 8, th.dim, 0);
         int tw = (hd[2] - 16) / WIRED_TABS.length;
@@ -1354,7 +1423,9 @@ final class Engine {
                 p.rect(sx, wb[1] + Math.round((wb[3] - thumb) * (scroll / max)), 2, thumb, th.accent);
             }
         }
-        if (dialDrag) {
+        if (searchMode) {
+            drawSearchPanel(l);
+        } else if (dialDrag) {
             float settle = dialPos;
             int[] d = dialBox();
             net.drawDial(p, d[0], d[1], d[2], d[3], settle, channelCounts(), list().size(), t);
@@ -1364,6 +1435,34 @@ final class Engine {
             net.drawDial(p, d[0], d[1], d[2], d[3], dialPos, channelCounts(), (tab == 1 ? frequent : tab == 2 ? recent : all).size(), t);
         }
         Wired.glitch(p, vw, vh, t, 0);
+    }
+
+    /** 検索中の上の欄：リテが話しかけてくる。 */
+    private void drawSearchPanel(List<AppEntry> l) {
+        int[] b = searchBox();
+        window(b);
+        int bx = b[0] + 6, by = b[1] + 5;
+        if (riteBust != null) {
+            net.bust(p, riteBust, bx, by, riteBust.getWidth(), riteBust.getHeight(), t);
+            bx += riteBust.getWidth() + 8;
+        }
+        int w = b[0] + b[2] - 10 - bx;
+        String cursorMark = (t / 500) % 2 == 0 ? "_" : " ";
+        Wired.ghost(p, p.fit("> " + query, w - 10) + cursorMark, bx, by + 2, Wired.CYAN);
+        String line1, line2;
+        if (query.isEmpty()) {
+            line1 = "なにを さがすの？";
+            line2 = "なまえを うって";
+        } else if (l.isEmpty()) {
+            line1 = "…ない。";
+            line2 = "べつの ことばで";
+        } else {
+            line1 = l.size() + "こ みつけた。";
+            line2 = "えらんで";
+        }
+        p.text(p.fit(line1, w), bx, by + 30, Wired.TEXT, 0);
+        p.text(p.fit(line2, w), bx, by + 50, Wired.SUB, 0);
+        p.text("RITE", b[0] + b[2] - 10 - p.width("RITE"), by + 68, Wired.PURPLE, 0);
     }
 
     private void drawApps() {

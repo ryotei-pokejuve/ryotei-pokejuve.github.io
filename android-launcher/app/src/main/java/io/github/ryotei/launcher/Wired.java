@@ -26,6 +26,9 @@ final class Wired {
     private final HashMap<String, Bitmap> mono = new HashMap<>();
     int cx, cy, rx, ry;
     private double spin;
+    // リテ（ナビゲーター）。null ならモニターを置く
+    private Bitmap rite, riteCyan, riteMag;
+    int riteX, riteY, riteW, riteH;
 
     void layout(int x, int y, int w, int h) {
         cx = x + w / 2;
@@ -77,7 +80,9 @@ final class Wired {
                 }
             }
         }
-        boolean onMonitor = Math.abs(x - cx) <= MON_W / 2 && Math.abs(y - cy) <= MON_H / 2;
+        boolean onMonitor = rite != null
+                ? x >= riteX && x < riteX + riteW && y >= riteY && y < riteY + riteH
+                : Math.abs(x - cx) <= MON_W / 2 && Math.abs(y - cy) <= MON_H / 2;
         if (onMonitor && (best < 0 || bestDepth < 0)) return ROOT;
         return best;
     }
@@ -156,7 +161,8 @@ final class Wired {
         }
         // 奥のカプセル → モニター → 手前のカプセル
         for (int pass = 0; pass < 2; pass++) {
-            if (pass == 1) monitor(p, t, cursor >= 0 && cursor < NODES ? apps[cursor] : null, cursor == ROOT);
+            if (pass == 1 && rite != null) figure(p, t, cursor == ROOT);
+            else if (pass == 1) monitor(p, t, cursor >= 0 && cursor < NODES ? apps[cursor] : null, cursor == ROOT);
             for (int i = 0; i < NODES; i++) {
                 boolean front = depth(i, t) >= 0;
                 if (front != (pass == 1)) continue;
@@ -457,5 +463,82 @@ final class Wired {
         frame(p, x, y, w, h, CYAN);
         if (k > 0.5f) noise(p, vw, vh, t, (k - 0.5f) * 2);
         glitch(p, vw, vh, t, k);
+    }
+
+    // ================================================================ リテ
+
+    /** 真ん中に立つリテの絵を、軌道の大きさに合わせて用意する。色ずれ用に青緑と赤紫の影も作っておく。 */
+    void setFigure(Bitmap full) {
+        if (full == null) {
+            rite = null;
+            return;
+        }
+        riteH = Math.max(80, Math.min(ry * 2 + 90, 330));
+        riteW = Math.max(1, full.getWidth() * riteH / full.getHeight());
+        riteX = cx - riteW / 2;
+        riteY = cy - riteH / 2 + 4;
+        rite = Bitmap.createScaledBitmap(full, riteW, riteH, true);
+        riteCyan = Bitmap.createBitmap(riteW, riteH, Bitmap.Config.ARGB_8888);
+        riteMag = Bitmap.createBitmap(riteW, riteH, Bitmap.Config.ARGB_8888);
+        for (int y = 0; y < riteH; y++) {
+            for (int x = 0; x < riteW; x++) {
+                int a = rite.getPixel(x, y) >>> 24;
+                if (a < 40) continue;
+                riteCyan.setPixel(x, y, ((a * 6 / 10) << 24) | 0x40F0E8);
+                riteMag.setPixel(x, y, ((a * 6 / 10) << 24) | 0xF040B0);
+            }
+        }
+    }
+
+    boolean hasFigure() {
+        return rite != null;
+    }
+
+    /** 画面の向こう側にいるように見せる：走査線・横ずれ・色のにじみ・ときどき途切れる。 */
+    private void figure(Pix p, long t, boolean sel) {
+        int x = riteX, y = riteY, w = riteW, h = riteH;
+        // うしろの淡い光
+        for (int i = 0; i < 6; i++) {
+            int pad = 6 + i * 6;
+            p.rect(x - pad / 2, y + h / 6 - pad / 3, w + pad, h - h / 4, (6 << 24) | 0x40F0E8);
+        }
+        long g = t % 3700;
+        boolean glitch = g < 200;
+        boolean flicker = (t % 4300) < 160 && ((t / 40) % 2 == 0);
+        int alpha = flicker ? 110 : 235;
+        int chroma = glitch ? 4 : 1 + (int) ((t / 900) % 2);
+        Random r = new Random(t / 50);
+        int tear = (int) ((t / 25) % (h + 40)) - 20; // ゆっくり下りていく裂け目
+        for (int sy = 0; sy < h; sy += 3) {
+            int sh = Math.min(3, h - sy);
+            int off = Math.abs(sy - tear) < 6 ? 2 : 0;
+            if (glitch && r.nextInt(5) == 0) off = r.nextInt(13) - 6;
+            if (glitch && r.nextInt(14) == 0) continue; // 一瞬消える行
+            p.imagePart(riteMag, 0, sy, w, sh, x + off - chroma, y + sy, alpha / 3);
+            p.imagePart(riteCyan, 0, sy, w, sh, x + off + chroma, y + sy, alpha / 3);
+            p.imagePart(rite, 0, sy, w, sh, x + off, y + sy, alpha);
+        }
+        for (int yy = y; yy < y + h; yy += 2) p.rect(x - 6, yy, w + 12, 1, 0x26000000);
+        if (glitch) {
+            for (int i = 0; i < 3; i++) {
+                int by = y + r.nextInt(h);
+                p.rect(x - 8 + r.nextInt(10), by, w / 2 + r.nextInt(w), 1 + r.nextInt(3), r.nextBoolean() ? 0x707CF4E8 : 0x60F040B0);
+            }
+        }
+        if (sel) brackets(p, cx, y + h / 2, Math.max(w, h) / 2 + 6, t);
+    }
+
+    /** 検索画面で話しかけてくるリテ（胸から上）。 */
+    void bust(Pix p, Bitmap img, int x, int y, int w, int h, long t) {
+        long g = t % 4100;
+        boolean glitch = g < 180;
+        Random r = new Random(t / 50);
+        int alpha = (t % 5300) < 140 && ((t / 40) % 2 == 0) ? 120 : 240;
+        for (int sy = 0; sy < h; sy += 3) {
+            int sh = Math.min(3, h - sy);
+            int off = glitch && r.nextInt(4) == 0 ? r.nextInt(9) - 4 : 0;
+            p.imagePart(img, 0, sy, w, sh, x + off, y + sy, alpha);
+        }
+        for (int yy = y; yy < y + h; yy += 2) p.rect(x, yy, w, 1, 0x30000000);
     }
 }

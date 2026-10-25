@@ -219,6 +219,27 @@ final class AndroidHost implements Host {
         if (prefs.getInt("sound", 1) == 1) sfx.play(id);
     }
 
+    @Override
+    public Bitmap loadImage(String path) {
+        try (java.io.InputStream in = activity.getAssets().open(path)) {
+            return android.graphics.BitmapFactory.decodeStream(in);
+        } catch (java.io.IOException e) {
+            return null;
+        }
+    }
+
+    /** キーボードの出し入れは Activity にまかせる。 */
+    interface Keyboard {
+        void show(boolean show);
+    }
+
+    Keyboard keyboard;
+
+    @Override
+    public void showKeyboard(boolean show) {
+        if (keyboard != null) keyboard.show(show);
+    }
+
     void release() {
         sfx.release();
     }

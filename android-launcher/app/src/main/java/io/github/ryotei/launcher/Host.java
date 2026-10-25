@@ -60,4 +60,10 @@ interface Host {
     long now();
 
     void sfx(int id);
+
+    /** assets の画像を読む。無ければ null。 */
+    android.graphics.Bitmap loadImage(String path);
+
+    /** 検索の文字入力用にキーボードを出す／しまう。入力は Engine.setQuery に届く。 */
+    void showKeyboard(boolean show);
 }

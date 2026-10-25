@@ -37,7 +37,9 @@ public final class Canvas {
     }
 
     public void drawBitmap(Bitmap b, Rect src, Rect dst, Paint p) {
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, p.alpha / 255f));
         g.drawImage(b.img, dst.left, dst.top, dst.right, dst.bottom, src.left, src.top, src.right, src.bottom, null);
+        g.setComposite(AlphaComposite.SrcOver);
     }
 
     public boolean clipRect(int l, int t, int r, int b) { g.clipRect(l, t, r - l, b - t); return true; }
