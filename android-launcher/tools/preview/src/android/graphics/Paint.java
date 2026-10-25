@@ -25,18 +25,44 @@ public final class Paint {
 
     public void setTypeface(Typeface t) { typeface = t; }
 
+    private Font cachedFont;
+    private FontMetrics cachedMetrics;
+    private Typeface cachedFace;
+    private float cachedSize = -1;
+    private final java.util.HashMap<String, Float> widths = new java.util.HashMap<>();
+
     Font font() {
-        Font base = typeface != null ? typeface.font : new Font(Font.MONOSPACED, Font.PLAIN, 12);
-        return base.deriveFont(size);
+        if (cachedFont == null || cachedFace != typeface || cachedSize != size) {
+            Font base = typeface != null ? typeface.font : new Font(Font.MONOSPACED, Font.PLAIN, 12);
+            cachedFont = base.deriveFont(size);
+            cachedFace = typeface;
+            cachedSize = size;
+            cachedMetrics = null;
+            widths.clear();
+        }
+        return cachedFont;
     }
 
     FontMetrics metrics() {
-        SCRATCH.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-        SCRATCH.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-        return SCRATCH.getFontMetrics(font());
+        Font f = font();
+        if (cachedMetrics == null) {
+            SCRATCH.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+            SCRATCH.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+            cachedMetrics = SCRATCH.getFontMetrics(f);
+        }
+        return cachedMetrics;
     }
 
-    public float measureText(String s) { return (float) metrics().getStringBounds(s, SCRATCH).getWidth(); }
+    public float measureText(String s) {
+        FontMetrics m = metrics();
+        Float w = widths.get(s);
+        if (w == null) {
+            if (widths.size() > 4000) widths.clear();
+            w = (float) m.getStringBounds(s, SCRATCH).getWidth();
+            widths.put(s, w);
+        }
+        return w;
+    }
 
     public float ascent() { return -metrics().getAscent(); }
 }

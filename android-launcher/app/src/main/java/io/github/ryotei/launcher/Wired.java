@@ -250,7 +250,11 @@ final class Wired {
 
     /** 選んだものの大きな名札。title は大きく（入らなければ流して）、sub はその下に小さく。 */
     void label(Pix p, int y, String title, String sub, long t) {
-        int maxW = Math.max(60, rx * 2 + 20);
+        label(p, cx, y, Math.max(60, rx * 2 + 20), title, sub, t);
+    }
+
+    /** 名札を (cx, y) を中心に、幅 maxW までで描く（PCの横長画面用）。 */
+    void label(Pix p, int cx, int y, int maxW, String title, String sub, long t) {
         boolean big = p.bigWidth(title, 2) <= maxW;
         int w = (big ? p.bigWidth(title, 2) : Math.min(p.width(title), maxW)) + 20, x = cx - w / 2;
         capsule(p, x, y, w, 40, CYAN, 0xFF8C6CE8, 0xFFD8C8FF);
@@ -368,6 +372,8 @@ final class Wired {
     private static final String[] KANA_ROWS = {"ぁあぃいぅうぇえぉおゔ", "かがきぎくぐけげこごゕゖ", "さざしじすずせぜそぞ",
             "ただちぢっつづてでとど", "なにぬねの", "はばぱひびぴふぶぷへべぺほぼぽ", "まみむめも", "ゃやゅゆょよ", "らりるれろ", "ゎわゐゑをん"};
     static final int WALL_COLS = 3, CELL_H = 98, DIAL_STEP = 26;
+    /** モニターの壁の列数（スマホは3、PCの横長画面ではもっと多い）。 */
+    int wallCols = WALL_COLS;
 
     static int channelOf(AppEntry a) {
         String c = a.code;
@@ -386,13 +392,13 @@ final class Wired {
     /** 古いモニターが3列に積まれた壁。画面の中央に近いほど映りがはっきりする。 */
     void drawWall(Pix p, int x, int y, int w, int h, List<AppEntry> l, float scroll, int cursor, long t, long tuneStart,
                   ToIntFunction<AppEntry> count) {
-        int cellW = w / WALL_COLS;
-        int first = Math.max(0, (int) (scroll / CELL_H) * WALL_COLS);
-        int last = Math.min(l.size() - 1, (int) ((scroll + h) / CELL_H + 1) * WALL_COLS + WALL_COLS - 1);
+        int cols = wallCols, cellW = w / cols;
+        int first = Math.max(0, (int) (scroll / CELL_H) * cols);
+        int last = Math.min(l.size() - 1, (int) ((scroll + h) / CELL_H + 1) * cols + cols - 1);
         p.c.save();
         p.c.clipRect(x, y, x + w, y + h);
         for (int i = first; i <= last; i++) {
-            int col = i % WALL_COLS, row = i / WALL_COLS;
+            int col = i % cols, row = i / cols;
             int mx = x + col * cellW + (cellW - 78) / 2, my = y + row * CELL_H - Math.round(scroll) + 6;
             float centre = Math.abs(my + 34 - (y + h / 2f)) / (h / 2f);
             float fuzz = Math.min(0.9f, Math.max(0, centre - 0.25f));
@@ -406,8 +412,12 @@ final class Wired {
 
     /** 壁のモニターの位置（タップ判定とズーム演出用）。 */
     static int[] wallRect(int x, int y, int w, int index, float scroll) {
-        int cellW = w / WALL_COLS;
-        int col = index % WALL_COLS, row = index / WALL_COLS;
+        return wallRect(x, y, w, index, scroll, WALL_COLS);
+    }
+
+    static int[] wallRect(int x, int y, int w, int index, float scroll, int cols) {
+        int cellW = w / cols;
+        int col = index % cols, row = index / cols;
         return new int[]{x + col * cellW + (cellW - 78) / 2, y + row * CELL_H - Math.round(scroll) + 6, 78, 68};
     }
 

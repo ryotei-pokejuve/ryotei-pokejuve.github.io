@@ -21,7 +21,14 @@ public final class Canvas {
         g.setComposite(AlphaComposite.SrcOver);
     }
 
-    private void color(int c) { g.setColor(new Color(c, true)); }
+    private int lastColor = 1;
+
+    private void color(int c) {
+        if (c != lastColor) {
+            g.setColor(new Color(c, true));
+            lastColor = c;
+        }
+    }
 
     public void drawColor(int c) { color(c); g.fillRect(-10000, -10000, 30000, 30000); }
 
@@ -31,7 +38,8 @@ public final class Canvas {
     }
 
     public void drawText(String s, float x, float y, Paint p) {
-        color(p.color);
+        lastColor = 1;
+        g.setColor(new Color(p.color, true));
         g.setFont(p.font());
         g.drawString(s, x, y);
     }

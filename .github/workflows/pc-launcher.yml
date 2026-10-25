@@ -1,0 +1,65 @@
+name: PC Launcher (Windows)
+
+on:
+  push:
+    paths:
+      - "pc-launcher/**"
+      - "android-launcher/app/src/main/java/**"
+      - "android-launcher/app/src/main/assets/**"
+      - "android-launcher/tools/preview/src/android/**"
+      - ".github/workflows/pc-launcher.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pc-launcher
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Build jar
+        shell: bash
+        run: sh pc-launcher/build.sh
+
+      # Javaの実行環境ごと入った、ダブルクリックで起動できるフォルダを作る
+      - name: Package app
+        shell: bash
+        run: |
+          jpackage --type app-image --name RYOTEI-WIRED \
+            --input pc-launcher/build/jar --main-jar wired.jar \
+            --main-class io.github.ryotei.launcher.PcMain \
+            --icon pc-launcher/icon.ico \
+            --app-version "1.0.${{ github.run_number }}" \
+            --java-options "-Dsun.java2d.uiScale=1 -Dfile.encoding=UTF-8" \
+            --dest pc-launcher/dist
+
+      - name: Zip
+        shell: pwsh
+        run: Compress-Archive -Path pc-launcher/dist/RYOTEI-WIRED -DestinationPath RYOTEI-WIRED.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RYOTEI-WIRED
+          path: RYOTEI-WIRED.zip
+
+      - name: Publish release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete pc-launcher-latest --cleanup-tag --yes || true
+          gh release create pc-launcher-latest RYOTEI-WIRED.zip \
+            --target "$GITHUB_SHA" \
+            --title "RYOTEI WIRED for Windows (build ${{ github.run_number }})" \
+            --notes "RYOTEI-WIRED.zip をダウンロードして展開し、RYOTEI-WIRED フォルダの中の RYOTEI-WIRED.exe を起動してください。ブランチ: ${GITHUB_REF_NAME}"
