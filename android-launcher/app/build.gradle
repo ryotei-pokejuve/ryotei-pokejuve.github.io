@@ -34,6 +34,12 @@ android {
         }
     }
 
+    // 個人用なので、リリースビルド時のlint検査で止めない
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
