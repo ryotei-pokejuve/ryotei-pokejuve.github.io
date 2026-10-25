@@ -88,6 +88,22 @@ final class Pix {
         return t + "…";
     }
 
+    /** 幅に収まらない文字は、少し止まってから横に流して最後まで見せる（選んでいる項目の名前用）。 */
+    void marquee(String s, int x, int y, int maxW, int color, int shadow, long t) {
+        int w = width(s);
+        if (w <= maxW) {
+            text(s, x, y, color, shadow);
+            return;
+        }
+        int over = w - maxW, scrollMs = over * 30, period = 1400 + scrollMs + 1400;
+        long ph = t % period;
+        int off = ph < 1400 ? 0 : ph < 1400 + scrollMs ? (int) ((ph - 1400) / 30) : over;
+        c.save();
+        c.clipRect(x, y - 2, x + maxW, y + LINE + 3);
+        text(s, x - off, y, color, shadow);
+        c.restore();
+    }
+
     /** 文字をscale倍のドットで描く（時計やタイトル用）。 */
     void big(String s, int x, int y, int scale, int color, int shadow) {
         String key = s + '|' + color + '|' + shadow;

@@ -245,9 +245,9 @@ final class Wired {
         String rec = name.toUpperCase() + " REC.";
         int ty = y + 44;
         p.rect(cx - 90, ty + 8, 180, 1, 0x607CF4E8);
-        int rw = p.width(rec) + 12;
+        int maxW = Math.max(60, rx * 2 + 20), rw = Math.min(p.width(rec), maxW) + 12;
         p.rect(cx - rw / 2, ty, rw, 16, 0xE007061A);
-        p.textCenter(rec, cx, ty, CYAN, 0);
+        p.marquee(rec, cx - (rw - 12) / 2, ty, maxW, CYAN, 0, t);
     }
 
     /** 選んでいる印：四隅のかぎかっこが少し呼吸する。 */
@@ -417,8 +417,8 @@ final class Wired {
         String id = nodeId(a, count);
         p.text(id, x + 6, y + 50, sel ? CYAN : 0xFF4A4868, 0);
         p.rect(x + 70, y + 56, 3, 2, sel || (t / 500) % 2 == 0 ? CYAN : 0xFF2A4A50);
-        String name = p.fit(a.label, 84);
-        p.textCenter(name, x + 39, y + 71, sel ? TEXT : SUB, 0);
+        if (sel) p.marquee(a.label, x + 39 - Math.min(42, p.width(a.label) / 2), y + 71, 84, TEXT, 0, t);
+        else p.textCenter(p.fit(a.label, 84), x + 39, y + 71, SUB, 0);
         if (sel) brackets(p, x + 39, y + 34, 40, t);
     }
 

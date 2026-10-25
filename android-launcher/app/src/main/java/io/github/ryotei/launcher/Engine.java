@@ -103,6 +103,8 @@ final class Engine {
     private String msg = "";
     private long msgStart = -1;
     private boolean msgInstant;
+    private int msgPage;
+    private boolean homeHinted;
 
     // タッチ
     private boolean down, dragging, longFired, scrollbarDrag;
@@ -198,7 +200,13 @@ final class Engine {
         menu = null;
         down = false;
         if (returnMode == 0) {
-            if (screen == HOME && replaceKey == null && flySlot < 0) describe(cursor, true);
+            if (!homeHinted && screen == HOME && !host.isDefaultHome()) {
+                homeHinted = true;
+                say(w("メニューの「メインの ホームに する」で\nいつでも ここに もどってこられるよ。",
+                        "> リテ「ここを メインの ホームに して？」\n> メニューの「メインの ホームに する」から"), false);
+            } else if (screen == HOME && replaceKey == null && flySlot < 0) {
+                describe(cursor, true);
+            }
             return;
         }
         if (returnMode == 1 && flySlot >= 0) {
@@ -488,6 +496,7 @@ final class Engine {
         msg = text;
         msgStart = -1;
         msgInstant = instant;
+        msgPage = 0;
     }
 
     private String greeting() {
@@ -514,11 +523,11 @@ final class Engine {
     /** カーソルを合わせたまち（ノード）の説明。 */
     private void describe(int i, boolean instant) {
         if (wired) {
-            if (i == TownMap.NET && net.hasFigure()) say("> リテ「…よんだ？」\n> もういちど タップで さがしもの", instant);
-            else if (i == TownMap.NET) say("> ROOT / すべての いりぐち\n> もういちど タップで ひらく", instant);
-            else if (slotApps[i] == null) say("> からっぽの ノード\n> もういちど タップで つなぐ", instant);
-            else say("> " + p.fit(slotApps[i].label, 120) + " / " + Wired.nodeId(slotApps[i], count(slotApps[i]))
-                    + "\n> もういちど タップで せつぞく", instant);
+            if (i == TownMap.NET && net.hasFigure()) say("> リテ「…よんだ？」\n> もういちど おすと さがす", instant);
+            else if (i == TownMap.NET) say("> ROOT / すべての いりぐち\n> もういちど おすと ひらく", instant);
+            else if (slotApps[i] == null) say("> からっぽの ノード\n> もういちど おすと つなぐ", instant);
+            else say("> " + slotApps[i].label + " / " + Wired.nodeId(slotApps[i], count(slotApps[i]))
+                    + "\n> もういちど おすと せつぞく", instant);
             return;
         }
         if (i == TownMap.NET) {
@@ -616,7 +625,7 @@ final class Engine {
         cursor = i;
         host.sfx(Host.SFX_LEVEL);
         if (screen == APPS) go(HOME);
-        say(w(townName(i, 200) + "が\nタウンマップに のった！", "> あたらしい ノード " + Wired.nodeId(a, count(a)) + "\n> " + p.fit(a.label, 200) + " と つながった。"), false);
+        say(w(townName(i, 200) + "が\nタウンマップに のった！", "> あたらしい ノード " + Wired.nodeId(a, count(a)) + "\n> " + a.label + " と つながった。"), false);
     }
 
     // ================================================================ タッチ
@@ -765,7 +774,21 @@ final class Engine {
 
     private void tapHome(int x, int y) {
         if (inside(x, y, msgBox())) {
-            msgInstant = true;
+            int[] b = msgBox();
+            List<String> lines = wrap(msg, b[2] - 28);
+            int pages = (lines.size() + 1) / 2;
+            if (!msgInstant && (int) ((t - msgStart) / 18) < pageChars(lines)) {
+                msgInstant = true;
+            } else if (msgPage + 1 < pages) {
+                msgPage++;
+                msgStart = -1;
+                msgInstant = false;
+                host.sfx(Host.SFX_CURSOR);
+            } else if (pages > 1) {
+                msgPage = 0;
+                msgStart = -1;
+                msgInstant = false;
+            }
             return;
         }
         int[] b = wired ? wiredButtons() : buttons();
@@ -877,14 +900,15 @@ final class Engine {
 
     private void openMenu() {
         String[] labels = {w("チップフォルダ", "ディレクトリ"), "せかい：" + (wired ? "WIRED" : "GBA"), "サウンド：" + (host.getInt("sound", 1) == 1 ? "ON" : "OFF"),
-                "オープニング：" + (host.getInt("opening", 1) == 1 ? "ON" : "OFF"), "いつもの ホームへ", "ホームアプリ", "たんまつせってい",
+                "オープニング：" + (host.getInt("opening", 1) == 1 ? "ON" : "OFF"), "いつもの ホームへ",
+                host.isDefaultHome() ? "ホームアプリ" : "メインの ホームに する", "たんまつせってい",
                 "レポート", "とじる"};
         int[] ids = {M_APPS, M_WORLD, M_SOUND, M_OP, M_OTHER_HOME, M_HOMESET, M_SETTINGS, M_SAVE, M_CLOSE};
         Menu m = new Menu();
         m.title = w("MENU", "> menu");
         m.labels = labels;
         m.ids = ids;
-        m.w = Math.min(vw - 12, 176);
+        m.w = Math.min(vw - 12, 200);
         m.h = labels.length * 18 + 34;
         m.x = vw - 6 - m.w;
         m.y = wired ? 50 : nameBox()[1] + nameBox()[3] + 4;
@@ -956,7 +980,8 @@ final class Engine {
             case M_HOMESET:
                 menu = null;
                 host.sfx(Host.SFX_OK);
-                host.openHomeSettings();
+                if (host.isDefaultHome()) host.openHomeSettings();
+                else host.requestDefaultHome();
                 return;
             case M_SETTINGS:
                 menu = null;
@@ -1191,7 +1216,7 @@ final class Engine {
         drawHud();
         int[] nb = nameBox();
         window(nb);
-        p.text(townName(cursor, nb[2] - 22), nb[0] + 10, nb[1] + 7, th.text, th.shadow);
+        p.marquee(townName(cursor, 9999), nb[0] + 10, nb[1] + 7, nb[2] - 22, th.text, th.shadow, t);
         int[] b = buttons();
         smallButton(b[0], b[1], b[2], b[3], "MENU");
         smallButton(b[4], b[5], b[6], b[7], "APPS");
@@ -1254,26 +1279,39 @@ final class Engine {
         p.textRight(num, right, b[1] + 6, th.text, th.shadow);
     }
 
+    /** いまのページ（2行ぶん）の文字数。 */
+    private int pageChars(List<String> lines) {
+        int n = 0;
+        for (int i = msgPage * 2; i < Math.min(lines.size(), msgPage * 2 + 2); i++) n += lines.get(i).length();
+        return n;
+    }
+
+    /** メッセージ窓。2行に入らない文は▼を出し、タップで次のページへ送る。 */
     private void drawMessage(int[] b) {
         window(b);
         int maxW = b[2] - 28;
         List<String> lines = wrap(msg, maxW);
+        int pages = Math.max(1, (lines.size() + 1) / 2);
+        if (msgPage >= pages) msgPage = 0;
         int shown = msgInstant ? Integer.MAX_VALUE : (int) ((t - msgStart) / 18);
-        int used = 0, total = 0;
-        for (int i = 0; i < Math.min(2, lines.size()); i++) {
-            String line = lines.get(i);
-            total += line.length();
+        int used = 0;
+        for (int i = 0; i < 2; i++) {
+            int li = msgPage * 2 + i;
+            if (li >= lines.size()) break;
+            String line = lines.get(li);
             int n = Math.max(0, Math.min(line.length(), shown - used));
             used += line.length();
             if (n > 0) p.text(line.substring(0, n), b[0] + 12, b[1] + 9 + i * 18, th.text, th.shadow);
         }
-        if (shown >= total) {
-            if (th.wired) {
-                if ((t / 500) % 2 == 0) p.rect(b[0] + b[2] - 16, b[1] + b[3] - 18, 6, 10, th.accent);
-            } else {
-                int bob = (int) ((t / 400) % 2);
-                p.arrowDown(b[0] + b[2] - 18, b[1] + b[3] - 13 + bob, th.accent);
-            }
+        if (shown < pageChars(lines)) return;
+        boolean more = msgPage + 1 < pages;
+        int bob = (int) ((t / 400) % 2);
+        if (more) {
+            p.arrowDown(b[0] + b[2] - 18, b[1] + b[3] - 13 + bob, th.wired ? Wired.PURPLE : th.accent);
+        } else if (th.wired) {
+            if ((t / 500) % 2 == 0) p.rect(b[0] + b[2] - 16, b[1] + b[3] - 18, 6, 10, th.accent);
+        } else if (pages == 1) {
+            p.arrowDown(b[0] + b[2] - 18, b[1] + b[3] - 13 + bob, th.accent);
         }
     }
 
@@ -1517,11 +1555,13 @@ final class Engine {
                     String id = Wired.nodeId(a, count(a));
                     int idW = p.width(id);
                     p.image(net.mono(a), left + 12, y + 2, 16, 16);
-                    p.text(p.fit(a.label, right - left - 40 - idW - 6), left + 32, y + 2, textColor, 0);
+                    if (sel) p.marquee(a.label, left + 32, y + 2, right - left - 40 - idW - 6, textColor, 0, t);
+                    else p.text(p.fit(a.label, right - left - 40 - idW - 6), left + 32, y + 2, textColor, 0);
                     p.text(id, right - 2 - idW, y + 2, sel ? th.rowSelText : th.dim, 0);
                 } else {
                     p.image(a.icon16, left + 12, y + 2, 16, 16);
-                    p.text(p.fit(a.label, right - left - 40 - 24), left + 32, y + 2, textColor, shadow);
+                    if (sel) p.marquee(a.label, left + 32, y + 2, right - left - 40 - 24, textColor, shadow, t);
+                    else p.text(p.fit(a.label, right - left - 40 - 24), left + 32, y + 2, textColor, shadow);
                     p.rect(right - 19, y + 2, 17, 16, th.chip);
                     p.textCenter(a.code, right - 10, y + 2, th.chipText, 0);
                 }
@@ -1561,7 +1601,7 @@ final class Engine {
         p.textCenter(a.code, cx + 12, cy + 56, th.chipText, 0);
         int n = count(a);
         int tx = cx + 72, w = b[0] + b[2] - 10 - tx;
-        p.text(p.fit(a.label, w), tx, cy + 1, th.text, th.shadow);
+        p.marquee(a.label, tx, cy + 1, w, th.text, th.shadow, t);
         p.text("CODE " + a.code + "  Lv" + level(n), tx, cy + 19, th.chip, th.shadow);
         p.text(n + "かい プラグイン", tx, cy + 37, th.dim, 0);
         String hint = pickSlot >= 0 ? "タップで のせる" : slotOf(a) >= 0 ? "マップに のっている" : "ながおしで メニュー";

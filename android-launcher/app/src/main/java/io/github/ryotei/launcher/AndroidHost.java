@@ -126,6 +126,34 @@ final class AndroidHost implements Host {
     }
 
     @Override
+    public void requestDefaultHome() {
+        if (android.os.Build.VERSION.SDK_INT >= 29) {
+            android.app.role.RoleManager rm = activity.getSystemService(android.app.role.RoleManager.class);
+            if (rm != null && rm.isRoleAvailable(android.app.role.RoleManager.ROLE_HOME)
+                    && !rm.isRoleHeld(android.app.role.RoleManager.ROLE_HOME)) {
+                try {
+                    activity.startActivityForResult(rm.createRequestRoleIntent(android.app.role.RoleManager.ROLE_HOME), 7);
+                    return;
+                } catch (ActivityNotFoundException ignored) {
+                }
+            }
+        }
+        openHomeSettings();
+    }
+
+    @Override
+    public boolean isDefaultHome() {
+        if (android.os.Build.VERSION.SDK_INT >= 29) {
+            android.app.role.RoleManager rm = activity.getSystemService(android.app.role.RoleManager.class);
+            if (rm != null && rm.isRoleAvailable(android.app.role.RoleManager.ROLE_HOME))
+                return rm.isRoleHeld(android.app.role.RoleManager.ROLE_HOME);
+        }
+        ResolveInfo ri = activity.getPackageManager().resolveActivity(
+                new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME), PackageManager.MATCH_DEFAULT_ONLY);
+        return ri != null && ri.activityInfo != null && activity.getPackageName().equals(ri.activityInfo.packageName);
+    }
+
+    @Override
     public boolean openOtherHome() {
         PackageManager pm = activity.getPackageManager();
         Intent home = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME);

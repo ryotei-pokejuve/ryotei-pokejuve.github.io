@@ -68,13 +68,15 @@ public final class Video {
         tap(4300, 135, 300);                   // 起動ログのあとタップ
         tapNode(6400, 1);                      // YouTubeのカプセルを選ぶ
         tapNode(8400, 10);                     // リテを選ぶ
-        tapNode(10400, 10);                    // もう一度で検索
+        tap(9700, 135, 540);                   // メッセージをタップして続きを読む
+        tapNode(10600, 10);                    // もう一度で検索
         type(12000, "か");                     // キーボードで入力していく
         type(12600, "かめ");
         type(13400, "カメラ");
         tap(15200, 49, 205);                  // 見つかったモニターをタップ
         evs.add(new Ev(16800, 9, 0, 0));       // 戻ってくる
         tapNode(18600, 10);                    // 回る軌道の中のリテ
+        tap(19800, 185, 34);                   // [MENU]
     }
 
     public static void main(String[] args) throws Exception {

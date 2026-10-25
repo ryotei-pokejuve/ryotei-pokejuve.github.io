@@ -33,6 +33,12 @@ interface Host {
 
     void openHomeSettings();
 
+    /** このランチャーをメインのホームにするようAndroidに頼む（確認画面が出る）。 */
+    void requestDefaultHome();
+
+    /** いまメインのホームになっているか。 */
+    boolean isDefaultHome();
+
     /** 標準のホームは変えずに、端末にもとからあるホームアプリをその場で開く。見つからなければfalse。 */
     boolean openOtherHome();
 

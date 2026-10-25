@@ -102,6 +102,8 @@ public final class PreviewBridge implements Host {
     @Override public void openSettings() {}
     @Override public void openHomeSettings() {}
     @Override public boolean openOtherHome() { return true; }
+    @Override public void requestDefaultHome() {}
+    @Override public boolean isDefaultHome() { return false; }
     /** assets フォルダの場所（Video が設定する）。 */
     public static java.io.File assets;
     @Override public Bitmap loadImage(String path) {
