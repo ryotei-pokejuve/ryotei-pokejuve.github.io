@@ -114,6 +114,7 @@ public final class PreviewBridge implements Host {
         }
     }
     @Override public void showKeyboard(boolean show) {}
+    @Override public void clearInput() {}
     public void setQuery(String q) { engine.setQuery(q); }
     @Override public void openClock() {}
     @Override public boolean expandNotifications() { return true; }

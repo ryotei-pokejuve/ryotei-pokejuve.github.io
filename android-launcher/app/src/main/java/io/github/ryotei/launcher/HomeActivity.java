@@ -56,7 +56,9 @@ public final class HomeActivity extends Activity {
         // 検索の文字はこの見えない入力欄で受け取り、表示はEngineが自前で描く
         input = new EditText(this);
         input.setAlpha(0f);
+        input.setFocusable(true);
         input.setFocusableInTouchMode(true);
+        input.setShowSoftInputOnFocus(true);
         input.setSingleLine(true);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         input.setImeOptions(EditorInfo.IME_ACTION_SEARCH | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
@@ -80,9 +82,19 @@ public final class HomeActivity extends Activity {
         });
         FrameLayout root = new FrameLayout(this);
         root.addView(view, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        root.addView(input, new FrameLayout.LayoutParams(1, 1, Gravity.BOTTOM));
+        root.addView(input, new FrameLayout.LayoutParams(4, 4, Gravity.BOTTOM | Gravity.START));
         setContentView(root);
-        host.keyboard = this::showKeyboard;
+        host.keyboard = new AndroidHost.Keyboard() {
+            @Override
+            public void show(boolean show) {
+                showKeyboard(show);
+            }
+
+            @Override
+            public void clear() {
+                clearInput();
+            }
+        };
 
         registerReceiver(batteryReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         IntentFilter pf = new IntentFilter();
@@ -95,12 +107,24 @@ public final class HomeActivity extends Activity {
         host.reload();
     }
 
+    private void clearInput() {
+        input.setText("");
+    }
+
     private void showKeyboard(boolean show) {
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         if (show) {
-            input.setText("");
             input.requestFocus();
-            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+            // タップの処理中に呼ぶと無視されることがあるので、入力欄がつながるのを少し待ってから出す
+            input.postDelayed(() -> {
+                input.requestFocus();
+                if (android.os.Build.VERSION.SDK_INT >= 30 && input.getWindowInsetsController() != null) {
+                    input.getWindowInsetsController().show(android.view.WindowInsets.Type.ime());
+                }
+                if (!imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)) {
+                    imm.showSoftInput(input, InputMethodManager.SHOW_FORCED);
+                }
+            }, 120);
         } else {
             imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
             input.clearFocus();

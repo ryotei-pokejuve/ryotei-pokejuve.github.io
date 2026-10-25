@@ -72,4 +72,7 @@ interface Host {
 
     /** 検索の文字入力用にキーボードを出す／しまう。入力は Engine.setQuery に届く。 */
     void showKeyboard(boolean show);
+
+    /** 検索の入力欄を空にする。 */
+    void clearInput();
 }

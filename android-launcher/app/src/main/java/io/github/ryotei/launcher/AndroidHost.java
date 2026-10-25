@@ -259,6 +259,8 @@ final class AndroidHost implements Host {
     /** キーボードの出し入れは Activity にまかせる。 */
     interface Keyboard {
         void show(boolean show);
+
+        void clear();
     }
 
     Keyboard keyboard;
@@ -266,6 +268,11 @@ final class AndroidHost implements Host {
     @Override
     public void showKeyboard(boolean show) {
         if (keyboard != null) keyboard.show(show);
+    }
+
+    @Override
+    public void clearInput() {
+        if (keyboard != null) keyboard.clear();
     }
 
     void release() {

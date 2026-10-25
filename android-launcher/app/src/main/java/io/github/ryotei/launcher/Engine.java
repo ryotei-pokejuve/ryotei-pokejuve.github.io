@@ -170,6 +170,7 @@ final class Engine {
         scroll = 0;
         host.sfx(Host.SFX_MENU);
         go(APPS);
+        host.clearInput();
         host.showKeyboard(true);
     }
 
@@ -755,6 +756,10 @@ final class Engine {
         }
         if (screen == HOME) {
             tapHome(x, y);
+            return;
+        }
+        if (searchMode && inside(x, y, searchBox())) {
+            host.showKeyboard(true); // キーボードを閉じてしまっても、ここを押せばまた出る
             return;
         }
         int[] hd = headerBox();
