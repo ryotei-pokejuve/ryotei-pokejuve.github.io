@@ -142,6 +142,14 @@ final class AndroidHost implements Host {
     }
 
     @Override
+    public void setLiveWallpaper() {
+        Intent i = new Intent(android.app.WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
+                .putExtra(android.app.WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
+                        new ComponentName(activity, RiteWallpaper.class));
+        if (!start(i)) start(new Intent(android.app.WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER));
+    }
+
+    @Override
     public boolean isDefaultHome() {
         if (android.os.Build.VERSION.SDK_INT >= 29) {
             android.app.role.RoleManager rm = activity.getSystemService(android.app.role.RoleManager.class);

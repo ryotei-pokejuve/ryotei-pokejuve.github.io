@@ -88,6 +88,10 @@ public final class Video {
         long end = !endArg.isEmpty() ? Long.parseLong(endArg) : "WIRED".equals(args.length > 3 ? args[3] : "") ? 25000 : 30000;
 
         String world = args.length > 3 ? args[3] : "GBA";
+        if ("WALL".equals(world)) {
+            PreviewBridge.wallpaperFrames(tf, out, 12000, VW, VH);
+            return;
+        }
         if ("WIRED".equals(world)) wiredScript();
         else gbaScript();
 

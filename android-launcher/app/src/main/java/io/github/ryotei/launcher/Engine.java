@@ -24,7 +24,7 @@ final class Engine {
     static final int LAYERS = 5;
 
     private static final int M_APPS = 1, M_SOUND = 3, M_OP = 4, M_HOMESET = 5, M_SETTINGS = 6, M_SAVE = 7,
-            M_CLOSE = 8, M_WORLD = 9, M_OTHER_HOME = 10, C_OPEN = 20, C_SWAP = 21, C_REMOVE = 22, C_INFO = 23, C_ADD = 24, C_UNINSTALL = 25,
+            M_CLOSE = 8, M_WORLD = 9, M_OTHER_HOME = 10, M_WALLPAPER = 11, C_OPEN = 20, C_SWAP = 21, C_REMOVE = 22, C_INFO = 23, C_ADD = 24, C_UNINSTALL = 25,
             C_CANCEL = 26;
     private static final String[] TABS = {"すべて", "よくつかう", "さいきん"};
     private static final String[] WIRED_TABS = {"all", "freq", "recent"};
@@ -945,10 +945,10 @@ final class Engine {
 
     private void openMenu() {
         String[] labels = {w("チップフォルダ", "ディレクトリ"), "せかい：" + (wired ? "WIRED" : "GBA"), "サウンド：" + (host.getInt("sound", 1) == 1 ? "ON" : "OFF"),
-                "オープニング：" + (host.getInt("opening", 1) == 1 ? "ON" : "OFF"), "いつもの ホームへ",
+                "オープニング：" + (host.getInt("opening", 1) == 1 ? "ON" : "OFF"), "ライブかべがみ", "いつもの ホームへ",
                 host.isDefaultHome() ? "ホームアプリ" : "メインの ホームに する", "たんまつせってい",
                 "レポート", "とじる"};
-        int[] ids = {M_APPS, M_WORLD, M_SOUND, M_OP, M_OTHER_HOME, M_HOMESET, M_SETTINGS, M_SAVE, M_CLOSE};
+        int[] ids = {M_APPS, M_WORLD, M_SOUND, M_OP, M_WALLPAPER, M_OTHER_HOME, M_HOMESET, M_SETTINGS, M_SAVE, M_CLOSE};
         Menu m = new Menu();
         m.title = w("MENU", "> menu");
         m.labels = labels;
@@ -1019,6 +1019,11 @@ final class Engine {
                 host.putInt("opening", host.getInt("opening", 1) == 1 ? 0 : 1);
                 host.sfx(Host.SFX_OK);
                 openMenu();
+                return;
+            case M_WALLPAPER:
+                menu = null;
+                host.sfx(Host.SFX_OK);
+                host.setLiveWallpaper();
                 return;
             case M_OTHER_HOME:
                 menu = null;

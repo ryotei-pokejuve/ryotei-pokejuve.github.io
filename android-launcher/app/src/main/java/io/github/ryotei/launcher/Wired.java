@@ -482,11 +482,16 @@ final class Wired {
 
     /** 真ん中に立つリテの絵を、軌道の大きさに合わせて用意する。色ずれ用に青緑と赤紫の影も作っておく。 */
     void setFigure(Bitmap full) {
+        setFigure(full, Math.max(80, Math.min(ry * 2 + 90, 330)));
+    }
+
+    /** 高さを指定して用意する（ライブ壁紙では大きめに置く）。 */
+    void setFigure(Bitmap full, int height) {
         if (full == null) {
             rite = null;
             return;
         }
-        riteH = Math.max(80, Math.min(ry * 2 + 90, 330));
+        riteH = height;
         riteW = Math.max(1, full.getWidth() * riteH / full.getHeight());
         riteX = cx - riteW / 2;
         riteY = cy - riteH / 2 + 4;
@@ -501,6 +506,11 @@ final class Wired {
                 riteMag.setPixel(x, y, ((a * 6 / 10) << 24) | 0xF040B0);
             }
         }
+    }
+
+    /** 選択の印なしでリテだけを描く（ライブ壁紙用）。 */
+    void drawFigure(Pix p, long t) {
+        if (rite != null) figure(p, t, false);
     }
 
     boolean hasFigure() {

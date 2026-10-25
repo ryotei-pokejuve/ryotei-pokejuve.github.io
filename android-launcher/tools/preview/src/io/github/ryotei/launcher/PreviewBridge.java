@@ -81,6 +81,22 @@ public final class PreviewBridge implements Host {
 
     public void resume() { engine.onResume(); }
 
+    /** ライブ壁紙の画面だけを連番PNGで書き出す。 */
+    public static void wallpaperFrames(Typeface tf, java.io.File out, long end, int w, int h) throws java.io.IOException {
+        Bitmap rite = Bitmap.fromImage(javax.imageio.ImageIO.read(new java.io.File(assets, "images/rite_full.png")));
+        WallpaperScene scene = new WallpaperScene(new Pix(tf), rite);
+        scene.resize(w, h);
+        Bitmap fb = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(fb);
+        int n = 0;
+        for (long t = 0; t <= end; t += 33) {
+            scene.frame(c, t + 1000);
+            java.awt.image.BufferedImage big = new java.awt.image.BufferedImage(w * 2, h * 2, java.awt.image.BufferedImage.TYPE_INT_RGB);
+            big.getGraphics().drawImage(fb.img, 0, 0, w * 2, h * 2, null);
+            javax.imageio.ImageIO.write(big, "png", new java.io.File(out, String.format("f%05d.png", n++)));
+        }
+    }
+
     /** WIREDのノードの画面上の中心（ゆっくり回っているので時刻ごとに違う）。 */
     public int[] nodeCenter(int i, long t) {
         try {
@@ -103,6 +119,7 @@ public final class PreviewBridge implements Host {
     @Override public void openHomeSettings() {}
     @Override public boolean openOtherHome() { return true; }
     @Override public void requestDefaultHome() {}
+    @Override public void setLiveWallpaper() {}
     @Override public boolean isDefaultHome() { return false; }
     /** assets フォルダの場所（Video が設定する）。 */
     public static java.io.File assets;

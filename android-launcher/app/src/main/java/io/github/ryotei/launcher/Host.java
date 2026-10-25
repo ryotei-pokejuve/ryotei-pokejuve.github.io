@@ -36,6 +36,9 @@ interface Host {
     /** このランチャーをメインのホームにするようAndroidに頼む（確認画面が出る）。 */
     void requestDefaultHome();
 
+    /** WIREDのライブ壁紙を設定する画面を開く。 */
+    void setLiveWallpaper();
+
     /** いまメインのホームになっているか。 */
     boolean isDefaultHome();
 
