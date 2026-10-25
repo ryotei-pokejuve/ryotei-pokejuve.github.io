@@ -2,14 +2,13 @@ package io.github.ryotei.launcher;
 
 import android.graphics.Bitmap;
 
-/** フィールドを歩くキャラクターのドット絵（16x20、オリジナル）。文字1つが1ドット。 */
+/** 主人公のドット絵（16x20、オリジナル）。文字1つが1ドット。タイトル画面とタウンマップのアイコンに使う。 */
 final class Sprites {
     private Sprites() {
     }
 
     /** 色の割り当て：o=線 C=帽子 W=白 H=髪 S=肌 E=目 J=服 P=ズボン B=くつ */
     static final int[] HERO = {0xFF303030, 0xFFF08030, 0xFFF8F8F8, 0xFF583018, 0xFFF8D0A8, 0xFF202020, 0xFF3878D0, 0xFF485060, 0xFFD04030};
-    static final int[] VILLAGER = {0xFF303030, 0xFFE05878, 0xFFF8F8F8, 0xFFA05828, 0xFFF8D0A8, 0xFF202020, 0xFF58B060, 0xFF706048, 0xFF805028};
     private static final String KEYS = "oCWHSEJPB";
 
     private static final String[] DOWN = {
@@ -105,6 +104,19 @@ final class Sprites {
         }
         for (int f = 0; f < 3; f++) out[3][f] = make(LEFT, f == 0 ? SIDE_STAND : SIDE_STEP, pal, true, false);
         return out;
+    }
+
+    /** タウンマップに置く顔アイコン（16x11、正面の帽子と顔）。 */
+    static Bitmap head(int[] pal) {
+        Bitmap b = Bitmap.createBitmap(16, 11, Bitmap.Config.ARGB_8888);
+        for (int y = 0; y < 11; y++) {
+            String row = y < 10 ? DOWN[y] : "....oooooooo....";
+            for (int x = 0; x < 16; x++) {
+                int k = KEYS.indexOf(row.charAt(x));
+                b.setPixel(x, y, k < 0 ? 0 : pal[k]);
+            }
+        }
+        return b;
     }
 
     private static Bitmap make(String[] body, String[] legs, int[] pal, boolean mirrorAll, boolean mirrorLegs) {

@@ -1,5 +1,6 @@
 package io.github.ryotei.launcher;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
 import java.util.ArrayList;
@@ -10,35 +11,30 @@ import java.util.List;
 
 /**
  * ランチャー本体。GBAくらいの低解像度キャンバスに全部を描き、タッチを「ゲームの操作」として扱う。
- * ホームはRPGのフィールド（お気に入りアプリ＝いえ）、メニューとアプリ一覧は電脳風のチップフォルダ。
+ * ホームはRPGのタウンマップ（お気に入りアプリ＝まち）、メニューとアプリ一覧は電脳風のチップフォルダ。
  * Android固有の処理は Host 越しに呼ぶので、このクラスは android.graphics 以外に依存しない。
  */
 final class Engine {
     static final int BOOT = 0, HOME = 1, APPS = 2;
-    static final int SLOTS = 6;
+    /** お気に入りのまちの数（ネットシティは含まない）。 */
+    static final int SLOTS = 10;
 
     private static final int M_APPS = 1, M_SOUND = 3, M_OP = 4, M_HOMESET = 5, M_SETTINGS = 6, M_SAVE = 7,
             M_CLOSE = 8, C_OPEN = 20, C_SWAP = 21, C_REMOVE = 22, C_INFO = 23, C_ADD = 24, C_UNINSTALL = 25,
             C_CANCEL = 26;
-    private static final int ACT_NONE = 0, ACT_ENTER = 1, ACT_LOT = 2, ACT_TALK = 3;
     private static final String[] TABS = {"すべて", "よくつかう", "さいきん"};
     private static final String[] WEEK = {"日", "月", "火", "水", "木", "金", "土"};
-    private static final String[] TIPS = {
-            "うえに スワイプすると\nチップフォルダが ひらくよ！",
-            "いえを ながおしすると\nたてかえたり できるんだって！",
-            "あきちの たてふだを しらべると\nあたらしい いえが たつよ！",
-            "きみ じしんを タップすると\nメニューが ひらくよ！",
-            "したに スワイプすると\nおしらせが みられるよ！",
-            "いえに たくさん はいると\nレベルが あがるらしいよ！",
-    };
     private static final long LONG_PRESS = 450;
+    private static final long FLY_MS = 700;
     private static final int SLOP = 6;
     private static final int ROW = 20;
 
     private final Host host;
     private final Pix p;
     private final Scenery scenery = new Scenery();
-    private final Overworld world = new Overworld();
+    private final TownMap map = new TownMap();
+    private final Bitmap[][] hero = Sprites.actor(Sprites.HERO);
+    private final Bitmap heroHead = Sprites.head(Sprites.HERO);
     private Theme th = Theme.FIELD;
     private int vw = 270, vh = 520;
     int screen;
@@ -52,17 +48,15 @@ final class Engine {
     private List<AppEntry> recent = Collections.emptyList();
     private boolean listsDirty = true;
 
-    // ホーム（フィールド）
+    // ホーム（タウンマップ）
     private final String[] slots = new String[SLOTS];
     private final AppEntry[] slotApps = new AppEntry[SLOTS];
-    private int houseHover = -1;
+    private final int[] levels = new int[SLOTS];
+    private int cursor;
+    private int here;
     private String replaceKey;
-    private int action = ACT_NONE, actionSlot = -1;
-    private int tipIndex;
-    private int enterSlot = -1;
-    private long enterStart;
-    private int openDoor = -1;
-    private long doorCloseAt;
+    private int flySlot = -1;
+    private long flyStart;
 
     // チップフォルダ
     private int tab = 0;
@@ -103,17 +97,19 @@ final class Engine {
     private long launchAt;
     private long plugStart = -10000;
     private AppEntry plugApp;
-    private int returnMode; // 0=なし 1=いえから 2=チップフォルダから
+    private int returnMode; // 0=なし 1=まちから 2=チップフォルダから
     private String levelUpMsg;
     private long saveAt = -1;
-    private float fade; // 0=なし 1=真っ暗
-    private int fadeDir; // 1=暗くする -1=明るくする
+    private float fade; // 0=なし 1=真っ白
+    private int fadeDir; // 1=白くする -1=戻す
     private long fadeStart = -1;
 
     Engine(Host host, Pix pix) {
         this.host = host;
         this.p = pix;
         for (int i = 0; i < SLOTS; i++) slots[i] = host.getString("slot" + i, "");
+        here = Math.max(0, Math.min(TownMap.NET, host.getInt("here", TownMap.NET)));
+        cursor = here;
         screen = host.getInt("opening", 1) == 1 ? BOOT : HOME;
         if (screen == HOME) say(greeting(), true);
     }
@@ -121,7 +117,8 @@ final class Engine {
     void resize(int w, int h) {
         vw = w;
         vh = h;
-        world.layout(vw, vh, hudBox()[1] + hudBox()[3] + 2, msgBox()[1] - 2);
+        int[] f = mapFrame();
+        map.layout(f[0] + 6, f[1] + 6, f[2] - 12, f[3] - 12);
     }
 
     // ================================================================ ライフサイクル
@@ -130,17 +127,15 @@ final class Engine {
         menu = null;
         down = false;
         if (returnMode == 0) {
-            if (screen == HOME && replaceKey == null && enterSlot < 0) say(greeting(), true);
+            if (screen == HOME && replaceKey == null && flySlot < 0) describe(cursor, true);
             return;
         }
-        if (returnMode == 1 && enterSlot >= 0) {
-            int i = enterSlot;
-            world.player.place(world.doorX[i], world.frontY(i), 0);
-            world.player.hidden = false;
-            openDoor = i;
-            doorCloseAt = -1; // 次のフレームで決める
+        if (returnMode == 1 && flySlot >= 0) {
+            here = flySlot;
+            cursor = flySlot;
+            host.putInt("here", here);
+            flySlot = -1;
             startFade(-1);
-            enterSlot = -1;
         }
         returnMode = 0;
         screen = HOME;
@@ -157,7 +152,7 @@ final class Engine {
 
     /** ホーム画面表示中にもう一度ホームボタンが押された。 */
     void homePressed() {
-        if (enterSlot >= 0 || pendingLaunch != null) return;
+        if (busy()) return;
         menu = null;
         replaceKey = null;
         if (screen == BOOT) {
@@ -167,6 +162,9 @@ final class Engine {
             pickSlot = -1;
             host.sfx(Host.SFX_CANCEL);
             go(HOME);
+            say(greeting(), true);
+        } else {
+            cursor = here;
             say(greeting(), true);
         }
     }
@@ -190,7 +188,7 @@ final class Engine {
     }
 
     private boolean busy() {
-        return nextScreen >= 0 || pendingLaunch != null || enterSlot >= 0 || fadeStart >= 0 || fade > 0;
+        return nextScreen >= 0 || pendingLaunch != null || flySlot >= 0 || fadeStart >= 0 || fade > 0;
     }
 
     // ================================================================ 1フレーム
@@ -201,18 +199,13 @@ final class Engine {
         lastFrame = now;
         if (msgStart < 0) msgStart = t;
         if (fadeStart == -2) fadeStart = t;
-        if (openDoor >= 0 && doorCloseAt == -1) doorCloseAt = t + 450;
         p.c = canvas;
         syncApps();
         update(dt);
 
-        if (screen == BOOT) {
-            drawBoot();
-        } else if (screen == HOME) {
-            drawHome();
-        } else {
-            drawApps();
-        }
+        if (screen == BOOT) drawBoot();
+        else if (screen == HOME) drawHome();
+        else drawApps();
         if (menu != null) drawMenu(menu);
         drawEffects();
     }
@@ -228,11 +221,14 @@ final class Engine {
             fade = fadeDir > 0 ? k : 1 - k;
             if (k >= 1f) fadeStart = -1;
         }
-        if (openDoor >= 0 && enterSlot < 0 && doorCloseAt > 0 && t >= doorCloseAt) openDoor = -1;
-        if (screen == HOME) {
-            world.update(t);
-            if (action != ACT_NONE && !world.player.busy()) arrive();
-            if (enterSlot >= 0) updateEnter();
+        if (flySlot >= 0 && returnMode == 0) {
+            long e = t - flyStart;
+            if (e >= FLY_MS && fadeDir != 1) startFade(1);
+            if (e >= FLY_MS + 330 && pendingLaunch == null) {
+                pendingLaunch = slotApps[flySlot];
+                launchAt = t;
+                returnMode = 1;
+            }
         }
         if (pendingLaunch != null && t >= launchAt) {
             AppEntry app = pendingLaunch;
@@ -242,12 +238,9 @@ final class Engine {
                 levelUpMsg = null;
                 returnMode = 0;
                 host.sfx(Host.SFX_ERROR);
-                if (enterSlot >= 0) {
-                    world.player.place(world.doorX[enterSlot], world.frontY(enterSlot), 0);
-                    world.player.hidden = false;
-                    openDoor = enterSlot;
-                    doorCloseAt = t + 450;
-                    enterSlot = -1;
+                if (flySlot >= 0) {
+                    here = flySlot;
+                    flySlot = -1;
                     startFade(-1);
                 }
                 say("あれ？ その アプリは\nひらけなかった…", false);
@@ -292,6 +285,7 @@ final class Engine {
         for (int i = 0; i < SLOTS; i++) {
             String k = slots[i];
             slotApps[i] = k == null || k.isEmpty() ? null : byKey.get(k);
+            levels[i] = slotApps[i] == null ? 0 : level(count(slotApps[i]));
         }
     }
 
@@ -302,7 +296,7 @@ final class Engine {
                 "com.android.vending", "com.google.android.apps.maps"};
         int n = 0;
         for (String pkg : wanted) {
-            if (n >= SLOTS - 1) break; // 1軒はあき地にしておく
+            if (n >= SLOTS - 2) break; // いくつかはあき地にしておく
             for (AppEntry a : all) {
                 if (a.pkg.equals(pkg)) {
                     slots[n++] = a.key;
@@ -343,13 +337,28 @@ final class Engine {
         return Math.min(100, (int) Math.sqrt(count) + 1);
     }
 
+    /** まちの名前。よく使うほど「タウン」から「シティ」に育つ。 */
+    private String townName(int i, int maxW) {
+        if (i == TownMap.NET) return "ネットシティ";
+        AppEntry a = slotApps[i];
+        if (a == null) return "？？？";
+        String suffix = levels[i] >= 5 ? "シティ" : "タウン";
+        return p.fit(a.label, maxW - p.width(suffix)) + suffix;
+    }
+
     private void countLaunch(AppEntry a) {
         int before = count(a);
         host.putInt("n:" + a.key, before + 1);
         host.putLong("t:" + a.key, host.now());
         listsDirty = true;
         int lv = level(before + 1);
-        levelUpMsg = lv > level(before) && lv > 1 ? p.fit(a.label, 150) + "の レベルが\n" + lv + "に あがった！" : null;
+        if (lv > level(before) && lv > 1) {
+            String name = p.fit(a.label, 150);
+            levelUpMsg = lv == 5 && slotOf(a) >= 0 ? name + "タウンが\n" + name + "シティに なった！"
+                    : name + "の レベルが\n" + lv + "に あがった！";
+        } else {
+            levelUpMsg = null;
+        }
     }
 
     private int slotOf(AppEntry a) {
@@ -361,6 +370,7 @@ final class Engine {
         slots[i] = key == null ? "" : key;
         host.putString("slot" + i, slots[i]);
         slotApps[i] = slots[i].isEmpty() ? null : byKey.get(slots[i]);
+        levels[i] = slotApps[i] == null ? 0 : level(count(slotApps[i]));
     }
 
     // ================================================================ メッセージ
@@ -377,9 +387,21 @@ final class Engine {
         if (host.charging()) return "じゅうでん ちゅう…\nHPが すこしずつ かいふく！";
         int h = hour();
         if (h >= 5 && h <= 10) return "おはよう！ RYOTEI。\nきょうは どこへ いく？";
-        if (h >= 11 && h <= 16) return "RYOTEIは あたりを\nみわたした。 どこへ いく？";
+        if (h >= 11 && h <= 16) return "タウンマップを ひろげた。\nどこへ いこうかな？";
         if (h >= 17 && h <= 20) return "ゆうがたに なってきた。\nどこかに よっていく？";
         return "よふかしは ほどほどに…\nそろそろ やすもう。";
+    }
+
+    /** カーソルを合わせたまちの説明。 */
+    private void describe(int i, boolean instant) {
+        if (i == TownMap.NET) {
+            say("でんのうせかいの いりぐち。\nもう いちど タップで はいる", instant);
+        } else if (slotApps[i] == null) {
+            say("なにも ない ばしょだ。\nもう いちど タップで つくる", instant);
+        } else {
+            int n = count(slotApps[i]);
+            say("Lv" + levels[i] + "・" + n + "かい おとずれた\nもう いちど タップで とぶ", instant);
+        }
     }
 
     private int hour() {
@@ -414,34 +436,15 @@ final class Engine {
         down = false;
     }
 
-    /** フィールドでいえの前に着いたら、ドアを開けて中に入り、暗転してアプリを起動する。 */
-    private void enter(int i) {
+    /** タウンマップで選んだまちへ飛ぶ。主人公のアイコンが空を飛び、白くなってアプリが起動する。 */
+    private void fly(int i) {
         AppEntry a = slotApps[i];
         if (a == null) return;
-        enterSlot = i;
-        enterStart = t;
-        openDoor = i;
-        world.player.dir = 1;
-        host.sfx(Host.SFX_DOOR);
-        say("RYOTEIは\n" + p.fit(a.label, 150) + "に はいった！", true);
-    }
-
-    private void updateEnter() {
-        long e = t - enterStart;
-        Overworld.Actor pl = world.player;
-        if (e >= 180 && !pl.moving && pl.y == world.frontY(enterSlot) && !pl.hidden) {
-            pl.stepMs = 220;
-            pl.forceStep(pl.x, pl.y - 1, t);
-        }
-        if (e >= 420 && !pl.hidden) {
-            pl.hidden = true;
-            startFade(1);
-        }
-        if (e >= 760 && pendingLaunch == null && returnMode == 0) {
-            pendingLaunch = slotApps[enterSlot];
-            launchAt = t;
-            returnMode = 1;
-        }
+        flySlot = i;
+        flyStart = t;
+        cursor = i;
+        host.sfx(Host.SFX_FLY);
+        say("RYOTEIは " + townName(i, 130) + "へ\nとんでいった！", true);
     }
 
     /** チップフォルダからの起動。電脳風の演出をはさむ。 */
@@ -471,42 +474,17 @@ final class Engine {
         replaceKey = a.key;
         host.sfx(Host.SFX_MENU);
         if (screen == APPS) go(HOME);
-        say("あきちが ない！\nどの いえと たてかえる？", false);
+        say("あきちが ない！\nどの まちと いれかえる？", false);
     }
 
     private void build(int i, AppEntry a) {
         int old = slotOf(a);
         if (old >= 0 && old != i) setSlot(old, slots[i]);
         setSlot(i, a.key);
+        cursor = i;
         host.sfx(Host.SFX_LEVEL);
         if (screen == APPS) go(HOME);
-        say(p.fit(a.label, 150) + "の\nいえが たった！", false);
-    }
-
-    /** 主人公が目的地に着いた。 */
-    private void arrive() {
-        int act = action, i = actionSlot;
-        action = ACT_NONE;
-        Overworld.Actor pl = world.player;
-        if (act == ACT_ENTER || act == ACT_LOT) {
-            if (pl.x != world.doorX[i] || pl.y != world.frontY(i)) return;
-            pl.dir = 1;
-            if (act == ACT_ENTER) {
-                enter(i);
-            } else {
-                host.sfx(Host.SFX_OK);
-                say("あきちだ。 たてふだに\n「いえを たてよう！」と ある。", true);
-                openApps(i);
-            }
-        } else if (act == ACT_TALK) {
-            Overworld.Actor npc = world.npc;
-            if (Math.abs(npc.x - pl.x) + Math.abs(npc.y - pl.y) != 1) return;
-            pl.face(npc.x, npc.y);
-            npc.face(pl.x, pl.y);
-            world.npcFrozenUntil = t + 2500;
-            host.sfx(Host.SFX_OK);
-            say(TIPS[tipIndex++ % TIPS.length], false);
-        }
+        say(townName(i, 200) + "が\nタウンマップに のった！", false);
     }
 
     // ================================================================ タッチ
@@ -539,7 +517,6 @@ final class Engine {
                     if (!dragging && (Math.abs(x - downX) > SLOP || Math.abs(y - downY) > SLOP)) {
                         dragging = true;
                         axis = Math.abs(x - downX) > Math.abs(y - downY) ? 2 : 1;
-                        houseHover = -1;
                     }
                     if (scrollbarDrag) {
                         scrollToBar(y);
@@ -556,7 +533,6 @@ final class Engine {
             case 2:
                 if (!down) return;
                 down = false;
-                houseHover = -1;
                 if (longFired) return;
                 if (menu != null) {
                     int hit = menuHit(menu, x, y);
@@ -577,7 +553,6 @@ final class Engine {
             default:
                 down = false;
                 scrollbarDrag = false;
-                houseHover = -1;
         }
     }
 
@@ -586,10 +561,7 @@ final class Engine {
             menu.hover = menuHit(menu, x, y);
             return;
         }
-        if (screen == HOME) {
-            houseHover = inMap(y) ? world.houseAt(world.toTileX(x), world.toTileY(y)) : -1;
-            if (houseHover >= 0) host.sfx(Host.SFX_CURSOR);
-        } else if (screen == APPS) {
+        if (screen == APPS) {
             int[] l = listBox();
             if (x >= l[0] + l[2] - 16 && y >= l[1] && y < l[1] + l[3] && maxScroll() > 0) {
                 scrollbarDrag = true;
@@ -613,10 +585,6 @@ final class Engine {
         } else if (screen == APPS && axis == 2 && Math.abs(dx) > 40) {
             setTab((tab + (dx < 0 ? 1 : TABS.length - 1)) % TABS.length);
         }
-    }
-
-    private boolean inMap(int y) {
-        return y >= hudBox()[1] + hudBox()[3] && y < msgBox()[1];
     }
 
     private void tap(int x, int y) {
@@ -664,84 +632,43 @@ final class Engine {
             host.openClock();
             return;
         }
-        if (!inMap(y)) return;
-        int tx = world.toTileX(x), ty = world.toTileY(y);
-        Overworld.Actor pl = world.player, npc = world.npc;
-        int house = world.houseAt(tx, ty);
-        if (house >= 0) {
-            if (replaceKey != null) {
-                AppEntry a = byKey.get(replaceKey);
-                replaceKey = null;
-                if (a != null) build(house, a);
-                return;
-            }
-            if (goTo(world.doorX[house], world.frontY(house))) {
-                action = slotApps[house] != null ? ACT_ENTER : ACT_LOT;
-                actionSlot = house;
-            }
+        int town = map.townAt(x, y);
+        if (town < 0) return;
+        if (replaceKey != null && town != TownMap.NET) {
+            AppEntry a = byKey.get(replaceKey);
+            replaceKey = null;
+            if (a != null) build(town, a);
             return;
         }
-        if (tx == pl.x && ty == pl.y && !pl.moving) {
-            openMenu();
+        if (town != cursor) {
+            cursor = town;
+            host.sfx(Host.SFX_CURSOR);
+            describe(town, false);
             return;
         }
-        if (tx == npc.x && ty == npc.y) {
-            int[][] around = {{npc.x, npc.y + 1}, {npc.x, npc.y - 1}, {npc.x - 1, npc.y}, {npc.x + 1, npc.y}};
-            int[] best = null;
-            int bestD = Integer.MAX_VALUE;
-            for (int[] a : around) {
-                if (world.solid(a[0], a[1])) continue;
-                int d = Math.abs(a[0] - pl.x) + Math.abs(a[1] - pl.y);
-                if (d < bestD) {
-                    bestD = d;
-                    best = a;
-                }
-            }
-            if (best != null && goTo(best[0], best[1])) {
-                action = ACT_TALK;
-                world.npcFrozenUntil = t + 4000;
-            }
-            return;
+        if (town == TownMap.NET) {
+            openApps(-1);
+        } else if (slotApps[town] == null) {
+            host.sfx(Host.SFX_OK);
+            openApps(town);
+        } else {
+            fly(town);
         }
-        int tile = world.tileAt(tx, ty);
-        if (tile == Scenery.TREE_TOP || tile == Scenery.TREE_BOTTOM) {
-            say("りっぱな きだ。\nかぜで はっぱが ゆれている。", false);
-            return;
-        }
-        if (tile == Scenery.ROCK) {
-            say("おおきな いわだ。\nびくとも しない。", false);
-            return;
-        }
-        action = ACT_NONE;
-        goTo(tx, ty);
-    }
-
-    private boolean goTo(int tx, int ty) {
-        Overworld.Actor pl = world.player;
-        if (pl.moving) {
-            // 歩いている途中なら、いまの1歩を終えてから向かう
-            pl.path.clear();
-        }
-        if (world.walk(pl, tx, ty, world.npc)) return true;
-        host.sfx(Host.SFX_ERROR);
-        say("そこへは いけない みたいだ。", true);
-        return false;
     }
 
     private void longPress(int x, int y) {
         if (menu != null) return;
         if (screen == HOME) {
-            if (!inMap(y)) return;
-            int house = world.houseAt(world.toTileX(x), world.toTileY(y));
-            houseHover = -1;
-            if (house >= 0 && slotApps[house] != null) {
-                AppEntry a = slotApps[house];
-                Menu m = contextMenu(a.label, new String[]{"はいる", "たてかえる", "とりこわす", "アプリじょうほう", "やめる"},
+            int town = map.townAt(x, y);
+            if (town >= 0 && town != TownMap.NET && slotApps[town] != null) {
+                cursor = town;
+                AppEntry a = slotApps[town];
+                Menu m = contextMenu(townName(town, 160), new String[]{"とぶ", "いれかえる", "けす", "アプリじょうほう", "やめる"},
                         new int[]{C_OPEN, C_SWAP, C_REMOVE, C_INFO, C_CANCEL});
                 m.app = a;
-                m.slot = house;
+                m.slot = town;
                 showMenu(m);
-            } else if (house < 0) {
+            } else if (town < 0 && !inside(x, y, msgBox())) {
                 openMenu();
             }
         } else if (screen == APPS) {
@@ -751,7 +678,7 @@ final class Engine {
             AppEntry a = list().get(r);
             boolean onHome = slotOf(a) >= 0;
             Menu m = contextMenu(a.label,
-                    new String[]{"プラグイン", onHome ? "ホームから はずす" : "ホームに たてる", "アプリじょうほう", "アンインストール", "やめる"},
+                    new String[]{"プラグイン", onHome ? "マップから けす" : "マップに のせる", "アプリじょうほう", "アンインストール", "やめる"},
                     new int[]{C_OPEN, onHome ? C_REMOVE : C_ADD, C_INFO, C_UNINSTALL, C_CANCEL});
             m.app = a;
             m.slot = slotOf(a);
@@ -801,7 +728,7 @@ final class Engine {
         m.w = Math.min(vw - 12, 176);
         m.h = labels.length * 18 + 34;
         m.x = vw - 6 - m.w;
-        m.y = hudBox()[1] + hudBox()[3] + 6;
+        m.y = nameBox()[1] + nameBox()[3] + 4;
         m.hover = menu != null && !menu.context ? menu.hover : 0;
         showMenu(m);
     }
@@ -817,7 +744,7 @@ final class Engine {
         m.title = p.fit(title, m.w - 20);
         m.h = labels.length * 18 + 34;
         m.x = vw - 6 - m.w;
-        m.y = Math.max(hudBox()[1] + hudBox()[3] + 4, msgBox()[1] - 4 - m.h);
+        m.y = Math.max(nameBox()[1] + nameBox()[3] + 4, msgBox()[1] - 4 - m.h);
         m.hover = 0;
         return m;
     }
@@ -845,18 +772,16 @@ final class Engine {
                 menu = null;
                 openApps(-1);
                 return;
-            case M_SOUND: {
+            case M_SOUND:
                 host.putInt("sound", host.getInt("sound", 1) == 1 ? 0 : 1);
                 host.sfx(Host.SFX_OK);
                 openMenu();
                 return;
-            }
-            case M_OP: {
+            case M_OP:
                 host.putInt("opening", host.getInt("opening", 1) == 1 ? 0 : 1);
                 host.sfx(Host.SFX_OK);
                 openMenu();
                 return;
-            }
             case M_HOMESET:
                 menu = null;
                 host.sfx(Host.SFX_OK);
@@ -876,21 +801,20 @@ final class Engine {
             case C_OPEN:
                 menu = null;
                 if (screen == APPS) plugIn(a);
-                else if (m.slot >= 0 && goTo(world.doorX[m.slot], world.frontY(m.slot))) {
-                    action = ACT_ENTER;
-                    actionSlot = m.slot;
-                }
+                else if (m.slot >= 0) fly(m.slot);
                 return;
             case C_SWAP:
                 menu = null;
                 openApps(m.slot);
                 return;
-            case C_REMOVE:
+            case C_REMOVE: {
                 menu = null;
+                String name = m.slot >= 0 ? townName(m.slot, 150) : a.label;
                 if (m.slot >= 0) setSlot(m.slot, "");
                 host.sfx(Host.SFX_CANCEL);
-                if (screen == HOME) say(p.fit(a.label, 150) + "の いえを\nとりこわした。 あきちに なった。", false);
+                if (screen == HOME) say(name + "が\nタウンマップから きえた。", false);
                 return;
+            }
             case C_ADD:
                 menu = null;
                 addToHome(a);
@@ -913,12 +837,21 @@ final class Engine {
     // ================================================================ レイアウト
 
     private int[] hudBox() {
-        return new int[]{6, 6, vw - 12 - 60, 46};
+        return new int[]{6, 6, vw - 12, 28};
+    }
+
+    private int[] nameBox() {
+        return new int[]{6, 38, vw - 12 - 100, 30};
     }
 
     private int[] buttons() {
-        int x = vw - 6 - 56;
-        return new int[]{x, 6, 56, 22, x, 30, 56, 22};
+        int x = vw - 6 - 96;
+        return new int[]{x, 40, 46, 26, x + 50, 40, 46, 26};
+    }
+
+    private int[] mapFrame() {
+        int top = 72, bottom = msgBox()[1] - 4;
+        return new int[]{6, top, vw - 12, bottom - top};
     }
 
     private int[] msgBox() {
@@ -1022,10 +955,8 @@ final class Engine {
             p.rect(sx - s, sy, s * 2 + 1, 1, 0xFFF8F8F8);
             p.rect(sx, sy - s, 1, s * 2 + 1, 0xFFF8F8F8);
         }
-        // 主人公が足踏みしている
-        Overworld.Actor hero = world.player;
         int f = (int) ((t / 250) % 4);
-        p.image(hero.frames[0][f == 1 ? 1 : f == 3 ? 2 : 0], vw / 2 - 16, vh * 50 / 100, 32, 40);
+        p.image(hero[0][f == 1 ? 1 : f == 3 ? 2 : 0], vw / 2 - 16, vh * 50 / 100, 32, 40);
         if ((t / 500) % 2 == 0) {
             String ps = "PRESS START";
             p.big(ps, (vw - p.bigWidth(ps, 2)) / 2, vh * 66 / 100, 2, 0xFFF8F8F8, shadow);
@@ -1035,14 +966,37 @@ final class Engine {
 
     private void drawHome() {
         th = Theme.FIELD;
-        world.draw(p, t, slotApps, houseHover, openDoor);
-        int h = hour();
-        if (h >= 19 || h <= 4) p.rect(0, 0, vw, vh, 0x48101848);
-        else if (h >= 17) p.rect(0, 0, vw, vh, 0x30F07830);
+        p.rect(0, 0, vw, vh, 0xFF305878);
+        for (int y = 0; y < vh; y += 4) p.rect(0, y, vw, 1, 0xFF28506E);
         drawHud();
+        int[] nb = nameBox();
+        window(nb);
+        p.text(townName(cursor, nb[2] - 22), nb[0] + 10, nb[1] + 7, th.text, th.shadow);
         int[] b = buttons();
         smallButton(b[0], b[1], b[2], b[3], "MENU");
         smallButton(b[4], b[5], b[6], b[7], "APPS");
+
+        int[] f = mapFrame();
+        p.round(f[0], f[1], f[2], f[3], 0xFF183048);
+        p.round(f[0] + 1, f[1] + 1, f[2] - 2, f[3] - 2, 0xFF58B8D0);
+        p.rect(f[0] + 3, f[1] + 3, f[2] - 6, f[3] - 6, 0xFF2C6890);
+        p.rect(f[0] + 5, f[1] + 5, f[2] - 10, f[3] - 10, 0xFF4878D8);
+        // 主人公アイコン：いる町の上。飛んでいる間は弧を描いて移動する
+        int hx = map.townX(here), hy = map.townY(here) - map.cs;
+        if (flySlot >= 0) {
+            float k = Math.min(1f, (t - flyStart) / (float) FLY_MS);
+            float e = k * k * (3 - 2 * k);
+            int tx = map.townX(flySlot), ty = map.townY(flySlot) - map.cs;
+            hx = Math.round(hx + (tx - hx) * e);
+            hy = Math.round(hy + (ty - hy) * e - (float) Math.sin(Math.PI * k) * 40);
+        }
+        map.draw(p, t, levels, flySlot >= 0 ? flySlot : cursor, heroHead, hx, hy);
+        if (replaceKey != null) {
+            String s = "いれかえる まちを えらんでね";
+            int w = p.width(s) + 16;
+            p.round(vw / 2 - w / 2, f[1] + 8, w, 20, 0xE0181818);
+            p.textCenter(s, vw / 2, f[1] + 10, 0xFFF8F8F8, 0);
+        }
         drawMessage(msgBox());
     }
 
@@ -1050,7 +1004,7 @@ final class Engine {
         p.round(x, y, w, h, th.winOuter);
         p.round(x + 1, y + 1, w - 2, h - 2, th.winFill);
         p.rect(x + 2, y + h - 3, w - 4, 1, th.shadow);
-        p.textCenter(label, x + w / 2, y + (h - Pix.LINE) / 2, th.text, th.shadow);
+        p.textCenter(label, x + w / 2, y + (h - Pix.LINE) / 2 - 1, th.text, th.shadow);
     }
 
     private void drawHud() {
@@ -1059,26 +1013,25 @@ final class Engine {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(host.now());
         int hh = cal.get(Calendar.HOUR_OF_DAY), mm = cal.get(Calendar.MINUTE);
-        String clock = (hh < 10 ? "0" : "") + hh + ((t / 500) % 2 == 0 ? ":" : " ") + (mm < 10 ? "0" : "") + mm;
-        p.big(clock, b[0] + 9, b[1] + 5, 2, th.text, th.shadow);
-        int right = b[0] + b[2] - 8;
         String date = (cal.get(Calendar.MONTH) + 1) + "/" + cal.get(Calendar.DAY_OF_MONTH) + "(" + WEEK[cal.get(Calendar.DAY_OF_WEEK) - 1] + ")";
-        p.textRight(date, right, b[1] + 6, th.text, th.shadow);
+        String clock = (hh < 10 ? "0" : "") + hh + ((t / 500) % 2 == 0 ? ":" : " ") + (mm < 10 ? "0" : "") + mm;
+        p.text(date + " " + clock, b[0] + 10, b[1] + 6, th.text, th.shadow);
+        int right = b[0] + b[2] - 8;
         int lv = host.batteryLevel();
         int pct = Math.max(0, lv);
         String num = lv < 0 ? "--" : String.valueOf(pct);
         int barRight = right - p.width("100") - 3;
-        int labelX = Math.max(b[0] + 96, barRight - 84);
-        p.round(labelX, b[1] + 25, 21, 15, th.hpLabel);
-        p.text("HP", labelX + 3, b[1] + 25, th.hpLabelText, 0);
+        int labelX = barRight - 70;
+        p.round(labelX, b[1] + 7, 21, 15, th.hpLabel);
+        p.text("HP", labelX + 3, b[1] + 7, th.hpLabelText, 0);
         int color = pct > 50 ? th.hpGreen : pct > 20 ? th.hpYellow : th.hpRed;
-        bar(labelX + 23, b[1] + 29, barRight - labelX - 23, 6, pct / 100f, color);
+        bar(labelX + 23, b[1] + 11, barRight - labelX - 23, 6, pct / 100f, color);
         if (host.charging()) {
             int bx = labelX + 24, bw = barRight - labelX - 25;
             int sx = (int) (t / 20 % (bw + 12)) - 6;
-            p.rect(bx + Math.max(0, sx), b[1] + 30, Math.max(0, Math.min(4, bw - Math.max(0, sx))), 4, 0xFFF8F8F8);
+            p.rect(bx + Math.max(0, sx), b[1] + 12, Math.max(0, Math.min(4, bw - Math.max(0, sx))), 4, 0xFFF8F8F8);
         }
-        p.textRight(num, right, b[1] + 25, th.text, th.shadow);
+        p.textRight(num, right, b[1] + 6, th.text, th.shadow);
     }
 
     private void drawMessage(int[] b) {
@@ -1108,7 +1061,7 @@ final class Engine {
         window(hd);
         p.arrowLeft(hd[0] + 10, hd[1] + 12, th.accent);
         p.text("もどる", hd[0] + 18, hd[1] + 8, th.text, th.shadow);
-        String title = pickSlot >= 0 ? "どれを たてる？" : "チップフォルダ";
+        String title = pickSlot >= 0 ? "どれを のせる？" : "チップフォルダ";
         p.textCenter(title, hd[0] + hd[2] / 2 + 8, hd[1] + 8, th.text, th.shadow);
         p.textRight(String.valueOf(l.size()), hd[0] + hd[2] - 10, hd[1] + 8, th.dim, 0);
         int tw = (hd[2] - 16) / TABS.length;
@@ -1179,7 +1132,7 @@ final class Engine {
         p.text(p.fit(a.label, w), tx, cy + 1, th.text, th.shadow);
         p.text("CODE " + a.code + "  Lv" + level(n), tx, cy + 19, th.chip, th.shadow);
         p.text(n + "かい プラグイン", tx, cy + 37, th.dim, 0);
-        String hint = pickSlot >= 0 ? "タップで たてる" : slotOf(a) >= 0 ? "ホームに いえ あり" : "ながおしで メニュー";
+        String hint = pickSlot >= 0 ? "タップで のせる" : slotOf(a) >= 0 ? "マップに のっている" : "ながおしで メニュー";
         p.text(p.fit(hint, w), tx, cy + 55, th.dim, 0);
     }
 
@@ -1211,7 +1164,7 @@ final class Engine {
             p.textCenter("プラグイン！", vw / 2, y + 9, th.chip, th.shadow);
             p.textCenter(p.fit(plugApp.label, w - 120) + " トランスミッション！", vw / 2, y + 27, th.text, th.shadow);
         }
-        if (fade > 0) p.rect(0, 0, vw, vh, ((int) (255 * Math.min(1, fade)) << 24) | 0x000000);
+        if (fade > 0) p.rect(0, 0, vw, vh, ((int) (255 * Math.min(1, fade)) << 24) | 0xF8F8F8);
         if (nextScreen >= 0) {
             float k = (t - transStart) / 300f;
             float cover = k < 0.5f ? k * 2 : (1 - k) * 2;
