@@ -37,13 +37,10 @@ public final class Video {
         evs.add(new Ev(t + n * 16 + 8, 2, x1, y1));
     }
 
-    public static void main(String[] args) throws Exception {
-        Typeface tf = Typeface.createFromFile(args[0]);
-        File out = new File(args[1]);
-        out.mkdirs();
-        long end = Long.parseLong(args.length > 2 ? args[2] : "30000");
+    /** WIREDのノードをタップ（回っているので押す瞬間の位置を使う）。 */
+    static void tapNode(long t, int node) { evs.add(new Ev(t, 7, node, 0)); evs.add(new Ev(t + 90, 6, node, 0)); }
 
-        // ---- 台本 ----
+    static void gbaScript() {
         tap(2200, 135, 300);                   // PRESS START
         tap(4500, 166, 177);                   // YouTubeタウンにカーソル
         tap(5900, 166, 177);                   // もう一度タップで飛ぶ
@@ -61,7 +58,38 @@ public final class Video {
         hold(26200, 76, 159, 700);             // まちを長押し
         tap(28400, 40, 450);                   // 閉じる
 
-        PreviewBridge b = new PreviewBridge(tf, "FIELD", VW, VH);
+    }
+
+    static void wiredScript() {
+        tap(4300, 135, 300);                   // 起動ログのあとタップ
+        tapNode(6000, 1);                      // YouTubeのノードを選ぶ
+        tapNode(7400, 1);                      // もう一度で接続
+        evs.add(new Ev(9400, 9, 0, 0));        // 戻ってくる
+        // しばらく触らずにいると声がする
+        tapNode(20000, 5);                     // からっぽのノード
+        tapNode(21300, 5);                     // もう一度でディレクトリから選ぶ
+        tap(23000, 100, 251);                  // LINEをつなぐ
+        tapNode(25000, 10);                    // ROOT
+        tapNode(26300, 10);                    // ディレクトリへ
+        swipe(27900, 135, 460, 135, 220, 120); // フリック
+        tap(29400, 100, 251);                  // 接続
+        evs.add(new Ev(30800, 9, 0, 0));       // 戻る
+        tap(32400, 185, 34);                   // [MENU]
+        tap(34400, 40, 450);                   // 閉じる
+    }
+
+    public static void main(String[] args) throws Exception {
+        Typeface tf = Typeface.createFromFile(args[0]);
+        File out = new File(args[1]);
+        out.mkdirs();
+        String endArg = args.length > 2 ? args[2] : "";
+        long end = !endArg.isEmpty() ? Long.parseLong(endArg) : "WIRED".equals(args.length > 3 ? args[3] : "") ? 36000 : 30000;
+
+        String world = args.length > 3 ? args[3] : "GBA";
+        if ("WIRED".equals(world)) wiredScript();
+        else gbaScript();
+
+        PreviewBridge b = new PreviewBridge(tf, world, VW, VH);
         Bitmap fb = Bitmap.createBitmap(VW, VH, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(fb);
         int ei = 0, frame = 0;
@@ -73,7 +101,13 @@ public final class Video {
                 long et = e.t + 1000;
                 if (e.a == 8) b.back();
                 else if (e.a == 9) b.resume();
-                else {
+                else if (e.a == 7 || e.a == 6) {
+                    int[] n = b.nodeCenter(e.x, et);
+                    b.touch(e.a == 7 ? 0 : 2, n[0], n[1], et);
+                    fingerX = n[0];
+                    fingerY = n[1];
+                    fingerUntil = e.a == 6 ? t + 150 : Long.MAX_VALUE;
+                } else {
                     b.touch(e.a, e.x, e.y, et);
                     fingerX = e.x;
                     fingerY = e.y;

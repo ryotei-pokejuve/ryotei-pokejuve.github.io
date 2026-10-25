@@ -11,7 +11,8 @@ import java.util.List;
 
 /**
  * ランチャー本体。GBAくらいの低解像度キャンバスに全部を描き、タッチを「ゲームの操作」として扱う。
- * ホームはRPGのタウンマップ（お気に入りアプリ＝まち）、メニューとアプリ一覧は電脳風のチップフォルダ。
+ * 世界は2つ。GBAではホームがRPGのタウンマップ（お気に入りアプリ＝まち）、メニューとアプリ一覧が電脳風のチップフォルダ。
+ * WIREDでは真っ暗な虚空のノードマップと、端末風のディレクトリになる。中身（お気に入り・回数）は共通。
  * Android固有の処理は Host 越しに呼ぶので、このクラスは android.graphics 以外に依存しない。
  */
 final class Engine {
@@ -20,9 +21,12 @@ final class Engine {
     static final int SLOTS = 10;
 
     private static final int M_APPS = 1, M_SOUND = 3, M_OP = 4, M_HOMESET = 5, M_SETTINGS = 6, M_SAVE = 7,
-            M_CLOSE = 8, C_OPEN = 20, C_SWAP = 21, C_REMOVE = 22, C_INFO = 23, C_ADD = 24, C_UNINSTALL = 25,
+            M_CLOSE = 8, M_WORLD = 9, C_OPEN = 20, C_SWAP = 21, C_REMOVE = 22, C_INFO = 23, C_ADD = 24, C_UNINSTALL = 25,
             C_CANCEL = 26;
     private static final String[] TABS = {"すべて", "よくつかう", "さいきん"};
+    private static final String[] WIRED_TABS = {"all", "freq", "recent"};
+    private static final String[] WHISPERS = {"…だれか いるの？", "ここは どこ？", "きこえる？", "わたしは ずっと ここに いる",
+            "つながっていない ひとなんて いない", "それは ほんとうに あなたの きおく？"};
     private static final String[] WEEK = {"日", "月", "火", "水", "木", "金", "土"};
     private static final long LONG_PRESS = 450;
     private static final long FLY_MS = 700;
@@ -33,6 +37,9 @@ final class Engine {
     private final Pix p;
     private final Scenery scenery = new Scenery();
     private final TownMap map = new TownMap();
+    private final Wired net = new Wired();
+    private boolean wired;
+    private long lastTouch;
     private final Bitmap[][] hero = Sprites.actor(Sprites.HERO);
     private final Bitmap heroHead = Sprites.head(Sprites.HERO);
     private Theme th = Theme.FIELD;
@@ -108,6 +115,7 @@ final class Engine {
         this.host = host;
         this.p = pix;
         for (int i = 0; i < SLOTS; i++) slots[i] = host.getString("slot" + i, "");
+        wired = "wired".equals(host.getString("world", "gba"));
         here = Math.max(0, Math.min(TownMap.NET, host.getInt("here", TownMap.NET)));
         cursor = here;
         screen = host.getInt("opening", 1) == 1 ? BOOT : HOME;
@@ -119,6 +127,12 @@ final class Engine {
         vh = h;
         int[] f = mapFrame();
         map.layout(f[0] + 6, f[1] + 6, f[2] - 12, f[3] - 12);
+        net.layout(6, 104, vw - 12, msgBox()[1] - 70 - 104);
+    }
+
+    /** GBAとWIREDで言い回しを変える。 */
+    private String w(String gba, String wiredText) {
+        return wired ? wiredText : gba;
     }
 
     // ================================================================ ライフサイクル
@@ -146,7 +160,7 @@ final class Engine {
             host.sfx(Host.SFX_LEVEL);
             levelUpMsg = null;
         } else {
-            say("おかえり！ RYOTEI。\nつぎは どこへ いく？", false);
+            say(w("おかえり！ RYOTEI。\nつぎは どこへ いく？", "> せつぞくを しゅうりょうした。\n> おかえりなさい、RYOTEI。"), false);
         }
     }
 
@@ -249,7 +263,7 @@ final class Engine {
         if (saveAt >= 0 && t >= saveAt) {
             saveAt = -1;
             host.sfx(Host.SFX_SAVE);
-            say("RYOTEIは レポートに\nしっかり かきこんだ！", false);
+            say(w("RYOTEIは レポートに\nしっかり かきこんだ！", "> かきこみ かんりょう。\n> あなたの きおくは ここに ある。"), false);
         }
         if (down && !dragging && !longFired && t - downT > LONG_PRESS) {
             longFired = true;
@@ -339,9 +353,10 @@ final class Engine {
 
     /** まちの名前。よく使うほど「タウン」から「シティ」に育つ。 */
     private String townName(int i, int maxW) {
-        if (i == TownMap.NET) return "ネットシティ";
+        if (i == TownMap.NET) return w("ネットシティ", "ROOT");
         AppEntry a = slotApps[i];
-        if (a == null) return "？？？";
+        if (a == null) return w("？？？", "------");
+        if (wired) return p.fit(a.label, maxW);
         String suffix = levels[i] >= 5 ? "シティ" : "タウン";
         return p.fit(a.label, maxW - p.width(suffix)) + suffix;
     }
@@ -354,7 +369,8 @@ final class Engine {
         int lv = level(before + 1);
         if (lv > level(before) && lv > 1) {
             String name = p.fit(a.label, 150);
-            levelUpMsg = lv == 5 && slotOf(a) >= 0 ? name + "タウンが\n" + name + "シティに なった！"
+            if (wired) levelUpMsg = "> " + Wired.nodeId(a, before + 1) + " どうきレベル " + lv + "\n> つながりが ふかくなった。";
+            else levelUpMsg = lv == 5 && slotOf(a) >= 0 ? name + "タウンが\n" + name + "シティに なった！"
                     : name + "の レベルが\n" + lv + "に あがった！";
         } else {
             levelUpMsg = null;
@@ -382,6 +398,7 @@ final class Engine {
     }
 
     private String greeting() {
+        if (wired) return wiredGreeting();
         int lv = host.batteryLevel();
         if (lv >= 0 && lv <= 15 && !host.charging()) return "でんちが のこり すくない！\nはやく じゅうでん しよう！";
         if (host.charging()) return "じゅうでん ちゅう…\nHPが すこしずつ かいふく！";
@@ -392,8 +409,23 @@ final class Engine {
         return "よふかしは ほどほどに…\nそろそろ やすもう。";
     }
 
-    /** カーソルを合わせたまちの説明。 */
+    private String wiredGreeting() {
+        int lv = host.batteryLevel();
+        if (lv >= 0 && lv <= 15 && !host.charging()) return "> でんげんが よわっている。\n> このままだと せつだんされる。";
+        int h = hour();
+        if (h >= 22 || h <= 4) return "> よるの WIRED は しずか。\n> だれかの こえが きこえる きがする。";
+        return "> WIRED に せつぞくした。\n> ノードを えらんで。";
+    }
+
+    /** カーソルを合わせたまち（ノード）の説明。 */
     private void describe(int i, boolean instant) {
+        if (wired) {
+            if (i == TownMap.NET) say("> ROOT / すべての いりぐち\n> もういちど タップで ひらく", instant);
+            else if (slotApps[i] == null) say("> からっぽの ノード\n> もういちど タップで つなぐ", instant);
+            else say("> " + p.fit(slotApps[i].label, 120) + " / " + Wired.nodeId(slotApps[i], count(slotApps[i]))
+                    + "\n> もういちど タップで せつぞく", instant);
+            return;
+        }
         if (i == TownMap.NET) {
             say("でんのうせかいの いりぐち。\nもう いちど タップで はいる", instant);
         } else if (slotApps[i] == null) {
@@ -444,7 +476,7 @@ final class Engine {
         flyStart = t;
         cursor = i;
         host.sfx(Host.SFX_FLY);
-        say("RYOTEIは " + townName(i, 130) + "へ\nとんでいった！", true);
+        say(w("RYOTEIは " + townName(i, 130) + "へ\nとんでいった！", "> " + Wired.nodeId(a, count(a)) + " に せつぞくちゅう…\n> うごかないで。"), true);
     }
 
     /** チップフォルダからの起動。電脳風の演出をはさむ。 */
@@ -474,7 +506,7 @@ final class Engine {
         replaceKey = a.key;
         host.sfx(Host.SFX_MENU);
         if (screen == APPS) go(HOME);
-        say("あきちが ない！\nどの まちと いれかえる？", false);
+        say(w("あきちが ない！\nどの まちと いれかえる？", "> あいている ノードが ない。\n> どれと いれかえる？"), false);
     }
 
     private void build(int i, AppEntry a) {
@@ -484,7 +516,7 @@ final class Engine {
         cursor = i;
         host.sfx(Host.SFX_LEVEL);
         if (screen == APPS) go(HOME);
-        say(townName(i, 200) + "が\nタウンマップに のった！", false);
+        say(w(townName(i, 200) + "が\nタウンマップに のった！", "> あたらしい ノード " + Wired.nodeId(a, count(a)) + "\n> " + p.fit(a.label, 200) + " と つながった。"), false);
     }
 
     // ================================================================ タッチ
@@ -497,6 +529,7 @@ final class Engine {
         }
         switch (act) {
             case 0:
+                lastTouch = time;
                 down = true;
                 dragging = false;
                 longFired = false;
@@ -520,6 +553,8 @@ final class Engine {
                     }
                     if (scrollbarDrag) {
                         scrollToBar(y);
+                    } else if (dragging && screen == HOME && wired && axis == 2) {
+                        net.spin(x - lastX);
                     } else if (dragging && screen == APPS && axis == 1) {
                         scroll -= y - lastY;
                         long dtm = Math.max(1, time - lastT);
@@ -618,7 +653,7 @@ final class Engine {
             msgInstant = true;
             return;
         }
-        int[] b = buttons();
+        int[] b = wired ? wiredButtons() : buttons();
         if (inside(x, y, b[0], b[1], b[2], b[3])) {
             openMenu();
             return;
@@ -627,12 +662,12 @@ final class Engine {
             openApps(-1);
             return;
         }
-        if (inside(x, y, hudBox())) {
+        if (wired ? y < 22 : inside(x, y, hudBox())) {
             host.sfx(Host.SFX_OK);
             host.openClock();
             return;
         }
-        int town = map.townAt(x, y);
+        int town = homeHit(x, y);
         if (town < 0) return;
         if (replaceKey != null && town != TownMap.NET) {
             AppEntry a = byKey.get(replaceKey);
@@ -656,14 +691,20 @@ final class Engine {
         }
     }
 
+    /** ホームでタップした所にあるまち（ノード）。 */
+    private int homeHit(int x, int y) {
+        return wired ? net.nodeAt(x, y, t) : map.townAt(x, y);
+    }
+
     private void longPress(int x, int y) {
         if (menu != null) return;
         if (screen == HOME) {
-            int town = map.townAt(x, y);
+            int town = homeHit(x, y);
             if (town >= 0 && town != TownMap.NET && slotApps[town] != null) {
                 cursor = town;
                 AppEntry a = slotApps[town];
-                Menu m = contextMenu(townName(town, 160), new String[]{"とぶ", "いれかえる", "けす", "アプリじょうほう", "やめる"},
+                Menu m = contextMenu(townName(town, 160), new String[]{w("とぶ", "せつぞく"), w("いれかえる", "つなぎかえる"),
+                                w("けす", "きりはなす"), "アプリじょうほう", "やめる"},
                         new int[]{C_OPEN, C_SWAP, C_REMOVE, C_INFO, C_CANCEL});
                 m.app = a;
                 m.slot = town;
@@ -678,7 +719,8 @@ final class Engine {
             AppEntry a = list().get(r);
             boolean onHome = slotOf(a) >= 0;
             Menu m = contextMenu(a.label,
-                    new String[]{"プラグイン", onHome ? "マップから けす" : "マップに のせる", "アプリじょうほう", "アンインストール", "やめる"},
+                    new String[]{w("プラグイン", "せつぞく"), onHome ? w("マップから けす", "ノードを きりはなす") : w("マップに のせる", "ノードに つなぐ"),
+                            "アプリじょうほう", "アンインストール", "やめる"},
                     new int[]{C_OPEN, onHome ? C_REMOVE : C_ADD, C_INFO, C_UNINSTALL, C_CANCEL});
             m.app = a;
             m.slot = slotOf(a);
@@ -717,18 +759,18 @@ final class Engine {
     // ================================================================ メニュー（電脳風）
 
     private void openMenu() {
-        String[] labels = {"チップフォルダ", "サウンド：" + (host.getInt("sound", 1) == 1 ? "ON" : "OFF"),
+        String[] labels = {w("チップフォルダ", "ディレクトリ"), "せかい：" + (wired ? "WIRED" : "GBA"), "サウンド：" + (host.getInt("sound", 1) == 1 ? "ON" : "OFF"),
                 "オープニング：" + (host.getInt("opening", 1) == 1 ? "ON" : "OFF"), "ホームアプリ", "たんまつせってい",
                 "レポート", "とじる"};
-        int[] ids = {M_APPS, M_SOUND, M_OP, M_HOMESET, M_SETTINGS, M_SAVE, M_CLOSE};
+        int[] ids = {M_APPS, M_WORLD, M_SOUND, M_OP, M_HOMESET, M_SETTINGS, M_SAVE, M_CLOSE};
         Menu m = new Menu();
-        m.title = "MENU";
+        m.title = w("MENU", "> menu");
         m.labels = labels;
         m.ids = ids;
         m.w = Math.min(vw - 12, 176);
         m.h = labels.length * 18 + 34;
         m.x = vw - 6 - m.w;
-        m.y = nameBox()[1] + nameBox()[3] + 4;
+        m.y = wired ? 50 : nameBox()[1] + nameBox()[3] + 4;
         m.hover = menu != null && !menu.context ? menu.hover : 0;
         showMenu(m);
     }
@@ -744,7 +786,7 @@ final class Engine {
         m.title = p.fit(title, m.w - 20);
         m.h = labels.length * 18 + 34;
         m.x = vw - 6 - m.w;
-        m.y = Math.max(nameBox()[1] + nameBox()[3] + 4, msgBox()[1] - 4 - m.h);
+        m.y = Math.max(wired ? 50 : nameBox()[1] + nameBox()[3] + 4, msgBox()[1] - 4 - m.h);
         m.hover = 0;
         return m;
     }
@@ -772,6 +814,13 @@ final class Engine {
                 menu = null;
                 openApps(-1);
                 return;
+            case M_WORLD:
+                wired = !wired;
+                host.putString("world", wired ? "wired" : "gba");
+                host.sfx(Host.SFX_OK);
+                openMenu();
+                say(w("GBA の せかいに もどってきた。\nタウンマップを ひろげた。", "> WIRED に せつぞくした。\n> ここでは なにもかもが つながっている。"), false);
+                return;
             case M_SOUND:
                 host.putInt("sound", host.getInt("sound", 1) == 1 ? 0 : 1);
                 host.sfx(Host.SFX_OK);
@@ -795,7 +844,7 @@ final class Engine {
             case M_SAVE:
                 menu = null;
                 host.sfx(Host.SFX_OK);
-                say("レポートを かきこんでいます…\nでんげんを きらないで ください。", false);
+                say(w("レポートを かきこんでいます…\nでんげんを きらないで ください。", "> きおくを かきこんでいる…\n> でんげんを きらないで。"), false);
                 saveAt = t + 1400;
                 return;
             case C_OPEN:
@@ -812,7 +861,7 @@ final class Engine {
                 String name = m.slot >= 0 ? townName(m.slot, 150) : a.label;
                 if (m.slot >= 0) setSlot(m.slot, "");
                 host.sfx(Host.SFX_CANCEL);
-                if (screen == HOME) say(name + "が\nタウンマップから きえた。", false);
+                if (screen == HOME) say(w(name + "が\nタウンマップから きえた。", "> " + name + " との\n> せつぞくを きりはなした。"), false);
                 return;
             }
             case C_ADD:
@@ -902,6 +951,16 @@ final class Engine {
 
     /** 今の th に合わせたウィンドウ。FIELDは白い角丸、CYBERは角を落とした電脳パネル。 */
     private void window(int x, int y, int w, int h) {
+        if (th.wired) {
+            p.rect(x, y, w, h, th.winFill);
+            Wired.frame(p, x, y, w, h, th.winOuter);
+            int l = Math.min(6, Math.min(w, h) / 3);
+            p.rect(x, y, l, 1, th.winFrame);
+            p.rect(x, y, 1, l, th.winFrame);
+            p.rect(x + w - l, y + h - 1, l, 1, th.winFrame);
+            p.rect(x + w - 1, y + h - l, 1, l, th.winFrame);
+            return;
+        }
         if (!th.cyber) {
             p.round(x, y, w, h, th.winOuter);
             p.round(x + 1, y + 1, w - 2, h - 2, th.winFrame);
@@ -935,6 +994,10 @@ final class Engine {
     // ================================================================ 描画：画面
 
     private void drawBoot() {
+        if (wired) {
+            drawWiredBoot();
+            return;
+        }
         th = Theme.FIELD;
         int[] bands = {0xFF0C3020, 0xFF124028, 0xFF185034, 0xFF206440, 0xFF2C784C, 0xFF3A8C5A};
         int bh = Math.max(1, vh / (bands.length * 2));
@@ -965,6 +1028,10 @@ final class Engine {
     }
 
     private void drawHome() {
+        if (wired) {
+            drawWiredHome();
+            return;
+        }
         th = Theme.FIELD;
         p.rect(0, 0, vw, vh, 0xFF305878);
         for (int y = 0; y < vh; y += 4) p.rect(0, y, vw, 1, 0xFF28506E);
@@ -1048,27 +1115,145 @@ final class Engine {
             if (n > 0) p.text(line.substring(0, n), b[0] + 12, b[1] + 9 + i * 18, th.text, th.shadow);
         }
         if (shown >= total) {
-            int bob = (int) ((t / 400) % 2);
-            p.arrowDown(b[0] + b[2] - 18, b[1] + b[3] - 13 + bob, th.accent);
+            if (th.wired) {
+                if ((t / 500) % 2 == 0) p.rect(b[0] + b[2] - 16, b[1] + b[3] - 18, 6, 10, th.accent);
+            } else {
+                int bob = (int) ((t / 400) % 2);
+                p.arrowDown(b[0] + b[2] - 18, b[1] + b[3] - 13 + bob, th.accent);
+            }
         }
     }
 
+    // ================================================================ 描画：WIRED
+
+    private int[] wiredButtons() {
+        int y = 24;
+        return new int[]{vw - 6 - 104, y, 56, 20, vw - 6 - 44, y, 44, 20};
+    }
+
+    private void drawWiredBoot() {
+        th = Theme.WIRED;
+        net.background(p, vw, vh, t);
+        String[] log = {"WIRED NAVI  ver.0.98", "", "memory ........ ok", "layer 01 ...... ok", "node map ...... ok",
+                "user: RYOTEI", "", "> タップで せつぞく"};
+        long e = t - 1000;
+        int y = vh * 30 / 100;
+        for (int i = 0; i < log.length; i++) {
+            long start = i * 380L;
+            if (e < start) break;
+            int n = Math.min(log[i].length(), (int) ((e - start) / 28));
+            int color = i == 0 ? Wired.CYAN : i == log.length - 1 ? Wired.TEXT : Wired.SUB;
+            if (i == log.length - 1 && (t / 500) % 2 == 1) color = Wired.LINE;
+            p.text(log[i].substring(0, n), 24, y + i * 20, color, 0);
+        }
+        if ((t / 400) % 2 == 0) p.rect(24, y + log.length * 20 + 4, 7, 12, Wired.CYAN);
+        Wired.noise(p, vw, vh, t, 0.04f);
+        Wired.glitch(p, vw, vh, t, 0);
+        for (int sy = 0; sy < vh; sy += 3) p.rect(0, sy, vw, 1, 0x0C96D2FF);
+    }
+
+    private void drawWiredHome() {
+        th = Theme.WIRED;
+        net.background(p, vw, vh, t);
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(host.now());
+        int hh = cal.get(Calendar.HOUR_OF_DAY), mm = cal.get(Calendar.MINUTE), ss = cal.get(Calendar.SECOND);
+        String clock = (hh < 10 ? "0" : "") + hh + ":" + (mm < 10 ? "0" : "") + mm + ":" + (ss < 10 ? "0" : "") + ss;
+        int lv = host.batteryLevel(), pct = Math.max(0, lv);
+        p.text("PWR", 8, 4, Wired.SUB, 0);
+        int segX = 8 + p.width("PWR "), segs = 10;
+        for (int i = 0; i < segs; i++) {
+            boolean on = pct > i * 10;
+            int c = !on ? Wired.LINE : pct <= 20 ? Wired.RED : host.charging() && i == (t / 150) % segs ? Wired.TEXT : Wired.CYAN;
+            p.rect(segX + i * 5, 8, 3, 9, c);
+        }
+        p.text((lv < 0 ? "--" : String.valueOf(pct)) + "%", segX + segs * 5 + 4, 4, Wired.TEXT, 0);
+        Wired.ghost(p, clock, vw - 8 - p.width(clock), 4, Wired.TEXT);
+        int[] b = wiredButtons();
+        p.text("//WIRED", 8, 26, Wired.SUB, 0);
+        p.text("[MENU]", b[0], b[1] + 2, Wired.CYAN, 0);
+        p.text("[DIR]", b[4], b[5] + 2, Wired.CYAN, 0);
+        // タイトル：LAYER 01: CONNECT_
+        Wired.ghost(p, "LAYER 01:", vw / 2 - p.width("LAYER 01:") / 2, 50, Wired.CYAN);
+        String word = "CONNECT";
+        int bw = p.bigWidth(word + "_", 2);
+        p.big(word, vw / 2 - bw / 2 + 2, 67, 2, 0x507CF4E8, 0);
+        p.big(word, vw / 2 - bw / 2, 66, 2, 0xFFD8FFF8, 0);
+        if ((t / 500) % 2 == 0) p.big("_", vw / 2 - bw / 2 + p.bigWidth(word, 2) - 4, 66, 2, 0xFFD8FFF8, 0);
+
+        int[] counts = new int[SLOTS];
+        for (int i = 0; i < SLOTS; i++) counts[i] = slotApps[i] == null ? 0 : count(slotApps[i]);
+        int sel = flySlot >= 0 ? flySlot : cursor;
+        net.drawOrbits(p, t, slotApps, counts, sel, flySlot);
+        int labelY = msgBox()[1] - 66;
+        if (sel >= 0 && sel < SLOTS && slotApps[sel] != null) {
+            net.label(p, labelY, Wired.nodeId(slotApps[sel], counts[sel]), slotApps[sel].label, t);
+        } else if (sel == Wired.ROOT) {
+            net.label(p, labelY, "Root000", "ALL NODES", t);
+        }
+        // しばらく触らないと、どこからか声がする
+        if (t - lastTouch > 8000 && menu == null && flySlot < 0) {
+            long cycle = t / 9000, ph = t % 9000;
+            if (ph < 2600) {
+                String wsp = WHISPERS[(int) (cycle % WHISPERS.length)];
+                java.util.Random r = new java.util.Random(cycle * 31);
+                int a = (int) (150 * Math.sin(Math.PI * ph / 2600.0));
+                int x = 10 + r.nextInt(Math.max(1, vw - 20 - p.width(wsp)));
+                int y = 110 + r.nextInt(Math.max(1, msgBox()[1] - 200));
+                p.text(wsp, x + 1, y, (a / 3 << 24) | 0x7CF4E8, 0);
+                p.text(wsp, x, y, (a << 24) | 0x9C7CF0, 0);
+            }
+        }
+        if (replaceKey != null) p.textCenter("> つなぎかえる ものを えらんで", vw / 2, 92, Wired.PURPLE, 0);
+        Wired.glitch(p, vw, vh, t, 0);
+        if (flySlot >= 0) {
+            AppEntry a = slotApps[flySlot];
+            float k = Math.min(1f, (t - flyStart) / (float) FLY_MS);
+            if (a != null) net.connecting(p, vw, vh, t, Wired.nodeId(a, count(a)), a.label, k);
+        }
+        drawMessage(msgBox());
+    }
+
+    private void drawWiredPreview(List<AppEntry> l, int[] b) {
+        int cx = b[0] + 10, cy = b[1] + 9;
+        Wired.frame(p, cx, cy, 62, 74, th.winOuter);
+        net.brackets(p, cx + 31, cy + 31, 27, 0);
+        if (l.isEmpty() || listCursor >= l.size()) {
+            p.text("> ながおしで メニュー", cx + 72, cy + 2, th.dim, 0);
+            return;
+        }
+        AppEntry a = l.get(listCursor);
+        p.image(net.mono(a), cx + 7, cy + 7, 48, 48);
+        int n = count(a);
+        String id = Wired.nodeId(a, n);
+        p.textCenter(id, cx + 31, cy + 56, Wired.CYAN, 0);
+        int tx = cx + 72, w = b[0] + b[2] - 10 - tx;
+        p.text(p.fit(a.label, w), tx, cy + 1, th.text, 0);
+        p.text("access " + n, tx, cy + 19, Wired.PURPLE, 0);
+        p.text(p.fit(a.pkg, w), tx, cy + 37, th.dim, 0);
+        String hint = pickSlot >= 0 ? "> タップで つなぐ" : slotOf(a) >= 0 ? "> ノード せつぞくずみ" : "> ながおしで メニュー";
+        p.text(p.fit(hint, w), tx, cy + 55, th.dim, 0);
+    }
+
     private void drawApps() {
-        th = Theme.CYBER;
-        scenery.drawCyber(p, vw, vh, t);
+        th = wired ? Theme.WIRED : Theme.CYBER;
+        if (wired) net.background(p, vw, vh, t);
+        else scenery.drawCyber(p, vw, vh, t);
+        String[] tabs = wired ? WIRED_TABS : TABS;
         List<AppEntry> l = list();
         int[] hd = headerBox();
         window(hd);
         p.arrowLeft(hd[0] + 10, hd[1] + 12, th.accent);
         p.text("もどる", hd[0] + 18, hd[1] + 8, th.text, th.shadow);
-        String title = pickSlot >= 0 ? "どれを のせる？" : "チップフォルダ";
+        String title = pickSlot >= 0 ? w("どれを のせる？", "> select node") : w("チップフォルダ", "/wired/root");
         p.textCenter(title, hd[0] + hd[2] / 2 + 8, hd[1] + 8, th.text, th.shadow);
         p.textRight(String.valueOf(l.size()), hd[0] + hd[2] - 10, hd[1] + 8, th.dim, 0);
         int tw = (hd[2] - 16) / TABS.length;
         for (int i = 0; i < TABS.length; i++) {
             int tx = hd[0] + 8 + i * tw;
-            if (i == tab) p.chamfer(tx + 1, hd[1] + 26, tw - 2, 17, 3, th.tabSel);
-            p.textCenter(TABS[i], tx + tw / 2, hd[1] + 27, i == tab ? th.tabSelText : th.dim, 0);
+            if (i == tab && th.wired) p.rect(tx + 1, hd[1] + 26, tw - 2, 17, th.tabSel);
+            else if (i == tab) p.chamfer(tx + 1, hd[1] + 26, tw - 2, 17, 3, th.tabSel);
+            p.textCenter(tabs[i], tx + tw / 2, hd[1] + 27, i == tab ? th.tabSelText : th.dim, 0);
         }
         drawPreview(l);
 
@@ -1079,7 +1264,7 @@ final class Engine {
         if (host.appsLoading() && all.isEmpty()) {
             p.textCenter("よみこみちゅう…", vw / 2, top + ih / 2 - 8, th.dim, 0);
         } else if (l.isEmpty()) {
-            p.textCenter(tab == 0 ? "チップが みつからない…" : "まだ なにも ない…", vw / 2, top + ih / 2 - 8, th.dim, 0);
+            p.textCenter(tab == 0 ? w("チップが みつからない…", "> no node") : w("まだ なにも ない…", "> empty"), vw / 2, top + ih / 2 - 8, th.dim, 0);
         } else {
             p.c.save();
             p.c.clipRect(left, top, right, top + ih);
@@ -1094,16 +1279,25 @@ final class Engine {
                     p.rect(left, y, right - left, ROW, th.rowSel);
                     p.arrowRight(left + 3, y + 7, th.rowSelText);
                 }
-                p.image(a.icon16, left + 12, y + 2, 16, 16);
-                p.text(p.fit(a.label, right - left - 40 - 24), left + 32, y + 2, textColor, shadow);
-                p.rect(right - 19, y + 2, 17, 16, th.chip);
-                p.textCenter(a.code, right - 10, y + 2, th.chipText, 0);
-                if (slotOf(a) >= 0) p.rect(right - 23, y + 8, 2, 4, sel ? th.rowSelText : th.accent);
+                if (th.wired) {
+                    String id = Wired.nodeId(a, count(a));
+                    int idW = p.width(id);
+                    p.image(net.mono(a), left + 12, y + 2, 16, 16);
+                    p.text(p.fit(a.label, right - left - 40 - idW - 6), left + 32, y + 2, textColor, 0);
+                    p.text(id, right - 2 - idW, y + 2, sel ? th.rowSelText : th.dim, 0);
+                } else {
+                    p.image(a.icon16, left + 12, y + 2, 16, 16);
+                    p.text(p.fit(a.label, right - left - 40 - 24), left + 32, y + 2, textColor, shadow);
+                    p.rect(right - 19, y + 2, 17, 16, th.chip);
+                    p.textCenter(a.code, right - 10, y + 2, th.chipText, 0);
+                }
+                if (slotOf(a) >= 0 && !th.wired) p.rect(right - 23, y + 8, 2, 4, sel ? th.rowSelText : th.accent);
+                if (slotOf(a) >= 0 && th.wired) p.rect(left + 8, y + 9, 2, 2, sel ? th.rowSelText : Wired.PURPLE);
             }
             p.c.restore();
             int max = maxScroll();
             int sx = lb[0] + lb[2] - 12;
-            p.rect(sx, top, 4, ih, 0xFF0A1C34);
+            p.rect(sx, top, 4, ih, th.wired ? 0xFF0A1020 : 0xFF0A1C34);
             if (max > 0) {
                 int thumb = Math.max(14, ih * ih / (l.size() * ROW));
                 p.rect(sx, top + Math.round((ih - thumb) * (scroll / max)), 4, thumb, th.accent);
@@ -1115,6 +1309,10 @@ final class Engine {
     private void drawPreview(List<AppEntry> l) {
         int[] b = previewBox();
         window(b);
+        if (th.wired) {
+            drawWiredPreview(l, b);
+            return;
+        }
         int cx = b[0] + 10, cy = b[1] + 9;
         p.chamfer(cx, cy, 62, 74, 4, th.chip);
         p.chamfer(cx + 2, cy + 2, 58, 70, 3, 0xFF183868);
@@ -1137,10 +1335,15 @@ final class Engine {
     }
 
     private void drawMenu(Menu m) {
-        th = Theme.CYBER;
+        th = wired ? Theme.WIRED : Theme.CYBER;
         window(m.x, m.y, m.w, m.h);
-        p.rect(m.x + 6, m.y + 6, m.w - 12, 17, th.winFrame);
-        p.text(m.title, m.x + 12, m.y + 6, th.chip, th.shadow);
+        if (th.wired) {
+            p.rect(m.x + 6, m.y + 22, m.w - 12, 1, th.winOuter);
+            p.text(m.title, m.x + 10, m.y + 5, th.accent, 0);
+        } else {
+            p.rect(m.x + 6, m.y + 6, m.w - 12, 17, th.winFrame);
+            p.text(m.title, m.x + 12, m.y + 6, th.chip, th.shadow);
+        }
         for (int i = 0; i < m.labels.length; i++) {
             int y = m.y + 27 + i * 18;
             boolean sel = i == m.hover;
@@ -1154,7 +1357,10 @@ final class Engine {
 
     private void drawEffects() {
         long pl = t - plugStart;
-        if (plugApp != null && pl >= 0 && pl < 700) {
+        if (wired && plugApp != null && pl >= 0 && pl < 700 && screen == APPS) {
+            net.connecting(p, vw, vh, t, Wired.nodeId(plugApp, count(plugApp)), plugApp.label, Math.min(1f, pl / 500f));
+            if (pl > 450) Wired.noise(p, vw, vh, t, (pl - 450) / 250f);
+        } else if (plugApp != null && pl >= 0 && pl < 700) {
             th = Theme.CYBER;
             int a = (int) (200 * Math.max(0, 1 - pl / 700f));
             p.rect(0, 0, vw, vh, (a << 24) | 0x60E0FF);
@@ -1164,12 +1370,15 @@ final class Engine {
             p.textCenter("プラグイン！", vw / 2, y + 9, th.chip, th.shadow);
             p.textCenter(p.fit(plugApp.label, w - 120) + " トランスミッション！", vw / 2, y + 27, th.text, th.shadow);
         }
-        if (fade > 0) p.rect(0, 0, vw, vh, ((int) (255 * Math.min(1, fade)) << 24) | 0xF8F8F8);
+        if (fade > 0) {
+            p.rect(0, 0, vw, vh, ((int) (255 * Math.min(1, fade)) << 24) | (wired ? 0x030408 : 0xF8F8F8));
+            if (wired) Wired.noise(p, vw, vh, t, fade * 0.8f);
+        }
         if (nextScreen >= 0) {
             float k = (t - transStart) / 300f;
             float cover = k < 0.5f ? k * 2 : (1 - k) * 2;
             int sh = Math.round(8 * Math.max(0, Math.min(1, cover)));
-            int color = nextScreen == APPS || screen == APPS ? 0xFF48E0F8 : 0xFF101010;
+            int color = wired ? 0xFF030408 : nextScreen == APPS || screen == APPS ? 0xFF48E0F8 : 0xFF101010;
             for (int y = 0; y < vh; y += 8) p.rect(0, y, vw, sh, color);
         }
     }

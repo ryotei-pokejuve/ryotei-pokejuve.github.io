@@ -8,6 +8,7 @@ GBAのRPGで遊んでいるような見た目の、Android用ホームアプリ�
 - 上部は時計と電池残量（HPバー）、下部はメッセージウィンドウ（1文字ずつ出る）
 - **メニューとアプリ一覧は電脳風**：アプリ一覧は「チップフォルダ」。名前の頭文字がチップコードになり、起動すると「プラグイン！ ○○ トランスミッション！」
 - 効果音は矩形波のピコピコ音（メニューでON/OFF）
+- **もうひとつの世界「WIRED」**（メニューの「せかい」で切り替え）：藍色の暗がりの真ん中に古いCRTモニターがあり、紫のカプセル（お気に入りアプリ）が傾いた楕円軌道でゆっくり回る。カプセルには `You015` のような記号的なIDが付き、選んだアプリはティール単色でモニターに映る。もう一度タップで接続（起動）、モニターをタップするとディレクトリ（アプリ一覧）。横ドラッグで軌道を回せる。しばらく触らずにいると、どこからか声がする
 
 画像・フォント以外の素材はすべてコードで描画しており、既存ゲームの画像は使っていない。フォントは [DotGothic16](https://github.com/fontworks-fonts/DotGothic16)（SIL Open Font License、`app/src/main/assets/fonts/OFL.txt`）。
 
@@ -38,9 +39,10 @@ GBAのRPGで遊んでいるような見た目の、Android用ホームアプリ�
 ## 構成
 
 - `Engine.java` … 画面・操作・演出のまとめ役。約270ドット幅の低解像度キャンバスに描き、整数倍で拡大表示する
+- `Wired.java` … WIREDの世界（背景・軌道とカプセル・モニター・グリッチや砂嵐の演出）
 - `TownMap.java` / `Sprites.java` … タウンマップの地形（文字列で描いた地図）・道・まちの印と、主人公のドット絵
 - `Scenery.java` / `Theme.java` / `Pix.java` … 背景タイル、配色、ドット描画の道具
 - `HomeActivity.java` / `GameView.java` / `AndroidHost.java` / `Sfx.java` / `PixelIcon.java` … Android側（アプリ一覧・起動・電池・効果音・アイコンのドット絵化）
-- `tools/preview/` … Android SDKなしで、台本どおりに操作した画面を連番PNGに書き出す確認ツール（`sh tools/preview/run.sh 出力先`。動画化の方法はスクリプト内に記載）
+- `tools/preview/` … Android SDKなしで、台本どおりに操作した画面を連番PNGに書き出す確認ツール（`sh tools/preview/run.sh 出力先 [GBA|WIRED]`。動画化の方法はスクリプト内に記載）
 
 署名鍵はリポジトリに置いていない。GitHub Actionsが初回ビルドで鍵を作ってキャッシュに保存し、以降はそれで署名する（同じ鍵なので上書き更新できる）。キャッシュは7日間ビルドが無いと消えることがあり、その後のビルドは鍵が変わって「アプリが競合」と出る（いったんアンインストールすれば入る）。確実にしたい場合は自分で鍵を作り、リポジトリの Settings → Secrets に `LAUNCHER_KEYSTORE_B64`（keystoreをbase64にしたもの、エイリアスは `ryotei`）と `LAUNCHER_KEYSTORE_PASSWORD` を登録する。

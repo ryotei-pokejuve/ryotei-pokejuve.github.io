@@ -1,8 +1,9 @@
 package io.github.ryotei.launcher;
 
-/** 2種類の見た目。FIELDは草むらとRPGの白いウィンドウ、CYBERは電脳グリッドと角を落としたパネル。 */
+/** 見た目の配色。FIELDはRPGの白いウィンドウ、CYBERは角を落とした電脳パネル、WIREDは虚空に細い線だけの端末。 */
 final class Theme {
     final boolean cyber;
+    final boolean wired;
     final String name;
 
     int text, shadow, dim;
@@ -16,15 +17,13 @@ final class Theme {
 
     private Theme(boolean cyber, String name) {
         this.cyber = cyber;
+        this.wired = "WIRED".equals(name);
         this.name = name;
     }
 
     static final Theme FIELD = field();
     static final Theme CYBER = cyber();
-
-    static Theme byName(String name) {
-        return "CYBER".equals(name) ? CYBER : FIELD;
-    }
+    static final Theme WIRED = wired();
 
     private static Theme field() {
         Theme t = new Theme(false, "FIELD");
@@ -99,6 +98,44 @@ final class Theme {
         t.chip = 0xFFF8D830;
         t.chipText = 0xFF181008;
         t.accent = 0xFFF89818;
+        return t;
+    }
+
+    private static Theme wired() {
+        Theme t = new Theme(true, "WIRED");
+        t.text = 0xFFE8F8F8;
+        t.shadow = 0;
+        t.dim = 0xFF7A86B0;
+        t.winOuter = 0xFF3A2C70;
+        t.winFrame = 0xFF7CF4E8;
+        t.winInner = 0xFF3A2C70;
+        t.winFill = 0xE007061A;
+        t.panelEdge = 0xFF3A2C70;
+        t.panelFill = 0xFF070A14;
+        t.panelHi = 0xFF5A64E0;
+        t.panelText = 0xFFE8F8F8;
+        t.panelShadow = 0;
+        t.selEdge = 0xFF7CF4E8;
+        t.selFill = 0xFF0A1830;
+        t.selHi = 0xFF7CF4E8;
+        t.emptyEdge = 0xFF1A2640;
+        t.emptyFill = 0xFF05070E;
+        t.cursor = 0xFF07061A;
+        t.rowSel = 0xFF7CF4E8;
+        t.rowSelText = 0xFF07061A;
+        t.tabSel = 0xFF7CF4E8;
+        t.tabSelText = 0xFF07061A;
+        t.hpLabel = 0xFF07061A;
+        t.hpLabelText = 0xFF7CF4E8;
+        t.barFrame = 0xFF3A2C70;
+        t.barBack = 0xFF07061A;
+        t.hpGreen = 0xFF7CF4E8;
+        t.hpYellow = 0xFF9C7CF0;
+        t.hpRed = 0xFFFF4868;
+        t.exp = 0xFF5A64E0;
+        t.chip = 0xFF9C7CF0;
+        t.chipText = 0xFF07061A;
+        t.accent = 0xFF7CF4E8;
         return t;
     }
 }

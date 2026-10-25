@@ -17,7 +17,7 @@ public final class PreviewBridge implements Host {
     public boolean launched;
 
     public PreviewBridge(Typeface tf, String theme, int w, int h) {
-        prefs.put("theme", theme);
+        if ("WIRED".equals(theme)) prefs.put("world", "wired");
         String[][] list = {
                 {"com.android.chrome", "Chrome"}, {"com.google.android.youtube", "YouTube"},
                 {"com.google.android.apps.photos", "フォト"}, {"com.google.android.GoogleCamera", "カメラ"},
@@ -80,6 +80,18 @@ public final class PreviewBridge implements Host {
     public void back() { engine.back(); }
 
     public void resume() { engine.onResume(); }
+
+    /** WIREDのノードの画面上の中心（ゆっくり回っているので時刻ごとに違う）。 */
+    public int[] nodeCenter(int i, long t) {
+        try {
+            java.lang.reflect.Field f = Engine.class.getDeclaredField("net");
+            f.setAccessible(true);
+            Wired w = (Wired) f.get(engine);
+            return new int[]{w.nodeX(i, t), w.nodeY(i, t)};
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override public List<AppEntry> apps() { return apps; }
     @Override public int appsVersion() { return 1; }
